@@ -1,0 +1,408 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2026-08-07 16:17:56.925408",
+ "description": "A complaint against one physical pump. Enter the serial and everything else fills itself.",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "serial_no",
+  "warranty_status_html",
+  "sb_snap",
+  "pump_model",
+  "hp",
+  "phase",
+  "manufacturing_date",
+  "cb1",
+  "dealer",
+  "sale_date",
+  "warranty_expiry_date",
+  "is_under_warranty",
+  "cb1b",
+  "end_customer_name",
+  "end_customer_mobile",
+  "is_repeat_failure",
+  "sb_complaint",
+  "complaint_category",
+  "priority",
+  "reported_on",
+  "cb2",
+  "status",
+  "assigned_technician",
+  "service_centre",
+  "sb_desc",
+  "complaint_description",
+  "sb_sla",
+  "response_due_on",
+  "first_response_on",
+  "cb3",
+  "resolution_due_on",
+  "resolved_on",
+  "cb3b",
+  "sla_status",
+  "sb_res",
+  "resolution_summary",
+  "root_cause",
+  "linked_claim",
+  "sb_hist",
+  "service_history_html",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "default": "SR-.YY.-.#####",
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Series",
+   "options": "SR-.YY.-.#####",
+   "print_hide": 1,
+   "reqd": 1
+  },
+  {
+   "bold": 1,
+   "fieldname": "serial_no",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Serial No",
+   "options": "Serial No",
+   "reqd": 1
+  },
+  {
+   "fieldname": "warranty_status_html",
+   "fieldtype": "HTML",
+   "label": "Warranty"
+  },
+  {
+   "fieldname": "sb_snap",
+   "fieldtype": "Section Break",
+   "label": "Pump Snapshot"
+  },
+  {
+   "fieldname": "pump_model",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Pump Model",
+   "options": "Pump Model",
+   "read_only": 1
+  },
+  {
+   "fieldname": "hp",
+   "fieldtype": "Float",
+   "label": "HP",
+   "read_only": 1
+  },
+  {
+   "fieldname": "phase",
+   "fieldtype": "Data",
+   "label": "Phase",
+   "read_only": 1
+  },
+  {
+   "fieldname": "manufacturing_date",
+   "fieldtype": "Date",
+   "label": "Manufacturing Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cb1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "dealer",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Dealer",
+   "options": "Dealer",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sale_date",
+   "fieldtype": "Date",
+   "label": "Sale Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "warranty_expiry_date",
+   "fieldtype": "Date",
+   "label": "Warranty Expiry",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_under_warranty",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Under Warranty",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cb1b",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "end_customer_name",
+   "fieldtype": "Data",
+   "label": "Customer",
+   "read_only": 1
+  },
+  {
+   "fieldname": "end_customer_mobile",
+   "fieldtype": "Data",
+   "label": "Mobile",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_repeat_failure",
+   "fieldtype": "Check",
+   "label": "Repeat Failure",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_complaint",
+   "fieldtype": "Section Break",
+   "label": "Complaint"
+  },
+  {
+   "fieldname": "complaint_category",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Category",
+   "options": "No Discharge\nLow Discharge\nMotor Burnt\nNoise & Vibration\nLeakage\nTripping\nSeal Failure\nBearing Failure\nImpeller Damage\nCable Fault\nInstallation Issue\nOther",
+   "reqd": 1
+  },
+  {
+   "default": "Medium",
+   "fieldname": "priority",
+   "fieldtype": "Select",
+   "in_standard_filter": 1,
+   "label": "Priority",
+   "options": "Low\nMedium\nHigh\nCritical"
+  },
+  {
+   "default": "now",
+   "fieldname": "reported_on",
+   "fieldtype": "Datetime",
+   "label": "Reported On",
+   "reqd": 1
+  },
+  {
+   "fieldname": "cb2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Open",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Open\nAssigned\nIn Progress\nAwaiting Parts\nResolved\nClosed\nCancelled"
+  },
+  {
+   "fieldname": "assigned_technician",
+   "fieldtype": "Link",
+   "label": "Technician",
+   "options": "Service Technician"
+  },
+  {
+   "fieldname": "service_centre",
+   "fieldtype": "Link",
+   "label": "Service Centre",
+   "options": "Dealer"
+  },
+  {
+   "fieldname": "sb_desc",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "complaint_description",
+   "fieldtype": "Text",
+   "label": "Complaint Description",
+   "reqd": 1
+  },
+  {
+   "fieldname": "sb_sla",
+   "fieldtype": "Section Break",
+   "label": "SLA"
+  },
+  {
+   "fieldname": "response_due_on",
+   "fieldtype": "Datetime",
+   "label": "Response Due",
+   "read_only": 1
+  },
+  {
+   "fieldname": "first_response_on",
+   "fieldtype": "Datetime",
+   "label": "First Response"
+  },
+  {
+   "fieldname": "cb3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "resolution_due_on",
+   "fieldtype": "Datetime",
+   "label": "Resolution Due",
+   "read_only": 1
+  },
+  {
+   "fieldname": "resolved_on",
+   "fieldtype": "Datetime",
+   "label": "Resolved On"
+  },
+  {
+   "fieldname": "cb3b",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Ongoing",
+   "fieldname": "sla_status",
+   "fieldtype": "Select",
+   "in_standard_filter": 1,
+   "label": "SLA Status",
+   "options": "Ongoing\nResponded\nFulfilled\nFailed",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_res",
+   "fieldtype": "Section Break",
+   "label": "Resolution"
+  },
+  {
+   "fieldname": "resolution_summary",
+   "fieldtype": "Text",
+   "label": "Resolution Summary"
+  },
+  {
+   "fieldname": "root_cause",
+   "fieldtype": "Select",
+   "in_standard_filter": 1,
+   "label": "Root Cause",
+   "options": "\nManufacturing Defect\nInstallation Error\nVoltage Fluctuation\nDry Run\nWater Quality\nWear & Tear\nMisuse\nNot a Defect"
+  },
+  {
+   "fieldname": "sb_hist",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "service_history_html",
+   "fieldtype": "HTML",
+   "label": "Service History"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Service Request",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "linked_claim",
+   "fieldtype": "Link",
+   "label": "Warranty Claim",
+   "options": "Kumar Warranty Claim",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "icon": "kumar-complaint",
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-08-07 23:16:49.714508",
+ "modified_by": "Administrator",
+ "module": "Kumar Service",
+ "name": "Service Request",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Service Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Service Technician",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Dealer",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Quality Engineer",
+   "share": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Warranty Approver",
+   "share": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "search_fields": "end_customer_name,end_customer_mobile,complaint_category",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "serial_no",
+ "track_changes": 1
+}

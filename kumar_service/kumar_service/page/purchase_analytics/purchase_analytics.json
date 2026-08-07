@@ -1,0 +1,25 @@
+{
+ "content": null,
+ "creation": "2026-08-07 18:00:00.000000",
+ "docstatus": 0,
+ "doctype": "Page",
+ "idx": 0,
+ "modified": "2026-08-07 18:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Kumar Service",
+ "name": "purchase-analytics",
+ "owner": "Administrator",
+ "page_name": "purchase-analytics",
+ "roles": [
+  {"role": "System Manager"},
+  {"role": "Purchase Manager"},
+  {"role": "Purchase User"},
+  {"role": "Accounts User"},
+  {"role": "Production Manager"}
+ ],
+ "script": null,
+ "standard": "Yes",
+ "style": null,
+ "system_page": 0,
+ "title": "Purchase Analytics"
+}

@@ -1,0 +1,85 @@
+{% extends "templates/web.html" %}
+
+{% block title %}{{ _("Warranty Check") }} | KUMAR Pumps{% endblock %}
+
+{% block page_content %}
+<style>
+  .kw-shell { max-width: 640px; margin: 0 auto; padding: 24px 16px 60px; }
+  .kw-brand { font-size: 34px; font-weight: 800; color: #0b5394; letter-spacing: 1px; }
+  .kw-tag { color: #666; font-size: 13px; margin-bottom: 26px; }
+  .kw-form { display: flex; gap: 10px; margin-bottom: 26px; flex-wrap: wrap; }
+  .kw-form input { flex: 1 1 260px; padding: 12px 14px; font-size: 16px;
+                   border: 1px solid #cfd8e3; border-radius: 8px; }
+  .kw-form button { padding: 12px 26px; font-size: 15px; font-weight: 600; border: 0;
+                    border-radius: 8px; background: #0b5394; color: #fff; cursor: pointer; }
+  .kw-card { border: 1px solid #cfd8e3; border-radius: 12px; padding: 22px; }
+  .kw-badge { display: inline-block; padding: 8px 18px; border-radius: 22px;
+              font-weight: 700; font-size: 15px; margin-bottom: 18px; }
+  .kw-in { background: #e6f4ea; color: #137333; border: 1px solid #137333; }
+  .kw-soon { background: #fef7e0; color: #b06000; border: 1px solid #b06000; }
+  .kw-out { background: #fce8e6; color: #a50e0e; border: 1px solid #a50e0e; }
+  .kw-grey { background: #f1f3f4; color: #444; border: 1px solid #999; }
+  .kw-row { display: flex; justify-content: space-between; padding: 9px 0;
+            border-bottom: 1px solid #eef1f5; font-size: 14px; }
+  .kw-row span:first-child { color: #666; }
+  .kw-row span:last-child { font-weight: 600; }
+  .kw-err { background: #fce8e6; border: 1px solid #a50e0e; color: #a50e0e;
+            padding: 14px 16px; border-radius: 8px; }
+  .kw-note { margin-top: 22px; font-size: 12px; color: #777; line-height: 1.6; }
+</style>
+
+<div class="kw-shell">
+  <div class="kw-brand">KUMAR</div>
+  <div class="kw-tag">
+    {{ _("Pumps & Motors") }} &middot; {{ _("Sri Lakshmi Ganapathi Engineering Works, Tenali") }}
+  </div>
+
+  <form class="kw-form" method="get" action="/warranty-check">
+    <input type="text" name="sn" value="{{ serial_no or '' }}" autofocus
+           placeholder="{{ _('Enter serial number from the nameplate') }}">
+    <button type="submit">{{ _("Check Warranty") }}</button>
+  </form>
+
+  {% if error %}
+    <div class="kw-err">{{ error }}</div>
+  {% endif %}
+
+  {% if result %}
+    {% set status = result.warranty_status %}
+    <div class="kw-card">
+      <span class="kw-badge
+        {%- if status == 'In Warranty' %} kw-in
+        {%- elif status == 'Expiring Soon' %} kw-soon
+        {%- elif status == 'Expired' %} kw-out
+        {%- else %} kw-grey{% endif %}">
+        {{ status|upper }}
+        {%- if result.days_remaining is not none and status in ('In Warranty', 'Expiring Soon') %}
+          &middot; {{ result.days_remaining }} {{ _("days left") }}
+        {%- endif %}
+      </span>
+
+      <div class="kw-row"><span>{{ _("Serial Number") }}</span><span>{{ result.serial_no }}</span></div>
+      <div class="kw-row"><span>{{ _("Model") }}</span><span>{{ result.model_code or "-" }}</span></div>
+      <div class="kw-row"><span>{{ _("Category") }}</span><span>{{ result.category or "-" }}</span></div>
+      <div class="kw-row"><span>{{ _("Rating") }}</span><span>{{ result.hp or "-" }} HP {{ result.phase or "" }}</span></div>
+      <div class="kw-row"><span>{{ _("Standard") }}</span><span>{{ result.bis_standard or "-" }}</span></div>
+      <div class="kw-row"><span>{{ _("Manufactured") }}</span>
+        <span>{{ frappe.utils.format_date(result.manufacturing_date) if result.manufacturing_date else "-" }}</span></div>
+      {% if result.is_registered %}
+      <div class="kw-row"><span>{{ _("Warranty Valid Upto") }}</span>
+        <span>{{ frappe.utils.format_date(result.warranty_expiry_date) }}</span></div>
+      {% endif %}
+    </div>
+
+    {% if not result.is_registered %}
+      <div class="kw-note">
+        {{ _("This pump has not been registered yet. Ask your dealer to register the sale so your warranty starts.") }}
+      </div>
+    {% endif %}
+  {% endif %}
+
+  <div class="kw-note">
+    {{ _("For service, contact your KUMAR dealer or the nearest branch office. Warranty covers manufacturing defects only.") }}
+  </div>
+</div>
+{% endblock %}

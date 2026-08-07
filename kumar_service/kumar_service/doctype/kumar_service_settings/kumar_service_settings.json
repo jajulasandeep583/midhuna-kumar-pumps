@@ -1,0 +1,215 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "creation": "2026-08-07 16:15:20.238335",
+ "description": "Every configurable assumption lives here - nothing is hardcoded.",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "sb_warranty",
+  "default_warranty_months",
+  "warranty_from",
+  "allow_dealer_backdated_registration_days",
+  "cb1",
+  "warranty_reminder_days",
+  "certificate_issuer",
+  "sb_sla",
+  "sla_response_hours",
+  "sla_resolution_hours",
+  "cb2",
+  "repeat_failure_window_days",
+  "default_service_centre",
+  "sb_trace",
+  "enable_heat_traceability",
+  "enable_test_certificate",
+  "cb3",
+  "enforce_qc_before_dispatch",
+  "batch_failure_threshold_pct",
+  "sb_qr",
+  "serial_format_template",
+  "qr_base_url",
+  "cb4",
+  "sms_gateway_enabled",
+  "whatsapp_notification_enabled"
+ ],
+ "fields": [
+  {
+   "fieldname": "sb_warranty",
+   "fieldtype": "Section Break",
+   "label": "Warranty"
+  },
+  {
+   "default": "12",
+   "fieldname": "default_warranty_months",
+   "fieldtype": "Int",
+   "label": "Default Warranty (Months)"
+  },
+  {
+   "default": "Sale Date",
+   "fieldname": "warranty_from",
+   "fieldtype": "Select",
+   "label": "Warranty Starts From",
+   "options": "Sale Date\nManufacturing Date"
+  },
+  {
+   "default": "30",
+   "fieldname": "allow_dealer_backdated_registration_days",
+   "fieldtype": "Int",
+   "label": "Allow Dealer Backdated Registration (Days)"
+  },
+  {
+   "fieldname": "cb1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "30,7",
+   "description": "Comma separated days before expiry to remind",
+   "fieldname": "warranty_reminder_days",
+   "fieldtype": "Data",
+   "label": "Warranty Reminder Days"
+  },
+  {
+   "default": "KUMAR Pumps & Motors",
+   "fieldname": "certificate_issuer",
+   "fieldtype": "Data",
+   "label": "Certificate Issued On Behalf Of"
+  },
+  {
+   "fieldname": "sb_sla",
+   "fieldtype": "Section Break",
+   "label": "Service SLA"
+  },
+  {
+   "default": "24",
+   "fieldname": "sla_response_hours",
+   "fieldtype": "Int",
+   "label": "Response Hours"
+  },
+  {
+   "default": "72",
+   "fieldname": "sla_resolution_hours",
+   "fieldtype": "Int",
+   "label": "Resolution Hours"
+  },
+  {
+   "fieldname": "cb2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "90",
+   "fieldname": "repeat_failure_window_days",
+   "fieldtype": "Int",
+   "label": "Repeat Failure Window (Days)"
+  },
+  {
+   "fieldname": "default_service_centre",
+   "fieldtype": "Link",
+   "label": "Default Service Centre",
+   "options": "Dealer"
+  },
+  {
+   "fieldname": "sb_trace",
+   "fieldtype": "Section Break",
+   "label": "Traceability"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_heat_traceability",
+   "fieldtype": "Check",
+   "label": "Enable Heat Traceability"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_test_certificate",
+   "fieldtype": "Check",
+   "label": "Enable Test Certificate"
+  },
+  {
+   "fieldname": "cb3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "fieldname": "enforce_qc_before_dispatch",
+   "fieldtype": "Check",
+   "label": "Block Dispatch Unless QC Passed"
+  },
+  {
+   "default": "5",
+   "fieldname": "batch_failure_threshold_pct",
+   "fieldtype": "Float",
+   "label": "Batch Failure Alert Threshold %"
+  },
+  {
+   "fieldname": "sb_qr",
+   "fieldtype": "Section Break",
+   "label": "Identity & QR"
+  },
+  {
+   "default": "^KP-[A-Z0-9()x.]+-\\d{4}-\\d{5}$",
+   "fieldname": "serial_format_template",
+   "fieldtype": "Data",
+   "label": "Serial Format (regex)"
+  },
+  {
+   "default": "https://kumarpumps.co.in/warranty-check",
+   "fieldname": "qr_base_url",
+   "fieldtype": "Data",
+   "label": "QR Base URL"
+  },
+  {
+   "fieldname": "cb4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "sms_gateway_enabled",
+   "fieldtype": "Check",
+   "label": "SMS Enabled"
+  },
+  {
+   "default": "0",
+   "fieldname": "whatsapp_notification_enabled",
+   "fieldtype": "Check",
+   "label": "WhatsApp Enabled"
+  }
+ ],
+ "grid_page_length": 50,
+ "icon": "kumar-settings",
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-08-07 23:16:40.286650",
+ "modified_by": "Administrator",
+ "module": "Kumar Service",
+ "name": "Kumar Service Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "Production Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

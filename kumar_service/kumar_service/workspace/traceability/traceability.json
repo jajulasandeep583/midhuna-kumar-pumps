@@ -1,0 +1,254 @@
+{
+ "app": "kumar_service",
+ "charts": [],
+ "content": "[{\"id\": \"209ec463c1\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Traceability &amp; Quality</b></span>\", \"col\": 12}}, {\"id\": \"6f0ac94278\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Shortcuts</b></span>\", \"col\": 12}}, {\"id\": \"93d8fb74db\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Heat Record\", \"col\": 3}}, {\"id\": \"bd1a77cfb9\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Winding Batch\", \"col\": 3}}, {\"id\": \"ae02c6d9f1\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Test Certificate\", \"col\": 3}}, {\"id\": \"24eec65c92\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Batch Defect Analysis\", \"col\": 3}}, {\"id\": \"15e8862f2b\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Trace a Serial\", \"col\": 3}}, {\"id\": \"80f5ef3b63\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"b3a1ee0af1\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Reports & Masters</b></span>\", \"col\": 12}}, {\"id\": \"07f5053525\", \"type\": \"card\", \"data\": {\"card_name\": \"Foundry & Winding\", \"col\": 4}}, {\"id\": \"cf9ce51d4d\", \"type\": \"card\", \"data\": {\"card_name\": \"Test & Dispatch\", \"col\": 4}}, {\"id\": \"cb13aa6529\", \"type\": \"card\", \"data\": {\"card_name\": \"Reports\", \"col\": 4}}, {\"id\": \"3f736134e1\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"a900743bd8\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>How to use this screen</b></span>\", \"col\": 12}}, {\"id\": \"18e3c3372f\", \"type\": \"paragraph\", \"data\": {\"text\": \"<div style='border:1px solid var(--border-color);border-radius:8px;padding:14px 16px;background:var(--fg-color)'><p style='margin:0 0 6px'><b>How to use Traceability & Quality</b></p><p style='margin:0 0 8px;color:var(--text-muted)'>The factory half. A pump's identity is built here: which melt its casing came from, which winding lot its stator came from, and whether it passed test. Get this right and any field failure can be traced back to a root batch.</p><p style='margin:10px 0 4px'><b>Do this, in order</b></p><ol style='margin:0 0 4px 18px'><li><b>Heat Record</b> - log the melt, enter spectrometer readings, and only then set status to Approved for Pouring. Out-of-spec elements block approval unless a Quality Engineer records an override reason.</li><li><b>Winding Batch</b> - log the stator lot with its IR and HiPot readings.</li><li>Assembly consumes those batches in a Manufacture Stock Entry. The heat and winding numbers are stamped onto every serial produced automatically - no typing.</li><li><b>Test Certificate</b> - one per unit. On submit it sets the serial's QC status, and a unit that has not passed cannot be put on a Delivery Note.</li><li><b>Trace a Serial</b> for one pump's ancestry; <b>Batch Defect Analysis</b> for the reverse - every pump built from a suspect batch.</li></ol><p style='margin:10px 0 4px'><b>Watch out for</b></p><ul style='margin:0 0 4px 18px'><li>Approving a heat with an override is a deliberate, recorded act. Use it rarely.</li><li>If a Manufacture entry warns that no traceable batches were consumed, fix it before submitting - that gap is permanent.</li></ul></div>\", \"col\": 12}}]",
+ "creation": "2026-08-07 17:15:57.643184",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "hide_custom": 0,
+ "icon": "kumar-trace",
+ "idx": 0,
+ "indicator_color": "green",
+ "is_hidden": 0,
+ "label": "Traceability",
+ "link_type": "DocType",
+ "links": [
+  {
+   "hidden": 0,
+   "icon": "kumar-heat",
+   "is_query_report": 0,
+   "label": "Foundry & Winding",
+   "link_count": 3,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-heat",
+   "is_query_report": 0,
+   "label": "Heat Record",
+   "link_count": 0,
+   "link_to": "Heat Record",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-winding",
+   "is_query_report": 0,
+   "label": "Winding Batch Record",
+   "link_count": 0,
+   "link_to": "Winding Batch Record",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-winding",
+   "is_query_report": 0,
+   "label": "Batch",
+   "link_count": 0,
+   "link_to": "Batch",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-test",
+   "is_query_report": 0,
+   "label": "Test & Dispatch",
+   "link_count": 4,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-test",
+   "is_query_report": 0,
+   "label": "Pump Test Certificate",
+   "link_count": 0,
+   "link_to": "Pump Test Certificate",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-serial",
+   "is_query_report": 0,
+   "label": "Serial No",
+   "link_count": 0,
+   "link_to": "Serial No",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-warehouse",
+   "is_query_report": 0,
+   "label": "Stock Entry",
+   "link_count": 0,
+   "link_to": "Stock Entry",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-motor",
+   "is_query_report": 0,
+   "label": "Work Order",
+   "link_count": 0,
+   "link_to": "Work Order",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-report",
+   "is_query_report": 0,
+   "label": "Reports",
+   "link_count": 5,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "dependencies": "Serial No",
+   "hidden": 0,
+   "icon": "kumar-quality",
+   "is_query_report": 1,
+   "label": "Batch Defect Analysis",
+   "link_count": 0,
+   "link_to": "Batch Defect Analysis",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "Serial No",
+   "hidden": 0,
+   "icon": "kumar-trace",
+   "is_query_report": 1,
+   "label": "Serial Genealogy",
+   "link_count": 0,
+   "link_to": "Serial Genealogy",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "Heat Record",
+   "hidden": 0,
+   "icon": "kumar-heat",
+   "is_query_report": 1,
+   "label": "Heat Chemistry Log",
+   "link_count": 0,
+   "link_to": "Heat Chemistry Log",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "Pump Registration",
+   "hidden": 0,
+   "icon": "kumar-model",
+   "is_query_report": 1,
+   "label": "Model Reliability",
+   "link_count": 0,
+   "link_to": "Model Reliability",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "Serial No",
+   "hidden": 0,
+   "icon": "kumar-serial",
+   "is_query_report": 1,
+   "label": "Unregistered Stock",
+   "link_count": 0,
+   "link_to": "Unregistered Stock",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-08-08 00:12:23.463921",
+ "modified_by": "Administrator",
+ "module": "Kumar Service",
+ "name": "Traceability",
+ "number_cards": [],
+ "owner": "Administrator",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [
+  {
+   "role": "Quality Engineer"
+  },
+  {
+   "role": "Production Manager"
+  },
+  {
+   "role": "Foundry Operator"
+  },
+  {
+   "role": "System Manager"
+  }
+ ],
+ "sequence_id": 4.0,
+ "shortcuts": [
+  {
+   "color": "red",
+   "doc_view": "",
+   "icon": "kumar-heat",
+   "label": "Heat Record",
+   "link_to": "Heat Record",
+   "type": "DocType"
+  },
+  {
+   "color": "orange",
+   "doc_view": "",
+   "icon": "kumar-winding",
+   "label": "Winding Batch",
+   "link_to": "Winding Batch Record",
+   "type": "DocType"
+  },
+  {
+   "color": "green",
+   "doc_view": "",
+   "icon": "kumar-certificate",
+   "label": "Test Certificate",
+   "link_to": "Pump Test Certificate",
+   "type": "DocType"
+  },
+  {
+   "color": "purple",
+   "doc_view": "",
+   "icon": "kumar-quality",
+   "label": "Batch Defect Analysis",
+   "link_to": "Batch Defect Analysis",
+   "report_ref_doctype": "Serial No",
+   "type": "Report"
+  },
+  {
+   "color": "blue",
+   "doc_view": "",
+   "icon": "kumar-qr",
+   "label": "Trace a Serial",
+   "link_to": "Serial Genealogy",
+   "report_ref_doctype": "Serial No",
+   "type": "Report"
+  }
+ ],
+ "title": "Traceability",
+ "type": "Workspace"
+}

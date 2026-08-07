@@ -1,0 +1,190 @@
+{
+ "app": "kumar_service",
+ "charts": [],
+ "content": "[{\"id\": \"f163055b05\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Dealer Desk</b></span>\", \"col\": 12}}, {\"id\": \"c8f8879acc\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Shortcuts</b></span>\", \"col\": 12}}, {\"id\": \"2a01afa509\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"My Business\", \"col\": 3}}, {\"id\": \"d4cd27de32\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Pump Lookup\", \"col\": 3}}, {\"id\": \"e4aa718b60\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Register Pump\", \"col\": 3}}, {\"id\": \"409b22c15e\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"New Service Request\", \"col\": 3}}, {\"id\": \"749aaad559\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"My Claims\", \"col\": 3}}, {\"id\": \"0dd93cbfe1\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Warranty Lookup\", \"col\": 3}}, {\"id\": \"37898da375\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"0b855d5a0b\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Reports & Masters</b></span>\", \"col\": 12}}, {\"id\": \"0a1477f94c\", \"type\": \"card\", \"data\": {\"card_name\": \"Sales & Registration\", \"col\": 4}}, {\"id\": \"d537f746bb\", \"type\": \"card\", \"data\": {\"card_name\": \"Service\", \"col\": 4}}, {\"id\": \"395373eb06\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"02d4375635\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>How to use this screen</b></span>\", \"col\": 12}}, {\"id\": \"3b1c22fccf\", \"type\": \"paragraph\", \"data\": {\"text\": \"<div style='border:1px solid var(--border-color);border-radius:8px;padding:14px 16px;background:var(--fg-color)'><p style='margin:0 0 6px'><b>How to use the Dealer Desk</b></p><p style='margin:0 0 8px;color:var(--text-muted)'>This is the dealer's whole job in one screen: record the sale of a pump so its warranty starts, and raise a complaint when a customer calls. Registering a pump is what generates the warranty certificate in KUMAR Pumps' name.</p><p style='margin:10px 0 4px'><b>Do this, in order</b></p><ol style='margin:0 0 4px 18px'><li><b>Register Pump</b> - scan or type the serial from the nameplate. Model, HP and manufacturing date fill themselves. Add the customer's name and mobile, the sale date and the installation address, then Submit.</li><li>The warranty expiry is calculated for you from the model's warranty period. Print the <b>Warranty Certificate</b> from the print icon - it carries the QR code.</li><li><b>New Service Request</b> - enter the serial and the warranty banner tells you immediately whether the visit is free or chargeable.</li><li><b>My Registrations</b> and <b>My Claims</b> show only your own network's records.</li></ol><p style='margin:10px 0 4px'><b>Watch out for</b></p><ul style='margin:0 0 4px 18px'><li>A serial can only be registered once. If the customer changes, amend the existing registration rather than creating a second one.</li><li>The mobile number must be a real 10-digit number - it is what the warranty is traced by.</li></ul></div>\", \"col\": 12}}]",
+ "creation": "2026-08-07 17:00:47.603425",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "hide_custom": 0,
+ "icon": "kumar-dealer",
+ "idx": 0,
+ "indicator_color": "green",
+ "is_hidden": 0,
+ "label": "Dealer Desk",
+ "link_type": "DocType",
+ "links": [
+  {
+   "hidden": 0,
+   "icon": "kumar-registration",
+   "is_query_report": 0,
+   "label": "Sales & Registration",
+   "link_count": 4,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-registration",
+   "is_query_report": 0,
+   "label": "Pump Registration",
+   "link_count": 0,
+   "link_to": "Pump Registration",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-serial",
+   "is_query_report": 0,
+   "label": "Serial No",
+   "link_count": 0,
+   "link_to": "Serial No",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-claim",
+   "is_query_report": 0,
+   "label": "Sales Invoice",
+   "link_count": 0,
+   "link_to": "Sales Invoice",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-visit",
+   "is_query_report": 0,
+   "label": "Delivery Note",
+   "link_count": 0,
+   "link_to": "Delivery Note",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-service",
+   "is_query_report": 0,
+   "label": "Service",
+   "link_count": 3,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-complaint",
+   "is_query_report": 0,
+   "label": "Service Request",
+   "link_count": 0,
+   "link_to": "Service Request",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-visit",
+   "is_query_report": 0,
+   "label": "Service Visit",
+   "link_count": 0,
+   "link_to": "Service Visit",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-claim",
+   "is_query_report": 0,
+   "label": "Kumar Warranty Claim",
+   "link_count": 0,
+   "link_to": "Kumar Warranty Claim",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-08-08 00:12:23.300838",
+ "modified_by": "Administrator",
+ "module": "Kumar Service",
+ "name": "Dealer Desk",
+ "number_cards": [],
+ "owner": "Administrator",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [
+  {
+   "role": "Dealer"
+  },
+  {
+   "role": "Dealer Manager"
+  },
+  {
+   "role": "Service Manager"
+  },
+  {
+   "role": "System Manager"
+  }
+ ],
+ "sequence_id": 1.0,
+ "shortcuts": [
+  {
+   "color": "green",
+   "doc_view": "",
+   "icon": "kumar-shop",
+   "label": "My Business",
+   "link_to": "my-business",
+   "type": "Page"
+  },
+  {
+   "color": "blue",
+   "doc_view": "",
+   "icon": "kumar-qr",
+   "label": "Pump Lookup",
+   "link_to": "pump-lookup",
+   "type": "Page"
+  },
+  {
+   "color": "green",
+   "doc_view": "",
+   "icon": "kumar-registration",
+   "label": "Register Pump",
+   "link_to": "Pump Registration",
+   "type": "DocType"
+  },
+  {
+   "color": "orange",
+   "doc_view": "",
+   "icon": "kumar-complaint",
+   "label": "New Service Request",
+   "link_to": "Service Request",
+   "type": "DocType"
+  },
+  {
+   "color": "blue",
+   "doc_view": "",
+   "icon": "kumar-claim",
+   "label": "My Claims",
+   "link_to": "Kumar Warranty Claim",
+   "type": "DocType"
+  },
+  {
+   "color": "grey",
+   "doc_view": "",
+   "icon": "kumar-qr",
+   "label": "Warranty Lookup",
+   "link_to": "Serial No",
+   "type": "DocType"
+  }
+ ],
+ "title": "Dealer Desk",
+ "type": "Workspace"
+}

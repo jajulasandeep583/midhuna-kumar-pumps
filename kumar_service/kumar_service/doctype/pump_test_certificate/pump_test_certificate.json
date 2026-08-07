@@ -1,0 +1,314 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2026-08-07 16:18:31.404652",
+ "description": "Per-unit test record. On submit it stamps QC status on the Serial No, which gates dispatch.",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "serial_no",
+  "pump_model",
+  "test_date",
+  "cb1",
+  "test_bench",
+  "tested_by",
+  "bis_standard_ref",
+  "sb_supply",
+  "supply_voltage_v",
+  "frequency_hz",
+  "cb2",
+  "no_load_current_a",
+  "full_load_current_a",
+  "sb_duty",
+  "duty_points",
+  "sb_elec",
+  "insulation_resistance_mohm",
+  "hipot_voltage_kv",
+  "hipot_result",
+  "cb3",
+  "hydrostatic_test_pressure",
+  "hydrostatic_result",
+  "cb3b",
+  "vibration_mm_s",
+  "noise_db",
+  "sb_result",
+  "overall_result",
+  "cb4",
+  "remarks",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "default": "TC-.YY.-.######",
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Series",
+   "options": "TC-.YY.-.######",
+   "print_hide": 1,
+   "reqd": 1
+  },
+  {
+   "bold": 1,
+   "fieldname": "serial_no",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Serial No",
+   "options": "Serial No",
+   "reqd": 1
+  },
+  {
+   "fieldname": "pump_model",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Pump Model",
+   "options": "Pump Model",
+   "read_only": 1
+  },
+  {
+   "default": "now",
+   "fieldname": "test_date",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Test Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "cb1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "test_bench",
+   "fieldtype": "Link",
+   "label": "Test Bench",
+   "options": "Workstation"
+  },
+  {
+   "fieldname": "tested_by",
+   "fieldtype": "Link",
+   "label": "Tested By",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "bis_standard_ref",
+   "fieldtype": "Data",
+   "label": "BIS Standard Ref"
+  },
+  {
+   "fieldname": "sb_supply",
+   "fieldtype": "Section Break",
+   "label": "Supply"
+  },
+  {
+   "default": "415",
+   "fieldname": "supply_voltage_v",
+   "fieldtype": "Float",
+   "label": "Supply Voltage (V)"
+  },
+  {
+   "default": "50",
+   "fieldname": "frequency_hz",
+   "fieldtype": "Float",
+   "label": "Frequency (Hz)"
+  },
+  {
+   "fieldname": "cb2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "no_load_current_a",
+   "fieldtype": "Float",
+   "label": "No Load Current (A)"
+  },
+  {
+   "fieldname": "full_load_current_a",
+   "fieldtype": "Float",
+   "label": "Full Load Current (A)"
+  },
+  {
+   "fieldname": "sb_duty",
+   "fieldtype": "Section Break",
+   "label": "Duty Points"
+  },
+  {
+   "fieldname": "duty_points",
+   "fieldtype": "Table",
+   "label": "Duty Points",
+   "options": "Test Duty Point"
+  },
+  {
+   "fieldname": "sb_elec",
+   "fieldtype": "Section Break",
+   "label": "Electrical & Mechanical Tests"
+  },
+  {
+   "fieldname": "insulation_resistance_mohm",
+   "fieldtype": "Float",
+   "label": "Insulation Resistance (Mohm)"
+  },
+  {
+   "fieldname": "hipot_voltage_kv",
+   "fieldtype": "Float",
+   "label": "HiPot Voltage (kV)"
+  },
+  {
+   "fieldname": "hipot_result",
+   "fieldtype": "Select",
+   "label": "HiPot Result",
+   "options": "\nPass\nFail"
+  },
+  {
+   "fieldname": "cb3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "hydrostatic_test_pressure",
+   "fieldtype": "Float",
+   "label": "Hydrostatic Pressure (kg/cm2)"
+  },
+  {
+   "fieldname": "hydrostatic_result",
+   "fieldtype": "Select",
+   "label": "Hydrostatic Result",
+   "options": "\nPass\nFail"
+  },
+  {
+   "fieldname": "cb3b",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "vibration_mm_s",
+   "fieldtype": "Float",
+   "label": "Vibration (mm/s)"
+  },
+  {
+   "fieldname": "noise_db",
+   "fieldtype": "Float",
+   "label": "Noise (dB)"
+  },
+  {
+   "fieldname": "sb_result",
+   "fieldtype": "Section Break",
+   "label": "Result"
+  },
+  {
+   "default": "Pass",
+   "fieldname": "overall_result",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Overall Result",
+   "options": "Pass\nFail\nRework",
+   "reqd": 1
+  },
+  {
+   "fieldname": "cb4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Pump Test Certificate",
+   "print_hide": 1,
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "icon": "kumar-test",
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-08-07 23:16:48.718311",
+ "modified_by": "Administrator",
+ "module": "Kumar Service",
+ "name": "Pump Test Certificate",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Quality Engineer",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Production Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Service Manager",
+   "share": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Service Technician",
+   "share": 1
+  },
+  {
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Dealer",
+   "share": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "serial_no",
+ "track_changes": 1
+}

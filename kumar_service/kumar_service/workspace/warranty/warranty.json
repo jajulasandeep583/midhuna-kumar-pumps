@@ -1,0 +1,161 @@
+{
+ "app": "kumar_service",
+ "charts": [],
+ "content": "[{\"id\": \"de92119ff3\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Warranty &amp; Claims</b></span>\", \"col\": 12}}, {\"id\": \"6b24a10a91\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Shortcuts</b></span>\", \"col\": 12}}, {\"id\": \"35fe1c80f6\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Pending Claims\", \"col\": 3}}, {\"id\": \"a5e2442ee3\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Warranty Expiring (30d)\", \"col\": 3}}, {\"id\": \"c53511203c\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Batch Defect Analysis\", \"col\": 3}}, {\"id\": \"9277109490\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Warranty Cost\", \"col\": 3}}, {\"id\": \"658bfd84dd\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"0c100032e2\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Reports & Masters</b></span>\", \"col\": 12}}, {\"id\": \"4dc2ebd0f3\", \"type\": \"card\", \"data\": {\"card_name\": \"Claims\", \"col\": 4}}, {\"id\": \"86c20d7f8d\", \"type\": \"card\", \"data\": {\"card_name\": \"Reports\", \"col\": 4}}, {\"id\": \"2de47579ea\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"40dabd01cc\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>How to use this screen</b></span>\", \"col\": 12}}, {\"id\": \"329481f0ff\", \"type\": \"paragraph\", \"data\": {\"text\": \"<div style='border:1px solid var(--border-color);border-radius:8px;padding:14px 16px;background:var(--fg-color)'><p style='margin:0 0 6px'><b>How to use Warranty & Claims</b></p><p style='margin:0 0 8px;color:var(--text-muted)'>Where a dealer's claim is checked and settled, and where warranty exposure is watched. Each claim carries the pump's heat number and winding batch, which is what makes it possible to spot a bad batch instead of arguing about one pump.</p><p style='margin:10px 0 4px'><b>Do this, in order</b></p><ol style='margin:0 0 4px 18px'><li>A dealer submits a claim; it lands in <b>Pending Claims</b>.</li><li>Service Manager reviews it into Under Investigation. Quality Engineer approves or rejects on the evidence - photos, technician report, root cause.</li><li>Approved claims go to Accounts to <b>Settle</b>, optionally against a credit note.</li><li>Check <b>Batch Defect Analysis</b> whenever two claims share a heat or winding batch.</li></ol><p style='margin:10px 0 4px'><b>Watch out for</b></p><ul style='margin:0 0 4px 18px'><li>Rejecting without a root cause loses the only information the factory would get.</li><li><b>Warranty Expiring (30d)</b> is a sales list, not a problem list - it is the AMC and replacement opportunity.</li></ul></div>\", \"col\": 12}}]",
+ "creation": "2026-08-07 17:15:57.054853",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "hide_custom": 0,
+ "icon": "kumar-warranty",
+ "idx": 0,
+ "indicator_color": "green",
+ "is_hidden": 0,
+ "label": "Warranty",
+ "link_type": "DocType",
+ "links": [
+  {
+   "hidden": 0,
+   "icon": "kumar-claim",
+   "is_query_report": 0,
+   "label": "Claims",
+   "link_count": 2,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-claim",
+   "is_query_report": 0,
+   "label": "Kumar Warranty Claim",
+   "link_count": 0,
+   "link_to": "Kumar Warranty Claim",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-complaint",
+   "is_query_report": 0,
+   "label": "Service Request",
+   "link_count": 0,
+   "link_to": "Service Request",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-report",
+   "is_query_report": 0,
+   "label": "Reports",
+   "link_count": 3,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "dependencies": "Serial No",
+   "hidden": 0,
+   "icon": "kumar-warranty",
+   "is_query_report": 1,
+   "label": "Warranty Expiring Soon",
+   "link_count": 0,
+   "link_to": "Warranty Expiring Soon",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "Kumar Warranty Claim",
+   "hidden": 0,
+   "icon": "kumar-claim",
+   "is_query_report": 1,
+   "label": "Warranty Cost Analysis",
+   "link_count": 0,
+   "link_to": "Warranty Cost Analysis",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "Serial No",
+   "hidden": 0,
+   "icon": "kumar-serial",
+   "is_query_report": 1,
+   "label": "Unregistered Stock",
+   "link_count": 0,
+   "link_to": "Unregistered Stock",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-08-08 00:12:23.409436",
+ "modified_by": "Administrator",
+ "module": "Kumar Service",
+ "name": "Warranty",
+ "number_cards": [],
+ "owner": "Administrator",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [
+  {
+   "role": "Warranty Approver"
+  },
+  {
+   "role": "Quality Engineer"
+  },
+  {
+   "role": "Accounts User"
+  },
+  {
+   "role": "Service Manager"
+  },
+  {
+   "role": "System Manager"
+  }
+ ],
+ "sequence_id": 3.0,
+ "shortcuts": [
+  {
+   "color": "orange",
+   "doc_view": "",
+   "icon": "kumar-claim",
+   "label": "Pending Claims",
+   "link_to": "Kumar Warranty Claim",
+   "type": "DocType"
+  },
+  {
+   "color": "red",
+   "doc_view": "",
+   "icon": "kumar-report",
+   "label": "Warranty Expiring (30d)",
+   "link_to": "Warranty Expiring Soon",
+   "report_ref_doctype": "Serial No",
+   "type": "Report"
+  },
+  {
+   "color": "purple",
+   "doc_view": "",
+   "icon": "kumar-quality",
+   "label": "Batch Defect Analysis",
+   "link_to": "Batch Defect Analysis",
+   "report_ref_doctype": "Serial No",
+   "type": "Report"
+  },
+  {
+   "color": "blue",
+   "doc_view": "",
+   "icon": "kumar-claim",
+   "label": "Warranty Cost",
+   "link_to": "Warranty Cost Analysis",
+   "report_ref_doctype": "Kumar Warranty Claim",
+   "type": "Report"
+  }
+ ],
+ "title": "Warranty",
+ "type": "Workspace"
+}

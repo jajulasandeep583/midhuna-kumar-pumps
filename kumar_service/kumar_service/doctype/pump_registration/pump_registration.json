@@ -1,0 +1,441 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2026-08-07 16:15:20.550505",
+ "description": "Dealer records a sale. This is what starts the warranty clock and issues the certificate.",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "serial_no",
+  "pump_model",
+  "item_code",
+  "cb1",
+  "hp",
+  "phase",
+  "manufacturing_date",
+  "sb_sale",
+  "dealer",
+  "sale_channel",
+  "sale_date",
+  "cb2",
+  "invoice_no",
+  "dealer_invoice_date",
+  "dealer_gstin",
+  "sales_invoice",
+  "sb_src",
+  "registration_source",
+  "cb2b",
+  "registered_by",
+  "sb_cust",
+  "end_customer_name",
+  "end_customer_mobile",
+  "end_customer_email",
+  "cb3",
+  "application_type",
+  "borewell_depth_ft",
+  "static_water_level_ft",
+  "sb_addr",
+  "installation_address",
+  "district",
+  "cb4",
+  "state",
+  "pincode",
+  "sb_warr",
+  "warranty_months",
+  "warranty_start_date",
+  "cb5",
+  "warranty_expiry_date",
+  "warranty_card_no",
+  "sb_qr",
+  "qr_url",
+  "qr_code",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "default": "PREG-.YY.-.#####",
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Series",
+   "options": "PREG-.YY.-.#####",
+   "print_hide": 1,
+   "reqd": 1
+  },
+  {
+   "bold": 1,
+   "fieldname": "serial_no",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Serial No",
+   "options": "Serial No",
+   "reqd": 1
+  },
+  {
+   "fieldname": "pump_model",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Pump Model",
+   "options": "Pump Model",
+   "read_only": 1
+  },
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "label": "Item",
+   "options": "Item",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cb1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "hp",
+   "fieldtype": "Float",
+   "label": "HP",
+   "read_only": 1
+  },
+  {
+   "fieldname": "phase",
+   "fieldtype": "Data",
+   "label": "Phase",
+   "read_only": 1
+  },
+  {
+   "fieldname": "manufacturing_date",
+   "fieldtype": "Date",
+   "label": "Manufacturing Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_sale",
+   "fieldtype": "Section Break",
+   "label": "Sale to End Customer"
+  },
+  {
+   "fieldname": "dealer",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Sold By",
+   "options": "Dealer",
+   "reqd": 1
+  },
+  {
+   "description": "The day the END CUSTOMER got the pump - this starts the warranty.",
+   "fieldname": "sale_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Sale Date",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.sale_channel==\"Through Dealer - Dealer's Own Invoice\"",
+   "description": "The dealer's own invoice to the customer, on the dealer's letterhead and GSTIN. We never raise this - we only record it, because it is the customer's proof of purchase when a claim comes in.",
+   "fieldname": "invoice_no",
+   "fieldtype": "Data",
+   "label": "Dealer's Invoice No"
+  },
+  {
+   "fieldname": "cb2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Our invoice. On a direct sale this IS the customer's invoice; through a dealer it is the invoice that sold the pump TO the dealer, kept for traceability only.",
+   "fieldname": "sales_invoice",
+   "fieldtype": "Link",
+   "label": "KUMAR Invoice",
+   "options": "Sales Invoice"
+  },
+  {
+   "default": "Desk",
+   "fieldname": "registration_source",
+   "fieldtype": "Select",
+   "label": "Source",
+   "options": "Dealer Portal\nDesk\nMobile\nBulk Import\nAuto from Invoice"
+  },
+  {
+   "fieldname": "registered_by",
+   "fieldtype": "Link",
+   "label": "Registered By",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_cust",
+   "fieldtype": "Section Break",
+   "label": "End Customer"
+  },
+  {
+   "fieldname": "end_customer_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Customer Name",
+   "reqd": 1
+  },
+  {
+   "description": "10 digits starting 6-9",
+   "fieldname": "end_customer_mobile",
+   "fieldtype": "Data",
+   "label": "Mobile",
+   "reqd": 1
+  },
+  {
+   "fieldname": "end_customer_email",
+   "fieldtype": "Data",
+   "label": "Email",
+   "options": "Email"
+  },
+  {
+   "fieldname": "cb3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Agriculture",
+   "fieldname": "application_type",
+   "fieldtype": "Select",
+   "label": "Application",
+   "options": "Domestic\nAgriculture\nIndustrial\nCommercial"
+  },
+  {
+   "fieldname": "borewell_depth_ft",
+   "fieldtype": "Float",
+   "label": "Borewell Depth (ft)"
+  },
+  {
+   "fieldname": "static_water_level_ft",
+   "fieldtype": "Float",
+   "label": "Static Water Level (ft)"
+  },
+  {
+   "fieldname": "sb_addr",
+   "fieldtype": "Section Break",
+   "label": "Installation"
+  },
+  {
+   "fieldname": "installation_address",
+   "fieldtype": "Small Text",
+   "label": "Address"
+  },
+  {
+   "fieldname": "district",
+   "fieldtype": "Data",
+   "label": "District"
+  },
+  {
+   "fieldname": "cb4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "state",
+   "fieldtype": "Data",
+   "label": "State"
+  },
+  {
+   "fieldname": "pincode",
+   "fieldtype": "Data",
+   "label": "Pincode"
+  },
+  {
+   "fieldname": "sb_warr",
+   "fieldtype": "Section Break",
+   "label": "Warranty"
+  },
+  {
+   "fieldname": "warranty_months",
+   "fieldtype": "Int",
+   "label": "Warranty (Months)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "warranty_start_date",
+   "fieldtype": "Date",
+   "label": "Warranty Start",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cb5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "warranty_expiry_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Warranty Expiry",
+   "read_only": 1
+  },
+  {
+   "fieldname": "warranty_card_no",
+   "fieldtype": "Data",
+   "label": "Warranty Card No",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_qr",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "qr_url",
+   "fieldtype": "Data",
+   "label": "QR URL",
+   "read_only": 1
+  },
+  {
+   "fieldname": "qr_code",
+   "fieldtype": "Long Text",
+   "hidden": 1,
+   "label": "QR Code",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Pump Registration",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "default": "Through Dealer - Dealer's Own Invoice",
+   "description": "Set automatically from the outlet. Change it only if the paperwork really went the other way.",
+   "fieldname": "sale_channel",
+   "fieldtype": "Select",
+   "in_standard_filter": 1,
+   "label": "Sale Channel",
+   "options": "Through Dealer - Dealer's Own Invoice\nDirect - KUMAR Invoice",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.sale_channel==\"Through Dealer - Dealer's Own Invoice\"",
+   "fieldname": "dealer_invoice_date",
+   "fieldtype": "Date",
+   "label": "Dealer's Invoice Date"
+  },
+  {
+   "depends_on": "eval:doc.sale_channel==\"Through Dealer - Dealer's Own Invoice\"",
+   "fetch_from": "dealer.gstin",
+   "fieldname": "dealer_gstin",
+   "fieldtype": "Data",
+   "label": "Dealer's GSTIN",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_src",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "cb2b",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "grid_page_length": 50,
+ "icon": "kumar-registration",
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-08-07 23:16:41.397795",
+ "modified_by": "Administrator",
+ "module": "Kumar Service",
+ "name": "Pump Registration",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Dealer Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Service Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "create": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Dealer",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Service Technician",
+   "share": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Quality Engineer",
+   "share": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Warranty Approver",
+   "share": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "search_fields": "end_customer_name,end_customer_mobile,dealer",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "serial_no",
+ "track_changes": 1
+}

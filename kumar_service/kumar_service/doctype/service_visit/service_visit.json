@@ -1,0 +1,270 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2026-08-07 16:17:57.565023",
+ "description": "What the technician actually did, what parts went in, and what it cost.",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "service_request",
+  "serial_no",
+  "technician",
+  "cb1",
+  "visit_date",
+  "visit_type",
+  "is_chargeable",
+  "sb_work",
+  "findings",
+  "action_taken",
+  "sb_parts",
+  "parts_used",
+  "total_parts_value",
+  "cb2",
+  "labour_charge",
+  "grand_total",
+  "sb_cust",
+  "customer_feedback",
+  "customer_rating",
+  "cb3",
+  "customer_signature",
+  "photo_1",
+  "photo_2",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "default": "SV-.YY.-.#####",
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Series",
+   "options": "SV-.YY.-.#####",
+   "print_hide": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "service_request",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Service Request",
+   "options": "Service Request",
+   "reqd": 1
+  },
+  {
+   "fieldname": "serial_no",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Serial No",
+   "options": "Serial No",
+   "read_only": 1
+  },
+  {
+   "fieldname": "technician",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Technician",
+   "options": "Service Technician",
+   "reqd": 1
+  },
+  {
+   "fieldname": "cb1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Today",
+   "fieldname": "visit_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Visit Date",
+   "reqd": 1
+  },
+  {
+   "default": "On-Site",
+   "fieldname": "visit_type",
+   "fieldtype": "Select",
+   "in_standard_filter": 1,
+   "label": "Visit Type",
+   "options": "On-Site\nWorkshop\nTelephonic"
+  },
+  {
+   "default": "0",
+   "description": "Set automatically from warranty status; override if needed",
+   "fieldname": "is_chargeable",
+   "fieldtype": "Check",
+   "label": "Chargeable"
+  },
+  {
+   "fieldname": "sb_work",
+   "fieldtype": "Section Break",
+   "label": "Work Done"
+  },
+  {
+   "fieldname": "findings",
+   "fieldtype": "Text",
+   "label": "Findings"
+  },
+  {
+   "fieldname": "action_taken",
+   "fieldtype": "Text",
+   "label": "Action Taken"
+  },
+  {
+   "fieldname": "sb_parts",
+   "fieldtype": "Section Break",
+   "label": "Parts"
+  },
+  {
+   "fieldname": "parts_used",
+   "fieldtype": "Table",
+   "label": "Parts Used",
+   "options": "Service Part Used"
+  },
+  {
+   "fieldname": "total_parts_value",
+   "fieldtype": "Currency",
+   "label": "Total Parts Value",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cb2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "labour_charge",
+   "fieldtype": "Currency",
+   "label": "Labour Charge"
+  },
+  {
+   "fieldname": "grand_total",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Grand Total",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_cust",
+   "fieldtype": "Section Break",
+   "label": "Customer Sign-off"
+  },
+  {
+   "fieldname": "customer_feedback",
+   "fieldtype": "Small Text",
+   "label": "Feedback"
+  },
+  {
+   "fieldname": "customer_rating",
+   "fieldtype": "Rating",
+   "label": "Rating"
+  },
+  {
+   "fieldname": "cb3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "customer_signature",
+   "fieldtype": "Signature",
+   "label": "Signature"
+  },
+  {
+   "fieldname": "photo_1",
+   "fieldtype": "Attach Image",
+   "label": "Photo 1"
+  },
+  {
+   "fieldname": "photo_2",
+   "fieldtype": "Attach Image",
+   "label": "Photo 2"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Service Visit",
+   "print_hide": 1,
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "icon": "kumar-visit",
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-08-07 23:16:44.050892",
+ "modified_by": "Administrator",
+ "module": "Kumar Service",
+ "name": "Service Visit",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Service Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Service Technician",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Dealer",
+   "share": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Warranty Approver",
+   "share": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

@@ -1,0 +1,309 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2026-08-07 16:17:58.115057",
+ "description": "Dealer asks for warranty settlement. Heat and winding batch ride along, which is what makes batch defect analysis possible.",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "service_request",
+  "serial_no",
+  "dealer",
+  "cb1",
+  "claim_date",
+  "claim_type",
+  "workflow_state",
+  "sb_trace",
+  "pump_model",
+  "heat_no",
+  "cb2",
+  "winding_batch",
+  "root_cause",
+  "sb_parts",
+  "defective_parts",
+  "claim_amount",
+  "cb3",
+  "approved_amount",
+  "credit_note",
+  "sb_evidence",
+  "technician_report",
+  "defect_photo",
+  "cb4",
+  "remarks",
+  "settled_on",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "default": "WC-.YY.-.#####",
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Series",
+   "options": "WC-.YY.-.#####",
+   "print_hide": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "service_request",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Service Request",
+   "options": "Service Request"
+  },
+  {
+   "fieldname": "serial_no",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Serial No",
+   "options": "Serial No",
+   "reqd": 1
+  },
+  {
+   "fieldname": "dealer",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Dealer",
+   "options": "Dealer",
+   "reqd": 1
+  },
+  {
+   "fieldname": "cb1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Today",
+   "fieldname": "claim_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Claim Date",
+   "reqd": 1
+  },
+  {
+   "default": "Part Replacement",
+   "fieldname": "claim_type",
+   "fieldtype": "Select",
+   "in_standard_filter": 1,
+   "label": "Claim Type",
+   "options": "Part Replacement\nFull Unit Replacement\nRepair Reimbursement"
+  },
+  {
+   "fieldname": "workflow_state",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "no_copy": 1,
+   "options": "Workflow State",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_trace",
+   "fieldtype": "Section Break",
+   "label": "Traceability (pulled from the serial)"
+  },
+  {
+   "fieldname": "pump_model",
+   "fieldtype": "Link",
+   "label": "Pump Model",
+   "options": "Pump Model",
+   "read_only": 1
+  },
+  {
+   "fieldname": "heat_no",
+   "fieldtype": "Link",
+   "label": "Heat No",
+   "options": "Batch",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cb2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "winding_batch",
+   "fieldtype": "Link",
+   "label": "Winding Batch",
+   "options": "Batch",
+   "read_only": 1
+  },
+  {
+   "fieldname": "root_cause",
+   "fieldtype": "Select",
+   "label": "Root Cause",
+   "options": "\nManufacturing Defect\nInstallation Error\nVoltage Fluctuation\nDry Run\nWater Quality\nWear & Tear\nMisuse\nNot a Defect"
+  },
+  {
+   "fieldname": "sb_parts",
+   "fieldtype": "Section Break",
+   "label": "Claimed Parts"
+  },
+  {
+   "fieldname": "defective_parts",
+   "fieldtype": "Table",
+   "label": "Defective Parts",
+   "options": "Claim Part Row"
+  },
+  {
+   "fieldname": "claim_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Claim Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cb3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "approved_amount",
+   "fieldtype": "Currency",
+   "label": "Approved Amount"
+  },
+  {
+   "fieldname": "credit_note",
+   "fieldtype": "Link",
+   "label": "Credit Note",
+   "options": "Sales Invoice"
+  },
+  {
+   "fieldname": "sb_evidence",
+   "fieldtype": "Section Break",
+   "label": "Evidence"
+  },
+  {
+   "fieldname": "technician_report",
+   "fieldtype": "Text",
+   "label": "Technician Report"
+  },
+  {
+   "fieldname": "defect_photo",
+   "fieldtype": "Attach Image",
+   "label": "Defect Photo"
+  },
+  {
+   "fieldname": "cb4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "settled_on",
+   "fieldtype": "Date",
+   "label": "Settled On",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Kumar Warranty Claim",
+   "print_hide": 1,
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "icon": "kumar-claim",
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-08-07 23:16:45.266138",
+ "modified_by": "Administrator",
+ "module": "Kumar Service",
+ "name": "Kumar Warranty Claim",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Warranty Approver",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Service Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Quality Engineer",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Dealer",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts User",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "serial_no",
+ "track_changes": 1
+}

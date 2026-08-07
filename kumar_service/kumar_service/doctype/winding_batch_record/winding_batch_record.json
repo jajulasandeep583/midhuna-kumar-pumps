@@ -1,0 +1,248 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2026-08-07 16:18:30.942386",
+ "description": "One stator winding lot. Carried onto every serial built from it.",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "batch_no",
+  "winding_date",
+  "machine",
+  "operator",
+  "cb1",
+  "pump_model",
+  "copper_wire_batch",
+  "wire_gauge_swg",
+  "turns_per_coil",
+  "sb_cure",
+  "varnish_batch",
+  "oven_temp_c",
+  "cb2",
+  "cure_duration_min",
+  "sb_test",
+  "ir_test_mohm",
+  "hipot_test_kv",
+  "cb3",
+  "winding_resistance_ohm",
+  "sb_qty",
+  "qty_produced",
+  "qty_passed",
+  "cb4",
+  "qty_rejected",
+  "rejection_reason"
+ ],
+ "fields": [
+  {
+   "default": "WDR-.YY..MM.-.####",
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Series",
+   "options": "WDR-.YY..MM.-.####",
+   "print_hide": 1,
+   "reqd": 1
+  },
+  {
+   "bold": 1,
+   "fieldname": "batch_no",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Winding Batch No",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "default": "Today",
+   "fieldname": "winding_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Winding Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "machine",
+   "fieldtype": "Link",
+   "label": "Machine",
+   "options": "Workstation"
+  },
+  {
+   "fieldname": "operator",
+   "fieldtype": "Link",
+   "label": "Operator",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "cb1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "pump_model",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Pump Model",
+   "options": "Pump Model"
+  },
+  {
+   "fieldname": "copper_wire_batch",
+   "fieldtype": "Link",
+   "label": "Copper Wire Batch",
+   "options": "Batch"
+  },
+  {
+   "fieldname": "wire_gauge_swg",
+   "fieldtype": "Data",
+   "label": "Wire Gauge (SWG)"
+  },
+  {
+   "fieldname": "turns_per_coil",
+   "fieldtype": "Int",
+   "label": "Turns per Coil"
+  },
+  {
+   "fieldname": "sb_cure",
+   "fieldtype": "Section Break",
+   "label": "Varnish & Cure"
+  },
+  {
+   "fieldname": "varnish_batch",
+   "fieldtype": "Link",
+   "label": "Varnish Batch",
+   "options": "Batch"
+  },
+  {
+   "fieldname": "oven_temp_c",
+   "fieldtype": "Float",
+   "label": "Oven Temp (C)"
+  },
+  {
+   "fieldname": "cb2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cure_duration_min",
+   "fieldtype": "Int",
+   "label": "Cure Duration (min)"
+  },
+  {
+   "fieldname": "sb_test",
+   "fieldtype": "Section Break",
+   "label": "Electrical Test"
+  },
+  {
+   "fieldname": "ir_test_mohm",
+   "fieldtype": "Float",
+   "label": "IR Test (Mohm)"
+  },
+  {
+   "fieldname": "hipot_test_kv",
+   "fieldtype": "Float",
+   "label": "HiPot Test (kV)"
+  },
+  {
+   "fieldname": "cb3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "winding_resistance_ohm",
+   "fieldtype": "Float",
+   "label": "Winding Resistance (ohm)"
+  },
+  {
+   "fieldname": "sb_qty",
+   "fieldtype": "Section Break",
+   "label": "Output"
+  },
+  {
+   "fieldname": "qty_produced",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Qty Produced"
+  },
+  {
+   "fieldname": "qty_passed",
+   "fieldtype": "Int",
+   "label": "Qty Passed"
+  },
+  {
+   "fieldname": "cb4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "qty_rejected",
+   "fieldtype": "Int",
+   "label": "Qty Rejected"
+  },
+  {
+   "fieldname": "rejection_reason",
+   "fieldtype": "Small Text",
+   "label": "Rejection Reason"
+  }
+ ],
+ "grid_page_length": 50,
+ "icon": "kumar-winding",
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-08-07 23:16:47.595092",
+ "modified_by": "Administrator",
+ "module": "Kumar Service",
+ "name": "Winding Batch Record",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Quality Engineer",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Production Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Service Manager",
+   "share": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "batch_no",
+ "track_changes": 1
+}

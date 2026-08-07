@@ -1,0 +1,307 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "autoname": "field:model_code",
+ "creation": "2026-08-07 16:13:38.695114",
+ "description": "One catalogue model, e.g. KSMB50P3(4x3). Specs here drive warranty and test limits.",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "model_code",
+  "pump_category",
+  "family_code",
+  "item",
+  "cb1",
+  "hp",
+  "kw",
+  "phase",
+  "voltage_range",
+  "rpm",
+  "sb_mech",
+  "suction_size_inch",
+  "delivery_size_inch",
+  "impeller_material",
+  "cb2",
+  "rotor_type",
+  "base_type",
+  "stage_type",
+  "sb_perf",
+  "head_min_m",
+  "head_max_m",
+  "cb3",
+  "discharge_min",
+  "discharge_max",
+  "discharge_uom",
+  "sb_curve",
+  "performance_curve",
+  "sb_meta",
+  "bis_standard",
+  "warranty_months",
+  "cb4",
+  "is_active"
+ ],
+ "fields": [
+  {
+   "bold": 1,
+   "fieldname": "model_code",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Model Code",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "pump_category",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Pump Category",
+   "options": "Pump Category",
+   "reqd": 1
+  },
+  {
+   "fieldname": "family_code",
+   "fieldtype": "Select",
+   "in_standard_filter": 1,
+   "label": "Family Code",
+   "options": "PP\nPPS\nPPS3PLG\nJM\nSMB\nHMB\nBP\nV3\nV4\nV6\nV8\nHAND\nMOTOR\nENGINE"
+  },
+  {
+   "fieldname": "item",
+   "fieldtype": "Link",
+   "label": "Stock Item",
+   "options": "Item"
+  },
+  {
+   "fieldname": "cb1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "hp",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "HP",
+   "reqd": 1
+  },
+  {
+   "description": "Auto = HP x 0.7457",
+   "fieldname": "kw",
+   "fieldtype": "Float",
+   "label": "kW",
+   "read_only": 1
+  },
+  {
+   "fieldname": "phase",
+   "fieldtype": "Select",
+   "in_standard_filter": 1,
+   "label": "Phase",
+   "options": "\nSingle Phase\nThree Phase"
+  },
+  {
+   "fieldname": "voltage_range",
+   "fieldtype": "Data",
+   "label": "Voltage Range"
+  },
+  {
+   "fieldname": "rpm",
+   "fieldtype": "Int",
+   "label": "RPM"
+  },
+  {
+   "fieldname": "sb_mech",
+   "fieldtype": "Section Break",
+   "label": "Mechanical"
+  },
+  {
+   "fieldname": "suction_size_inch",
+   "fieldtype": "Data",
+   "label": "Suction Size (inch)"
+  },
+  {
+   "fieldname": "delivery_size_inch",
+   "fieldtype": "Data",
+   "label": "Delivery Size (inch)"
+  },
+  {
+   "fieldname": "impeller_material",
+   "fieldtype": "Select",
+   "label": "Impeller Material",
+   "options": "\nGunmetal\nCast Iron\nStainless Steel\nThermoplastic"
+  },
+  {
+   "fieldname": "cb2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "rotor_type",
+   "fieldtype": "Select",
+   "label": "Rotor Type",
+   "options": "\nCopper\nAluminium Die Cast"
+  },
+  {
+   "fieldname": "base_type",
+   "fieldtype": "Select",
+   "label": "Base Type",
+   "options": "\nSquare\nRound\nNA"
+  },
+  {
+   "fieldname": "stage_type",
+   "fieldtype": "Select",
+   "label": "Stage Type",
+   "options": "\nSingle Stage\nDouble Stage\nNA"
+  },
+  {
+   "fieldname": "sb_perf",
+   "fieldtype": "Section Break",
+   "label": "Performance"
+  },
+  {
+   "fieldname": "head_min_m",
+   "fieldtype": "Float",
+   "label": "Head Min (m)"
+  },
+  {
+   "fieldname": "head_max_m",
+   "fieldtype": "Float",
+   "label": "Head Max (m)"
+  },
+  {
+   "fieldname": "cb3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "discharge_min",
+   "fieldtype": "Float",
+   "label": "Discharge Min"
+  },
+  {
+   "fieldname": "discharge_max",
+   "fieldtype": "Float",
+   "label": "Discharge Max"
+  },
+  {
+   "fieldname": "discharge_uom",
+   "fieldtype": "Select",
+   "label": "Discharge UOM",
+   "options": "LPM\nLPH\nLPS"
+  },
+  {
+   "fieldname": "sb_curve",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "performance_curve",
+   "fieldtype": "Table",
+   "label": "Performance Curve",
+   "options": "Pump Model Spec Point"
+  },
+  {
+   "fieldname": "sb_meta",
+   "fieldtype": "Section Break",
+   "label": "Compliance"
+  },
+  {
+   "description": "e.g. IS 8034, IS 9079, IS 7538",
+   "fieldname": "bis_standard",
+   "fieldtype": "Data",
+   "label": "BIS Standard"
+  },
+  {
+   "description": "Leave 0 to inherit the category default",
+   "fieldname": "warranty_months",
+   "fieldtype": "Int",
+   "label": "Warranty (Months)"
+  },
+  {
+   "fieldname": "cb4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "fieldname": "is_active",
+   "fieldtype": "Check",
+   "label": "Is Active"
+  }
+ ],
+ "grid_page_length": 50,
+ "icon": "kumar-model",
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-08-07 23:16:37.904756",
+ "modified_by": "Administrator",
+ "module": "Kumar Service",
+ "name": "Pump Model",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Production Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Quality Engineer",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Service Manager",
+   "share": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Service Technician",
+   "share": 1
+  },
+  {
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Dealer",
+   "share": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "search_fields": "pump_category,hp,phase",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "model_code",
+ "track_changes": 1
+}

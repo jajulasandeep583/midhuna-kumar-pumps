@@ -1,0 +1,172 @@
+{
+ "app": "kumar_service",
+ "charts": [],
+ "content": "[{\"id\": \"74cea279b9\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Service Desk</b></span>\", \"col\": 12}}, {\"id\": \"b0498c4cfe\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Shortcuts</b></span>\", \"col\": 12}}, {\"id\": \"d2392a371b\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Pump Lookup\", \"col\": 3}}, {\"id\": \"8f0b521cd3\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Open Requests\", \"col\": 3}}, {\"id\": \"42395186a0\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Today's Visits\", \"col\": 3}}, {\"id\": \"d9dfefc062\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Technicians\", \"col\": 3}}, {\"id\": \"b7042c420c\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"SLA Compliance\", \"col\": 3}}, {\"id\": \"05658ff438\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"e5757b2cf6\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Reports & Masters</b></span>\", \"col\": 12}}, {\"id\": \"b381e61c71\", \"type\": \"card\", \"data\": {\"card_name\": \"Service\", \"col\": 4}}, {\"id\": \"923311afde\", \"type\": \"card\", \"data\": {\"card_name\": \"Analysis\", \"col\": 4}}, {\"id\": \"c4de5ba6ed\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"ce449c7acf\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>How to use this screen</b></span>\", \"col\": 12}}, {\"id\": \"ab0c041255\", \"type\": \"paragraph\", \"data\": {\"text\": \"<div style='border:1px solid var(--border-color);border-radius:8px;padding:14px 16px;background:var(--fg-color)'><p style='margin:0 0 6px'><b>How to use the Service Desk</b></p><p style='margin:0 0 8px;color:var(--text-muted)'>Everything after a customer complains: triage it, put a technician on it, and close it inside the SLA the company promises (24 hours to respond).</p><p style='margin:10px 0 4px'><b>Do this, in order</b></p><ol style='margin:0 0 4px 18px'><li>Open the complaint from <b>Open Requests</b>. The pump's full history is already on the form - check <b>Repeat Failure</b> before assuming it is a fresh fault.</li><li>Set <b>Technician</b> and <b>Service Centre</b>, then set status to Assigned. The response clock stops when you fill <b>First Response</b>.</li><li>The technician records what happened in a <b>Service Visit</b>: findings, parts used, labour. Warranty jobs default to non-chargeable.</li><li>Close the request with a <b>Root Cause</b>. That field is what feeds the Pareto chart and tells the factory what to fix.</li></ol><p style='margin:10px 0 4px'><b>Watch out for</b></p><ul style='margin:0 0 4px 18px'><li><b>SLA Breaches</b> is the list to clear first thing every morning.</li><li>If the root cause is a Manufacturing Defect, raise a Warranty Claim so the batch gets analysed - otherwise the plant never learns.</li></ul></div>\", \"col\": 12}}]",
+ "creation": "2026-08-07 17:00:47.784711",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "hide_custom": 0,
+ "icon": "kumar-service",
+ "idx": 0,
+ "indicator_color": "green",
+ "is_hidden": 0,
+ "label": "Service Desk",
+ "link_type": "DocType",
+ "links": [
+  {
+   "hidden": 0,
+   "icon": "kumar-service",
+   "is_query_report": 0,
+   "label": "Service",
+   "link_count": 3,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-complaint",
+   "is_query_report": 0,
+   "label": "Service Request",
+   "link_count": 0,
+   "link_to": "Service Request",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-visit",
+   "is_query_report": 0,
+   "label": "Service Visit",
+   "link_count": 0,
+   "link_to": "Service Visit",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-technician",
+   "is_query_report": 0,
+   "label": "Service Technician",
+   "link_count": 0,
+   "link_to": "Service Technician",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-report",
+   "is_query_report": 0,
+   "label": "Analysis",
+   "link_count": 3,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "dependencies": "Pump Registration",
+   "hidden": 0,
+   "icon": "kumar-dealer",
+   "is_query_report": 1,
+   "label": "Dealer Performance",
+   "link_count": 0,
+   "link_to": "Dealer Performance",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "Service Visit",
+   "hidden": 0,
+   "icon": "kumar-technician",
+   "is_query_report": 1,
+   "label": "Technician Productivity",
+   "link_count": 0,
+   "link_to": "Technician Productivity",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "Pump Registration",
+   "hidden": 0,
+   "icon": "kumar-model",
+   "is_query_report": 1,
+   "label": "Model Reliability",
+   "link_count": 0,
+   "link_to": "Model Reliability",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-08-08 00:12:23.356625",
+ "modified_by": "Administrator",
+ "module": "Kumar Service",
+ "name": "Service Desk",
+ "number_cards": [],
+ "owner": "Administrator",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [
+  {
+   "role": "Service Manager"
+  },
+  {
+   "role": "Service Technician"
+  },
+  {
+   "role": "System Manager"
+  }
+ ],
+ "sequence_id": 2.0,
+ "shortcuts": [
+  {
+   "color": "blue",
+   "doc_view": "",
+   "icon": "kumar-qr",
+   "label": "Pump Lookup",
+   "link_to": "pump-lookup",
+   "type": "Page"
+  },
+  {
+   "color": "red",
+   "doc_view": "",
+   "icon": "kumar-complaint",
+   "label": "Open Requests",
+   "link_to": "Service Request",
+   "type": "DocType"
+  },
+  {
+   "color": "orange",
+   "doc_view": "",
+   "icon": "kumar-visit",
+   "label": "Today's Visits",
+   "link_to": "Service Visit",
+   "type": "DocType"
+  },
+  {
+   "color": "blue",
+   "doc_view": "",
+   "icon": "kumar-technician",
+   "label": "Technicians",
+   "link_to": "Service Technician",
+   "type": "DocType"
+  },
+  {
+   "color": "purple",
+   "doc_view": "",
+   "icon": "kumar-report",
+   "label": "SLA Compliance",
+   "link_to": "SLA Compliance",
+   "report_ref_doctype": "Service Request",
+   "type": "Report"
+  }
+ ],
+ "title": "Service Desk",
+ "type": "Workspace"
+}

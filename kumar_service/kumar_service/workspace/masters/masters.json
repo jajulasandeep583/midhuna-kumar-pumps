@@ -1,0 +1,189 @@
+{
+ "app": "kumar_service",
+ "charts": [],
+ "content": "[{\"id\": \"e6e689107f\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>KUMAR Masters</b></span>\", \"col\": 12}}, {\"id\": \"5e57da8514\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Shortcuts</b></span>\", \"col\": 12}}, {\"id\": \"850478721f\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Pump Model\", \"col\": 3}}, {\"id\": \"ec3550b2c0\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Pump Category\", \"col\": 3}}, {\"id\": \"249c96dcd7\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Dealer Tree\", \"col\": 3}}, {\"id\": \"e6b0aadbb5\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Settings\", \"col\": 3}}, {\"id\": \"110a8ea5d8\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Items\", \"col\": 3}}, {\"id\": \"7a0a4357a8\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"8a0122215e\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Reports & Masters</b></span>\", \"col\": 12}}, {\"id\": \"26493a16b6\", \"type\": \"card\", \"data\": {\"card_name\": \"Catalogue\", \"col\": 4}}, {\"id\": \"3b95e007cf\", \"type\": \"card\", \"data\": {\"card_name\": \"Network\", \"col\": 4}}, {\"id\": \"8561b5f98d\", \"type\": \"card\", \"data\": {\"card_name\": \"Configuration\", \"col\": 4}}, {\"id\": \"9e01c73f72\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"88c82be829\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>How to use this screen</b></span>\", \"col\": 12}}, {\"id\": \"40bc1c41b3\", \"type\": \"paragraph\", \"data\": {\"text\": \"<div style='border:1px solid var(--border-color);border-radius:8px;padding:14px 16px;background:var(--fg-color)'><p style='margin:0 0 6px'><b>How to use KUMAR Masters</b></p><p style='margin:0 0 8px;color:var(--text-muted)'>The catalogue and the network. Change things here and the rest of the system follows - warranty periods, model specs, who a dealer reports to.</p><p style='margin:10px 0 4px'><b>Do this, in order</b></p><ol style='margin:0 0 4px 18px'><li><b>Pump Category</b> sets the default warranty months for a whole family.</li><li><b>Pump Model</b> holds the real specs from the brochure and can override the category's warranty. Each model points at one stock Item.</li><li><b>Dealer Tree</b> is a hierarchy: Branch - Distributor - Dealer - Sub-Dealer. A dealer login sees its own records and everything below it, nothing sideways.</li><li><b>Settings</b> holds every assumption - SLA hours, warranty basis, QC enforcement, QR base URL. Nothing is hardcoded.</li></ol><p style='margin:10px 0 4px'><b>Watch out for</b></p><ul style='margin:0 0 4px 18px'><li>Give a dealer a login by setting <b>Portal User</b> on the Dealer record. That single field is what row-level access is derived from.</li></ul></div>\", \"col\": 12}}]",
+ "creation": "2026-08-07 17:15:58.064860",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "hide_custom": 0,
+ "icon": "kumar-masters",
+ "idx": 0,
+ "indicator_color": "green",
+ "is_hidden": 0,
+ "label": "Masters",
+ "link_type": "DocType",
+ "links": [
+  {
+   "hidden": 0,
+   "icon": "kumar-model",
+   "is_query_report": 0,
+   "label": "Catalogue",
+   "link_count": 3,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-model",
+   "is_query_report": 0,
+   "label": "Pump Model",
+   "link_count": 0,
+   "link_to": "Pump Model",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-category",
+   "is_query_report": 0,
+   "label": "Pump Category",
+   "link_count": 0,
+   "link_to": "Pump Category",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-pump",
+   "is_query_report": 0,
+   "label": "Item",
+   "link_count": 0,
+   "link_to": "Item",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-dealer",
+   "is_query_report": 0,
+   "label": "Network",
+   "link_count": 3,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-dealer",
+   "is_query_report": 0,
+   "label": "Dealer",
+   "link_count": 0,
+   "link_to": "Dealer",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-technician",
+   "is_query_report": 0,
+   "label": "Service Technician",
+   "link_count": 0,
+   "link_to": "Service Technician",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-dealer",
+   "is_query_report": 0,
+   "label": "Customer",
+   "link_count": 0,
+   "link_to": "Customer",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-settings",
+   "is_query_report": 0,
+   "label": "Configuration",
+   "link_count": 1,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-settings",
+   "is_query_report": 0,
+   "label": "Kumar Service Settings",
+   "link_count": 0,
+   "link_to": "Kumar Service Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-08-08 00:12:23.637660",
+ "modified_by": "Administrator",
+ "module": "Kumar Service",
+ "name": "Masters",
+ "number_cards": [],
+ "owner": "Administrator",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Production Manager"
+  },
+  {
+   "role": "Dealer Manager"
+  }
+ ],
+ "sequence_id": 6.0,
+ "shortcuts": [
+  {
+   "color": "blue",
+   "doc_view": "",
+   "icon": "kumar-model",
+   "label": "Pump Model",
+   "link_to": "Pump Model",
+   "type": "DocType"
+  },
+  {
+   "color": "green",
+   "doc_view": "",
+   "icon": "kumar-category",
+   "label": "Pump Category",
+   "link_to": "Pump Category",
+   "type": "DocType"
+  },
+  {
+   "color": "orange",
+   "doc_view": "",
+   "icon": "kumar-dealer",
+   "label": "Dealer Tree",
+   "link_to": "Dealer",
+   "type": "DocType"
+  },
+  {
+   "color": "grey",
+   "doc_view": "",
+   "icon": "kumar-settings",
+   "label": "Settings",
+   "link_to": "Kumar Service Settings",
+   "type": "DocType"
+  },
+  {
+   "color": "purple",
+   "doc_view": "",
+   "icon": "kumar-pump",
+   "label": "Items",
+   "link_to": "Item",
+   "type": "DocType"
+  }
+ ],
+ "title": "Masters",
+ "type": "Workspace"
+}

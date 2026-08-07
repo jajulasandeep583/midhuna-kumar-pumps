@@ -1,0 +1,411 @@
+{% extends "templates/web.html" %}
+
+{% block title %}{{ _("Dealer Portal") }} | KUMAR Pumps{% endblock %}
+
+{% block page_content %}
+<style>
+  .kd { max-width: 900px; margin: 0 auto; padding: 20px 14px 60px; }
+  .kd-top { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;
+            border-bottom:3px solid #0b5394; padding-bottom:12px; margin-bottom:20px; }
+  .kd-brand { font-size:26px; font-weight:800; color:#0b5394; }
+  .kd-who { font-size:13px; color:#555; }
+  .kd-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px;
+              margin-bottom:24px; }
+  .kd-card { border:1px solid #cfd8e3; border-radius:10px; padding:14px; text-align:center; }
+  .kd-num { font-size:26px; font-weight:800; color:#0b5394; }
+  .kd-lbl { font-size:12px; color:#666; margin-top:4px; }
+  .kd-actions { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:26px; }
+  .kd-btn { padding:11px 18px; border-radius:8px; background:#0b5394; color:#fff !important;
+            font-weight:600; font-size:14px; text-decoration:none; display:inline-block; }
+  .kd-btn.sec { background:#fff; color:#0b5394 !important; border:1px solid #0b5394; }
+  .kd-sec { margin-bottom:28px; }
+  .kd-h { font-size:15px; font-weight:700; margin-bottom:10px; color:#33475b; }
+  table.kd-t { width:100%; border-collapse:collapse; font-size:13px; }
+  table.kd-t th { text-align:left; background:#f2f6fb; padding:8px; border:1px solid #cfd8e3;
+                  font-size:12px; color:#33475b; }
+  table.kd-t td { padding:8px; border:1px solid #eef1f5; }
+  .kd-empty { color:#888; font-size:13px; padding:10px 0; }
+  @media (max-width:600px){ table.kd-t th:nth-child(n+4), table.kd-t td:nth-child(n+4){display:none} }
+
+  /* register-a-pump form. A dealer fills this standing in a shop on a phone,
+     so: one column, big targets, and never a field they have to think about. */
+  .kr { border:1px solid #cfd8e3; border-radius:12px; padding:18px; margin-bottom:28px; }
+  .kr-step { font-size:12px; font-weight:700; color:#0b5394; text-transform:uppercase;
+             letter-spacing:.6px; margin:18px 0 8px; }
+  .kr-step:first-child { margin-top:0; }
+  .kr-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px; }
+  .kr label { display:block; font-size:12px; color:#555; margin-bottom:4px; font-weight:600; }
+  .kr input, .kr select, .kr textarea {
+    width:100%; padding:11px 12px; border:1px solid #cfd8e3; border-radius:8px;
+    font-size:15px; background:#fff; }
+  .kr input:focus, .kr select:focus { outline:2px solid #0b5394; border-color:#0b5394; }
+  .kr-find { display:flex; gap:8px; align-items:flex-end; }
+  .kr-find > div { flex:1; }
+  .kr-btn { padding:12px 20px; border-radius:8px; background:#0b5394; color:#fff; border:0;
+            font-weight:700; font-size:15px; cursor:pointer; }
+  .kr-btn[disabled] { opacity:.5; cursor:not-allowed; }
+  .kr-btn.wide { width:100%; padding:15px; font-size:16px; margin-top:18px; }
+  /* the pump we found, and the cover WE are giving - stated, not asked */
+  .kr-found { background:#f2f6fb; border-left:4px solid #0b5394; border-radius:8px;
+              padding:14px; margin-top:14px; font-size:14px; }
+  .kr-found b { color:#0b5394; }
+  .kr-warr { font-size:13px; color:#33475b; margin-top:6px; }
+  .kr-msg { padding:12px 14px; border-radius:8px; font-size:14px; margin-top:14px; }
+  .kr-msg.bad { background:#fdeceb; color:#a32b20; }
+  .kr-msg.good { background:#eaf7ee; color:#1c6b34; }
+  .kr-hide { display:none; }
+
+  /* the headline: this month, against last month, and where that puts them */
+  .kp-head { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:16px; }
+  .kp-big { flex:1 1 300px; background:linear-gradient(135deg,#0b5394,#0d6bbd); color:#fff;
+            border-radius:16px; padding:20px 24px; }
+  .kp-big-lbl { font-size:13px; opacity:.85; }
+  .kp-big-val { font-size:46px; font-weight:800; line-height:1.05; }
+  .kp-big-sub { font-size:14px; opacity:.92; margin-top:6px; }
+  .kp-rank { flex:0 1 190px; border:1px solid #cfd8e3; border-radius:16px; padding:20px 22px;
+             display:flex; flex-direction:column; justify-content:center; }
+  .kp-rank-val { font-size:38px; font-weight:800; color:#0b5394; line-height:1; }
+  .kp-rank-lbl { font-size:13px; color:#666; margin-top:6px; }
+</style>
+
+<div class="kd">
+  <div class="kd-top">
+    <div>
+      <div class="kd-brand">KUMAR</div>
+      <div class="kd-who">{{ _("Dealer Portal") }}</div>
+    </div>
+    <div class="kd-who">{{ dealer or frappe.session.user }}</div>
+  </div>
+
+  {% if not_a_dealer %}
+    <p>{{ _("Your login is not linked to a dealer record. Ask the branch office to set Portal User on your Dealer.") }}</p>
+  {% else %}
+
+  {# This month first, and against last month - a running total since the shop
+     opened tells nobody whether today is going well. #}
+  <div class="kp-head">
+    <div class="kp-big">
+      <div class="kp-big-lbl">{{ _("Pumps sold in the last 30 days") }}</div>
+      <div class="kp-big-val">{{ performance.last_30 }}</div>
+      <div class="kp-big-sub">
+        {%- if performance.change_pct is not none -%}
+          {%- if performance.change_pct >= 0 %}&#9650;{% else %}&#9660;{% endif %}
+          {{ performance.change_pct|abs }}%
+          {{ _("on the 30 days before that") }} ({{ performance.prev_30 }})
+        {%- elif performance.prev_30 -%}
+          {{ _("against {0} in the 30 days before that").format(performance.prev_30) }}
+        {%- else -%}
+          {{ _("{0} so far in {1}").format(performance.this_month, performance.month_label) }}
+        {%- endif -%}
+      </div>
+    </div>
+    {% if performance.rank %}
+    <div class="kp-rank">
+      <div class="kp-rank-val">#{{ performance.rank }}</div>
+      <div class="kp-rank-lbl">{{ _("of {0} selling outlets").format(performance.of) }}</div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="kd-cards">
+    <div class="kd-card"><div class="kd-num">{{ counts.registrations }}</div>
+      <div class="kd-lbl">{{ _("Registered, All Time") }}</div></div>
+    <div class="kd-card"><div class="kd-num">{{ performance.in_warranty }}</div>
+      <div class="kd-lbl">{{ _("Pumps Still in Warranty") }}</div></div>
+    <div class="kd-card"><div class="kd-num">{{ frappe.utils.fmt_money(performance.revenue, 0, "INR") }}</div>
+      <div class="kd-lbl">{{ _("Billed to You, 30 Days") }}</div></div>
+    <div class="kd-card"><div class="kd-num">{{ frappe.utils.fmt_money(performance.outstanding, 0, "INR") }}</div>
+      <div class="kd-lbl">{{ _("You Owe KUMAR") }}</div></div>
+    <div class="kd-card"><div class="kd-num">{{ counts.open }}</div>
+      <div class="kd-lbl">{{ _("Open Complaints") }}</div></div>
+    <div class="kd-card"><div class="kd-num">{{ counts.claims }}</div>
+      <div class="kd-lbl">{{ _("Warranty Claims") }}</div></div>
+  </div>
+
+  <div class="kd-actions">
+    <a class="kd-btn sec" href="/app/service-request/new">{{ _("Raise a Complaint") }}</a>
+    <a class="kd-btn sec" href="/warranty-check">{{ _("Warranty Check") }}</a>
+    <a class="kd-btn sec" href="/app/dealer-desk">{{ _("Full Dealer Desk") }}</a>
+  </div>
+
+  <div class="kd-sec">
+    <div class="kd-h">{{ _("Register a Pump You Have Sold") }}</div>
+    <form class="kr" id="kr-form" autocomplete="off">
+
+      <div class="kr-step">{{ _("1. Which pump?") }}</div>
+      <div class="kr-find">
+        <div>
+          <label for="kr-serial">{{ _("Serial Number") }}</label>
+          <input id="kr-serial" name="serial_no" placeholder="KP-..." required>
+        </div>
+        <button type="button" class="kr-btn" id="kr-find">{{ _("Find") }}</button>
+      </div>
+      <div id="kr-result"></div>
+
+      <div id="kr-rest" class="kr-hide">
+        {% if is_own_outlet %}
+        {# A KUMAR branch. The customer's invoice IS ours, so there is nothing
+           for the clerk to type - we find it from the serial. #}
+        <div class="kr-step">{{ _("2. The KUMAR invoice") }}</div>
+        <div class="kr-row">
+          <div>
+            <label>{{ _("Invoice") }}</label>
+            <div id="kr-kinv" class="kr-found" style="margin-top:0">-</div>
+          </div>
+          <div>
+            <label for="kr-sale">{{ _("Date Sold") }}</label>
+            <input id="kr-sale" name="sale_date" type="date" required>
+          </div>
+        </div>
+        {% else %}
+        <div class="kr-step">{{ _("2. Your bill to the customer") }}</div>
+        <div class="kr-row">
+          <div>
+            <label for="kr-inv">{{ _("Your Invoice No") }}</label>
+            <input id="kr-inv" name="invoice_no" required>
+          </div>
+          <div>
+            <label for="kr-invdate">{{ _("Your Invoice Date") }}</label>
+            <input id="kr-invdate" name="dealer_invoice_date" type="date">
+          </div>
+          <div>
+            <label for="kr-sale">{{ _("Date Sold") }}</label>
+            <input id="kr-sale" name="sale_date" type="date" required>
+          </div>
+        </div>
+        {% endif %}
+
+        <div class="kr-step">{{ _("3. Who bought it") }}</div>
+        <div class="kr-row">
+          <div>
+            <label for="kr-cust">{{ _("Customer Name") }}</label>
+            <input id="kr-cust" name="end_customer_name" required>
+          </div>
+          <div>
+            <label for="kr-mob">{{ _("Mobile") }}</label>
+            <input id="kr-mob" name="end_customer_mobile" inputmode="numeric"
+                   pattern="[6-9][0-9]{9}" maxlength="10" required>
+          </div>
+          <div>
+            <label for="kr-app">{{ _("Used For") }}</label>
+            <select id="kr-app" name="application_type">
+              <option>Agriculture</option><option>Domestic</option>
+              <option>Industrial</option><option>Commercial</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="kr-step">{{ _("4. Where it is installed") }}</div>
+        <div class="kr-row">
+          <div>
+            <label for="kr-addr">{{ _("Village / Address") }}</label>
+            <input id="kr-addr" name="installation_address">
+          </div>
+          <div>
+            <label for="kr-dist">{{ _("District") }}</label>
+            <input id="kr-dist" name="district">
+          </div>
+          <div>
+            <label for="kr-pin">{{ _("Pincode") }}</label>
+            <input id="kr-pin" name="pincode" inputmode="numeric" maxlength="6">
+          </div>
+        </div>
+
+        <button type="submit" class="kr-btn wide" id="kr-submit">
+          {{ _("Register & Get Warranty Certificate") }}
+        </button>
+      </div>
+
+      <div id="kr-done"></div>
+    </form>
+  </div>
+
+  <div class="kd-sec">
+    <div class="kd-h">{{ _("Recent Registrations") }}</div>
+    {% if registrations %}
+    <table class="kd-t">
+      <tr><th>{{ _("Serial") }}</th><th>{{ _("Customer") }}</th><th>{{ _("Sold") }}</th>
+          <th>{{ _("Warranty Upto") }}</th><th>{{ _("Certificate") }}</th></tr>
+      {% for r in registrations %}
+      <tr>
+        <td><a href="/app/pump-registration/{{ r.name }}">{{ r.serial_no }}</a></td>
+        <td>{{ r.end_customer_name }}<br><small>{{ r.end_customer_mobile }}</small></td>
+        <td>{{ frappe.utils.format_date(r.sale_date) }}</td>
+        <td>{{ frappe.utils.format_date(r.warranty_expiry_date) }}</td>
+        <td><a href="{{ r.certificate_url }}" target="_blank" rel="noopener">{{ _("Print") }}</a></td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% else %}<div class="kd-empty">{{ _("No registrations yet.") }}</div>{% endif %}
+  </div>
+
+  <div class="kd-sec">
+    <div class="kd-h">{{ _("Open Complaints") }}</div>
+    {% if open_requests %}
+    <table class="kd-t">
+      <tr><th>{{ _("Request") }}</th><th>{{ _("Serial") }}</th><th>{{ _("Complaint") }}</th>
+          <th>{{ _("Status") }}</th><th>{{ _("Reported") }}</th></tr>
+      {% for s in open_requests %}
+      <tr>
+        <td><a href="/app/service-request/{{ s.name }}">{{ s.name }}</a></td>
+        <td>{{ s.serial_no }}</td><td>{{ s.complaint_category }}</td>
+        <td>{{ s.status }}</td><td>{{ frappe.utils.format_datetime(s.reported_on) }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% else %}<div class="kd-empty">{{ _("Nothing open. ") }}</div>{% endif %}
+  </div>
+
+  <div class="kd-sec">
+    <div class="kd-h">{{ _("My Warranty Claims") }}</div>
+    {% if claims %}
+    <table class="kd-t">
+      <tr><th>{{ _("Claim") }}</th><th>{{ _("Serial") }}</th><th>{{ _("Type") }}</th>
+          <th>{{ _("Amount") }}</th><th>{{ _("Status") }}</th></tr>
+      {% for c in claims %}
+      <tr>
+        <td><a href="/app/kumar-warranty-claim/{{ c.name }}">{{ c.name }}</a></td>
+        <td>{{ c.serial_no }}</td><td>{{ c.claim_type }}</td>
+        <td>{{ frappe.utils.fmt_money(c.claim_amount, currency="INR") }}</td>
+        <td>{{ c.workflow_state or "Draft" }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% else %}<div class="kd-empty">{{ _("No claims raised.") }}</div>{% endif %}
+  </div>
+
+  <div class="kd-sec">
+    <div class="kd-h">{{ _("Warranty Expiring in 30 Days") }} <small>{{ _("- call these customers") }}</small></div>
+    {% if expiring %}
+    <table class="kd-t">
+      <tr><th>{{ _("Serial") }}</th><th>{{ _("Customer") }}</th><th>{{ _("Mobile") }}</th>
+          <th>{{ _("Expires") }}</th></tr>
+      {% for e in expiring %}
+      <tr><td>{{ e.name }}</td><td>{{ e.custom_end_customer_name }}</td>
+          <td>{{ e.custom_end_customer_mobile }}</td>
+          <td>{{ frappe.utils.format_date(e.custom_warranty_expiry_date) }}</td></tr>
+      {% endfor %}
+    </table>
+    {% else %}<div class="kd-empty">{{ _("Nothing expiring this month.") }}</div>{% endif %}
+  </div>
+
+  {% endif %}
+</div>
+
+<script>
+// The dealer types a serial; everything about the pump - and above all the
+// warranty we are prepared to honour - is read back from the server. Nothing
+// on this page can change the cover, which is the whole point: the brand sets
+// it, the shop just reports the sale.
+frappe.ready(function () {
+  const $ = (id) => document.getElementById(id);
+  const form = $("kr-form");
+  if (!form) return;
+
+  const OWN_OUTLET = {{ "true" if is_own_outlet else "false" }};
+
+  const today = frappe.datetime ? frappe.datetime.get_today() : new Date().toISOString().slice(0, 10);
+  $("kr-sale").value = today;
+  if ($("kr-invdate")) $("kr-invdate").value = today;
+
+  const esc = (s) => frappe.utils.escape_html(String(s == null ? "" : s));
+  const say = (into, cls, html) => { $(into).innerHTML = `<div class="kr-msg ${cls}">${html}</div>`; };
+
+  let found = null;
+
+  function lookup() {
+    const serial = $("kr-serial").value.trim();
+    if (!serial) return;
+    found = null;
+    $("kr-rest").classList.add("kr-hide");
+    $("kr-result").innerHTML = `<div class="kr-msg">${__("Checking...")}</div>`;
+
+    frappe.call({
+      method: "kumar_service.api.portal_serial_lookup",
+      args: { serial_no: serial },
+      callback: function (r) {
+        const d = r.message;
+        if (!d) return;
+
+        if (d.already_registered) {
+          const e = d.existing || {};
+          say("kr-result", "bad",
+            __("Already registered to {0} on {1}. Warranty runs to {2}.", [
+              esc(e.end_customer_name), frappe.datetime.str_to_user(e.sale_date),
+              frappe.datetime.str_to_user(e.warranty_expiry_date)]));
+          return;
+        }
+
+        found = d;
+        $("kr-result").innerHTML = `
+          <div class="kr-found">
+            <b>${esc(d.pump_model || __("Unknown model"))}</b>
+            ${d.hp ? " &middot; " + esc(d.hp) + " HP" : ""}
+            ${d.phase ? " &middot; " + esc(d.phase) : ""}
+            <div class="kr-warr">
+              ${__("KUMAR warranty on this pump")}:
+              <b>${esc(d.warranty_months)} ${__("months")}</b>
+              ${__("from the date you sell it")}.
+            </div>
+          </div>`;
+
+        // a branch sells on our invoice, so show which one rather than asking
+        if (OWN_OUTLET && $("kr-kinv")) {
+          $("kr-kinv").innerHTML = d.kumar_invoice
+            ? `<b>${esc(d.kumar_invoice)}</b>`
+            : `<span style="color:#a32b20">${__("No KUMAR invoice found for this pump - raise it first.")}</span>`;
+        }
+
+        $("kr-rest").classList.remove("kr-hide");
+        $("kr-cust").focus();
+      },
+      error: function () {
+        say("kr-result", "bad", __("We have no record of that serial. Check the number on the nameplate."));
+      },
+    });
+  }
+
+  $("kr-find").addEventListener("click", lookup);
+  $("kr-serial").addEventListener("keydown", function (e) {
+    // a barcode scanner ends its scan with Enter, and Enter in a form submits
+    if (e.key === "Enter") { e.preventDefault(); lookup(); }
+  });
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (!found) { lookup(); return; }
+
+    const btn = $("kr-submit");
+    btn.disabled = true;
+    btn.textContent = __("Registering...");
+
+    const args = {};
+    new FormData(form).forEach((v, k) => { args[k] = v; });
+    args.serial_no = found.serial_no;
+    args.registration_source = "Dealer Portal";
+
+    frappe.call({
+      method: "kumar_service.api.register_pump",
+      args: args,
+      callback: function (r) {
+        const d = r.message || {};
+        form.querySelector("#kr-rest").classList.add("kr-hide");
+        $("kr-result").innerHTML = "";
+        say("kr-done", "good",
+          __("Registered as {0}. Warranty runs to {1}.", [
+            esc(d.name), frappe.datetime.str_to_user(d.warranty_expiry_date)]) +
+          ` <a class="kd-btn" style="margin-left:10px" target="_blank" rel="noopener"
+               href="${esc(d.certificate_url)}">${__("Print Certificate")}</a>`);
+        // the certificate is the deliverable, so leave it on screen; the list
+        // behind it is stale now, so refresh once the dealer has printed
+        setTimeout(() => { window.location.reload(); }, 30000);
+      },
+      error: function () {
+        btn.disabled = false;
+        btn.textContent = __("Register & Get Warranty Certificate");
+      },
+    });
+  });
+});
+</script>
+{% endblock %}

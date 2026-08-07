@@ -1,0 +1,255 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2026-08-07 16:18:30.508470",
+ "description": "One furnace melt. Chemistry is checked before pouring - this is the root of backward traceability.",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "heat_no",
+  "heat_date",
+  "furnace",
+  "cb1",
+  "shift",
+  "charge_weight_kg",
+  "tapping_temperature_c",
+  "status",
+  "sb_spectro",
+  "target_grade",
+  "grade_achieved",
+  "cb2",
+  "carbon_equivalent",
+  "all_within_spec",
+  "sb_rows",
+  "spectro_readings",
+  "sb_lab",
+  "lab_approved_by",
+  "lab_approved_on",
+  "cb3",
+  "override_reason",
+  "remarks"
+ ],
+ "fields": [
+  {
+   "default": "HTR-.YY..MM.-.####",
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Series",
+   "options": "HTR-.YY..MM.-.####",
+   "print_hide": 1,
+   "reqd": 1
+  },
+  {
+   "bold": 1,
+   "description": "Also created as a Batch so castings can carry it",
+   "fieldname": "heat_no",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Heat No",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "default": "Today",
+   "fieldname": "heat_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Heat Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "furnace",
+   "fieldtype": "Link",
+   "label": "Furnace",
+   "options": "Workstation"
+  },
+  {
+   "fieldname": "cb1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "A",
+   "fieldname": "shift",
+   "fieldtype": "Select",
+   "label": "Shift",
+   "options": "A\nB\nC"
+  },
+  {
+   "fieldname": "charge_weight_kg",
+   "fieldtype": "Float",
+   "label": "Charge Weight (kg)"
+  },
+  {
+   "default": "1500",
+   "fieldname": "tapping_temperature_c",
+   "fieldtype": "Float",
+   "label": "Tapping Temp (C)"
+  },
+  {
+   "default": "Draft",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Draft\nApproved for Pouring\nRejected"
+  },
+  {
+   "fieldname": "sb_spectro",
+   "fieldtype": "Section Break",
+   "label": "Spectrometer Analysis (before pouring)"
+  },
+  {
+   "default": "FG 200",
+   "fieldname": "target_grade",
+   "fieldtype": "Select",
+   "label": "Target Grade",
+   "options": "FG 200\nFG 260\nSG 500-7\nOther"
+  },
+  {
+   "fieldname": "grade_achieved",
+   "fieldtype": "Select",
+   "label": "Grade Achieved",
+   "options": "\nFG 200\nFG 260\nSG 500-7\nOther"
+  },
+  {
+   "fieldname": "cb2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "carbon_equivalent",
+   "fieldtype": "Float",
+   "label": "Carbon Equivalent",
+   "precision": "3",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "all_within_spec",
+   "fieldtype": "Check",
+   "label": "All Elements Within Spec",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_rows",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "spectro_readings",
+   "fieldtype": "Table",
+   "label": "Spectro Readings",
+   "options": "Heat Spectro Reading"
+  },
+  {
+   "fieldname": "sb_lab",
+   "fieldtype": "Section Break",
+   "label": "Lab Approval"
+  },
+  {
+   "fieldname": "lab_approved_by",
+   "fieldtype": "Link",
+   "label": "Approved By",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "lab_approved_on",
+   "fieldtype": "Datetime",
+   "label": "Approved On",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cb3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Required to approve a heat with any element out of spec",
+   "fieldname": "override_reason",
+   "fieldtype": "Small Text",
+   "label": "Out-of-Spec Override Reason"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  }
+ ],
+ "grid_page_length": 50,
+ "icon": "kumar-heat",
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-08-07 23:16:46.719588",
+ "modified_by": "Administrator",
+ "module": "Kumar Service",
+ "name": "Heat Record",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Quality Engineer",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Production Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Foundry Operator",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Service Manager",
+   "share": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "heat_no",
+ "track_changes": 1
+}

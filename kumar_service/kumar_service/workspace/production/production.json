@@ -1,0 +1,561 @@
+{
+ "app": "kumar_service",
+ "charts": [],
+ "content": "[{\"id\": \"63cb384cb3\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Stock &amp; Manufacturing</b></span>\", \"col\": 12}}, {\"id\": \"19818ee997\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Shortcuts</b></span>\", \"col\": 12}}, {\"id\": \"626eab2941\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Stock Entry\", \"col\": 3}}, {\"id\": \"e19cb7fadb\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Work Order\", \"col\": 3}}, {\"id\": \"2a8f5fcb10\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Serial No\", \"col\": 3}}, {\"id\": \"0d377209b9\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Batch\", \"col\": 3}}, {\"id\": \"187ae10aee\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Items\", \"col\": 3}}, {\"id\": \"6956844b17\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"6bc687e458\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Reports & Masters</b></span>\", \"col\": 12}}, {\"id\": \"c6b216000d\", \"type\": \"card\", \"data\": {\"card_name\": \"Manufacturing\", \"col\": 4}}, {\"id\": \"001e4a8156\", \"type\": \"card\", \"data\": {\"card_name\": \"Stock Transactions\", \"col\": 4}}, {\"id\": \"8370293428\", \"type\": \"card\", \"data\": {\"card_name\": \"Stock Masters\", \"col\": 4}}, {\"id\": \"72a93f7ea1\", \"type\": \"card\", \"data\": {\"card_name\": \"Buying & Selling\", \"col\": 4}}, {\"id\": \"043a89bd80\", \"type\": \"card\", \"data\": {\"card_name\": \"Stock Reports\", \"col\": 4}}, {\"id\": \"3df30d6dc9\", \"type\": \"card\", \"data\": {\"card_name\": \"Manufacturing Reports\", \"col\": 4}}, {\"id\": \"cd84edf028\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"2e50c6190c\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>How to use this screen</b></span>\", \"col\": 12}}, {\"id\": \"ba1cd281aa\", \"type\": \"paragraph\", \"data\": {\"text\": \"<div style='border:1px solid var(--border-color);border-radius:8px;padding:14px 16px;background:var(--fg-color)'><p style='margin:0 0 6px'><b>How to use Stock &amp; Manufacturing</b></p><p style='margin:0 0 8px;color:var(--text-muted)'>The ERPNext side of the plant, in the order a pump is actually built: buy the components, melt and wind, raise a Work Order against a BOM, consume the batches, produce a serialised pump, test it, then dispatch it. Nothing here is a KUMAR invention - it is standard ERPNext, wired so the serial and batch numbers flow.</p><p style='margin:10px 0 4px'><b>Do this, in order</b></p><ol style='margin:0 0 4px 18px'><li><b>Item</b> - a finished pump has <i>Has Serial No</i> with the series <code>KP-&lt;MODEL&gt;-.YY..MM.-.#####</code>; casings, stators and rotors have <i>Has Batch No</i>. The <b>Traceability Group</b> field on the item is what tells the genealogy hook which slot a consumed part fills.</li><li><b>Purchase Order &rarr; Purchase Receipt</b> for bought-out parts (bearings, seals, capacitors). Supplier lots come in as batches.</li><li><b>BOM</b> then <b>Work Order</b> for a production run. Print the <b>Route Card</b> from the Work Order and let it travel with the job.</li><li><b>Stock Entry (Manufacture)</b> consumes the casing and stator batches and produces the pump. Serial numbers are generated here, and the heat and winding numbers are stamped onto each one automatically.</li><li><b>Pump Test Certificate</b> per unit, then <b>Delivery Note</b> / <b>Sales Invoice</b>. A unit that has not passed test cannot be delivered.</li><li><b>Stock Ledger</b>, <b>Stock Balance</b> and <b>Batch-wise Balance History</b> answer where anything is; <b>Serial No</b> answers what one unit is.</li></ol><p style='margin:10px 0 4px'><b>Watch out for</b></p><ul style='margin:0 0 4px 18px'><li>Do not type serials into the old text field - v16 keeps them in a Serial and Batch Bundle. Use the scan button or the bundle selector.</li><li>A Manufacture entry that consumes no traceable batch will warn you. Fix it before submitting; that gap cannot be filled in later.</li></ul></div>\", \"col\": 12}}]",
+ "creation": "2026-08-07 17:15:57.935543",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "hide_custom": 0,
+ "icon": "kumar-factory",
+ "idx": 0,
+ "indicator_color": "green",
+ "is_hidden": 0,
+ "label": "Production",
+ "link_type": "DocType",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Manufacturing",
+   "link_count": 7,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-production",
+   "is_query_report": 0,
+   "label": "BOM",
+   "link_count": 0,
+   "link_to": "BOM",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-motor",
+   "is_query_report": 0,
+   "label": "Work Order",
+   "link_count": 0,
+   "link_to": "Work Order",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-production",
+   "is_query_report": 0,
+   "label": "Job Card",
+   "link_count": 0,
+   "link_to": "Job Card",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-production",
+   "is_query_report": 0,
+   "label": "Production Plan",
+   "link_count": 0,
+   "link_to": "Production Plan",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-production",
+   "is_query_report": 0,
+   "label": "Workstation",
+   "link_count": 0,
+   "link_to": "Workstation",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-production",
+   "is_query_report": 0,
+   "label": "Operation",
+   "link_count": 0,
+   "link_to": "Operation",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-production",
+   "is_query_report": 0,
+   "label": "Routing",
+   "link_count": 0,
+   "link_to": "Routing",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Stock Transactions",
+   "link_count": 6,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-warehouse",
+   "is_query_report": 0,
+   "label": "Stock Entry",
+   "link_count": 0,
+   "link_to": "Stock Entry",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-visit",
+   "is_query_report": 0,
+   "label": "Delivery Note",
+   "link_count": 0,
+   "link_to": "Delivery Note",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-purchase",
+   "is_query_report": 0,
+   "label": "Purchase Receipt",
+   "link_count": 0,
+   "link_to": "Purchase Receipt",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-purchase",
+   "is_query_report": 0,
+   "label": "Material Request",
+   "link_count": 0,
+   "link_to": "Material Request",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-warehouse",
+   "is_query_report": 0,
+   "label": "Stock Reconciliation",
+   "link_count": 0,
+   "link_to": "Stock Reconciliation",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-warehouse",
+   "is_query_report": 0,
+   "label": "Packing Slip",
+   "link_count": 0,
+   "link_to": "Packing Slip",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-category",
+   "is_query_report": 0,
+   "label": "Stock Masters",
+   "link_count": 7,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-pump",
+   "is_query_report": 0,
+   "label": "Item",
+   "link_count": 0,
+   "link_to": "Item",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-category",
+   "is_query_report": 0,
+   "label": "Item Group",
+   "link_count": 0,
+   "link_to": "Item Group",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-warehouse",
+   "is_query_report": 0,
+   "label": "Warehouse",
+   "link_count": 0,
+   "link_to": "Warehouse",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-winding",
+   "is_query_report": 0,
+   "label": "Batch",
+   "link_count": 0,
+   "link_to": "Batch",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-serial",
+   "is_query_report": 0,
+   "label": "Serial No",
+   "link_count": 0,
+   "link_to": "Serial No",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-category",
+   "is_query_report": 0,
+   "label": "UOM",
+   "link_count": 0,
+   "link_to": "UOM",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-serial",
+   "is_query_report": 0,
+   "label": "Serial and Batch Bundle",
+   "link_count": 0,
+   "link_to": "Serial and Batch Bundle",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-sales",
+   "is_query_report": 0,
+   "label": "Buying & Selling",
+   "link_count": 6,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-purchase",
+   "is_query_report": 0,
+   "label": "Purchase Order",
+   "link_count": 0,
+   "link_to": "Purchase Order",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-purchase",
+   "is_query_report": 0,
+   "label": "Supplier",
+   "link_count": 0,
+   "link_to": "Supplier",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-sales",
+   "is_query_report": 0,
+   "label": "Sales Order",
+   "link_count": 0,
+   "link_to": "Sales Order",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-claim",
+   "is_query_report": 0,
+   "label": "Sales Invoice",
+   "link_count": 0,
+   "link_to": "Sales Invoice",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-dealer",
+   "is_query_report": 0,
+   "label": "Customer",
+   "link_count": 0,
+   "link_to": "Customer",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-sales",
+   "is_query_report": 0,
+   "label": "Quotation",
+   "link_count": 0,
+   "link_to": "Quotation",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-report",
+   "is_query_report": 0,
+   "label": "Stock Reports",
+   "link_count": 7,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "dependencies": "Stock Ledger Entry",
+   "hidden": 0,
+   "icon": "kumar-report",
+   "is_query_report": 1,
+   "label": "Stock Ledger",
+   "link_count": 0,
+   "link_to": "Stock Ledger",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "Stock Ledger Entry",
+   "hidden": 0,
+   "icon": "kumar-report",
+   "is_query_report": 1,
+   "label": "Stock Balance",
+   "link_count": 0,
+   "link_to": "Stock Balance",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "Item",
+   "hidden": 0,
+   "icon": "kumar-report",
+   "is_query_report": 1,
+   "label": "Stock Projected Qty",
+   "link_count": 0,
+   "link_to": "Stock Projected Qty",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "Stock Ledger Entry",
+   "hidden": 0,
+   "icon": "kumar-report",
+   "is_query_report": 1,
+   "label": "Batch-Wise Balance History",
+   "link_count": 0,
+   "link_to": "Batch-Wise Balance History",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "Stock Ledger Entry",
+   "hidden": 0,
+   "icon": "kumar-report",
+   "is_query_report": 1,
+   "label": "Serial No Ledger",
+   "link_count": 0,
+   "link_to": "Serial No Ledger",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "Item",
+   "hidden": 0,
+   "icon": "kumar-report",
+   "is_query_report": 1,
+   "label": "Stock Ageing",
+   "link_count": 0,
+   "link_to": "Stock Ageing",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "Item Price",
+   "hidden": 0,
+   "icon": "kumar-report",
+   "is_query_report": 1,
+   "label": "Item-wise Price List Rate",
+   "link_count": 0,
+   "link_to": "Item-wise Price List Rate",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-report",
+   "is_query_report": 0,
+   "label": "Manufacturing Reports",
+   "link_count": 4,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "dependencies": "Work Order",
+   "hidden": 0,
+   "icon": "kumar-report",
+   "is_query_report": 1,
+   "label": "Work Order Summary",
+   "link_count": 0,
+   "link_to": "Work Order Summary",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "BOM",
+   "hidden": 0,
+   "icon": "kumar-report",
+   "is_query_report": 1,
+   "label": "BOM Explorer",
+   "link_count": 0,
+   "link_to": "BOM Explorer",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "Work Order",
+   "hidden": 0,
+   "icon": "kumar-report",
+   "is_query_report": 1,
+   "label": "Production Planning Report",
+   "link_count": 0,
+   "link_to": "Production Planning Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "Job Card",
+   "hidden": 0,
+   "icon": "kumar-report",
+   "is_query_report": 1,
+   "label": "Job Card Summary",
+   "link_count": 0,
+   "link_to": "Job Card Summary",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-08-08 00:12:23.533148",
+ "modified_by": "Administrator",
+ "module": "Kumar Service",
+ "name": "Production",
+ "number_cards": [],
+ "owner": "Administrator",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [
+  {
+   "role": "Production Manager"
+  },
+  {
+   "role": "Quality Engineer"
+  },
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Foundry Operator"
+  }
+ ],
+ "sequence_id": 5.0,
+ "shortcuts": [
+  {
+   "color": "blue",
+   "doc_view": "",
+   "icon": "kumar-warehouse",
+   "label": "Stock Entry",
+   "link_to": "Stock Entry",
+   "type": "DocType"
+  },
+  {
+   "color": "orange",
+   "doc_view": "",
+   "icon": "kumar-motor",
+   "label": "Work Order",
+   "link_to": "Work Order",
+   "type": "DocType"
+  },
+  {
+   "color": "green",
+   "doc_view": "",
+   "icon": "kumar-serial",
+   "label": "Serial No",
+   "link_to": "Serial No",
+   "type": "DocType"
+  },
+  {
+   "color": "purple",
+   "doc_view": "",
+   "icon": "kumar-winding",
+   "label": "Batch",
+   "link_to": "Batch",
+   "type": "DocType"
+  },
+  {
+   "color": "grey",
+   "doc_view": "",
+   "icon": "kumar-pump",
+   "label": "Items",
+   "link_to": "Item",
+   "type": "DocType"
+  }
+ ],
+ "title": "Production",
+ "type": "Workspace"
+}

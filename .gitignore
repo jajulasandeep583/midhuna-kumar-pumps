@@ -1,0 +1,19 @@
+.DS_Store
+*.pyc
+*.egg-info
+*.swp
+tags
+node_modules
+__pycache__
+
+# built by `bench build` from the .bundle.* sources, so it is regenerated on
+# every deploy and the hashed filenames would churn the diff on each build
+kumar_service/public/dist
+
+# never let a site's own config near the app
+site_config.json
+common_site_config.json
+*.env
+.env*
+*.pem
+*.key
