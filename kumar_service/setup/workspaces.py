@@ -78,6 +78,9 @@ WORKSPACES = [
 			("purchase-analytics", "Page", "Purchase Analytics", "orange"),
 			("production-daily", "Page", "Daily Production", "purple"),
 			("dealer-network", "Page", "Dealer Network", "blue"),
+			# how well we are looking after customers and dealers - a management
+			# question, not only a service-desk one
+			("service-command-centre", "Page", "Service Command Centre", "red"),
 			("people-payroll", "Page", "People & Payroll", "grey"),
 		],
 		"links": [
@@ -162,7 +165,8 @@ WORKSPACES = [
 			],
 		),
 		"shortcuts": [
-			# first, because answering the dealers is the job
+			# the two screens the service desk actually runs on
+			("service-command-centre", "Page", "Command Centre", "blue"),
 			("dealer-conversations", "Page", "Dealer Conversations", "green"),
 			("pump-lookup", "Page", "Pump Lookup", "blue"),
 			("Service Request", "DocType", "Open Requests", "red"),

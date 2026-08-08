@@ -489,6 +489,119 @@ def _portal_users():
 	)
 
 
+#: What may be attached to a message. A dealer photographs a burnt winding on a
+#: phone and KUMAR sends back a credit note, so images and PDFs cover it; nothing
+#: executable is accepted, and the cap keeps a phone photo from timing out on a
+#: village connection.
+ALLOWED_ATTACHMENTS = {
+	".jpg", ".jpeg", ".png", ".webp", ".heic", ".gif", ".pdf",
+}
+MAX_ATTACHMENT_MB = 8
+IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".heic", ".gif"}
+
+
+def _attachments_for(comment_names):
+	"""Files hung on each message, in one query rather than one per message."""
+	if not comment_names:
+		return {}
+	found = {}
+	for f in frappe.get_all(
+		"File",
+		filters={"attached_to_doctype": "Comment", "attached_to_name": ["in", comment_names]},
+		fields=["name", "file_name", "file_url", "file_size", "attached_to_name"],
+		order_by="creation asc",
+	):
+		ext = ("." + (f.file_name or "").rsplit(".", 1)[-1]).lower() if "." in (f.file_name or "") else ""
+		found.setdefault(f.attached_to_name, []).append(
+			{
+				"name": f.name,
+				"file_name": f.file_name,
+				"file_url": f.file_url,
+				"size": f.file_size,
+				"is_image": ext in IMAGE_EXTENSIONS,
+			}
+		)
+	return found
+
+
+def attach_to_message(comment_name, filename, content_base64, ticket_doctype=None,
+		ticket_name=None):
+	"""Save one file against a message.
+
+	Attached to the Comment, not to the ticket: the file belongs to the thing
+	that was said, and both the portal and the Dealer Conversations screen render
+	it under that message. `ticket_doctype`/`ticket_name` are recorded on the File
+	as a folder hint only.
+	"""
+	import base64
+	import os
+
+	filename = os.path.basename(filename or "").strip() or "attachment"
+	ext = os.path.splitext(filename)[1].lower()
+	if ext not in ALLOWED_ATTACHMENTS:
+		frappe.throw(
+			_("{0} cannot be attached. Send a photo or a PDF.").format(filename or ext)
+		)
+
+	try:
+		content = base64.b64decode(content_base64 or "", validate=True)
+	except Exception:  # noqa: BLE001
+		frappe.throw(_("That file could not be read. Try again."))
+
+	if not content:
+		frappe.throw(_("That file is empty."))
+	if len(content) > MAX_ATTACHMENT_MB * 1024 * 1024:
+		frappe.throw(
+			_("{0} is too large. The limit is {1} MB.").format(filename, MAX_ATTACHMENT_MB)
+		)
+
+	doc = frappe.get_doc(
+		{
+			"doctype": "File",
+			"file_name": filename,
+			"attached_to_doctype": "Comment",
+			"attached_to_name": comment_name,
+			"content": content,
+			"decode": False,
+			# a message on a dealer's ticket is not public; it is reachable only
+			# through the endpoints that check the dealer's scope
+			"is_private": 1,
+		}
+	)
+	doc.flags.ignore_permissions = True
+	doc.insert(ignore_permissions=True)
+	return {"file_url": doc.file_url, "file_name": doc.file_name}
+
+
+def link_file_to_message(comment_name, file_url):
+	"""Hang an ALREADY-uploaded file on a message.
+
+	The desk's Attach field uploads through frappe and hands back a URL, so there
+	is no base64 to decode - only a second File row to create pointing at the same
+	stored file. Frappe keys content by hash, so this costs a row, not a copy.
+	"""
+	file_url = (file_url or "").strip()
+	if not file_url:
+		return None
+
+	source = frappe.db.get_value(
+		"File", {"file_url": file_url}, ["file_name", "is_private"], as_dict=True
+	)
+	doc = frappe.get_doc(
+		{
+			"doctype": "File",
+			"file_url": file_url,
+			"file_name": (source or {}).get("file_name") or file_url.rsplit("/", 1)[-1],
+			"attached_to_doctype": "Comment",
+			"attached_to_name": comment_name,
+			"is_private": (source or {}).get("is_private", 1),
+		}
+	)
+	doc.flags.ignore_permissions = True
+	doc.insert(ignore_permissions=True)
+	return doc.file_url
+
+
 def thread_for(doctype, name, portal_users=None):
 	"""The conversation on one ticket, oldest first.
 
@@ -508,6 +621,7 @@ def thread_for(doctype, name, portal_users=None):
 		fields=["name", "content", "owner", "creation", "comment_by"],
 		order_by="creation asc",
 	)
+	files = _attachments_for([r.name for r in rows])
 	thread = []
 	for r in rows:
 		from_dealer = r.owner in portal_users
@@ -521,20 +635,34 @@ def thread_for(doctype, name, portal_users=None):
 				"side": "dealer" if from_dealer else "kumar",
 				"who": _("Dealer") if from_dealer else "KUMAR",
 				"on": r.creation,
+				"attachments": files.get(r.name, []),
 			}
 		)
 	return thread
 
 
-def add_reply(doctype, name, message, notify_users=None):
+def add_reply(doctype, name, message, notify_users=None, attachments=None, attach_urls=None):
 	"""Append to a ticket's conversation and tell the other side.
 
 	`notify_users` is who to alert. Without the notification this is a noticeboard
 	nobody reads - the whole point is that neither side has to keep checking.
+
+	`attachments` is a list of `{filename, content}` where content is base64. A
+	message may be attachment-only: a photograph of a burnt winding says more than
+	a paragraph, and refusing it because the text box was empty would be silly.
 	"""
 	message = (message or "").strip()
-	if not message:
+	if isinstance(attachments, str):
+		attachments = frappe.parse_json(attachments)
+	attachments = attachments or []
+	if isinstance(attach_urls, str):
+		attach_urls = frappe.parse_json(attach_urls) if attach_urls.startswith("[") else [attach_urls]
+	attach_urls = [u for u in (attach_urls or []) if u]
+
+	if not message and not attachments and not attach_urls:
 		frappe.throw(_("Write a message before sending"))
+	if not message:
+		message = _("(photo attached)")
 
 	comment = frappe.get_doc(
 		{
@@ -548,6 +676,17 @@ def add_reply(doctype, name, message, notify_users=None):
 	)
 	comment.flags.ignore_permissions = True
 	comment.insert(ignore_permissions=True)
+
+	for row in attachments:
+		attach_to_message(
+			comment.name,
+			(row or {}).get("filename"),
+			(row or {}).get("content"),
+			ticket_doctype=doctype,
+			ticket_name=name,
+		)
+	for url in attach_urls:
+		link_file_to_message(comment.name, url)
 
 	for user in {u for u in (notify_users or []) if u and u != frappe.session.user}:
 		try:
@@ -577,8 +716,8 @@ def ticket_thread(kind, name):
 
 
 @frappe.whitelist()
-def post_reply(kind, name, message):
-	"""The dealer writing back to KUMAR."""
+def post_reply(kind, name, message, attachments=None):
+	"""The dealer writing back to KUMAR, with photos if they have them."""
 	doctype, dealer = _my_ticket(kind, name)
 
 	# Tell the people who actually own the ticket: whoever it is assigned to, the
@@ -601,7 +740,7 @@ def post_reply(kind, name, message):
 	)
 	notify.add(frappe.db.get_value(doctype, name, "owner"))
 
-	add_reply(doctype, name, message, notify_users=notify)
+	add_reply(doctype, name, message, notify_users=notify, attachments=attachments)
 	return {"thread": thread_for(doctype, name), "message": _("Sent to KUMAR.")}
 
 

@@ -99,6 +99,8 @@ EXTRA_ICONS = {
 	"Dealer Requests & Claims": "kumar-portal",
 	"Dealer Requests": "kumar-portal",
 	"Dealer Conversations": "kumar-portal",
+	"Command Centre": "kumar-report",
+	"Service Command Centre": "kumar-report",
 	"Data Migration": "kumar-import",
 	# desk pages
 	"Historical Serial Import": "kumar-import",

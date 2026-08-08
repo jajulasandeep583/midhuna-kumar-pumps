@@ -1418,3 +1418,308 @@ def people_overview(from_date=None, to_date=None):
 		"top_absent": top_absent,
 		"employees": employees,
 	}
+
+
+# ------------------------------------------- 8. service & warranty command centre
+
+
+@frappe.whitelist()
+def service_command_centre(from_date=None, to_date=None, dealer=None):
+	"""The one screen that answers "are we looking after our customers and dealers".
+
+	The service desk and the warranty desk exist to deal with queries from
+	customers and dealers, so the headline is not revenue - it is **how many we
+	closed**. Everything else on this screen explains that number: what is still
+	open, who is late, which service centre is carrying the load, which model
+	keeps coming back, and what the warranty is costing.
+
+	Deliberately counts two things separately and never adds them up:
+	  * raised   - tickets that came IN during the window
+	  * resolved - tickets CLOSED during the window, whenever they were raised
+	A ticket raised in June and closed in July belongs to June's intake and
+	July's output. Rolling them into one "tickets" figure is how a service desk
+	convinces itself it is keeping up when it is not.
+	"""
+	_require("Service Request")
+	from_date, to_date = _window(from_date, to_date)
+	scope = _scope(dealer)
+	days = max(date_diff(to_date, from_date) + 1, 1)
+
+	# previous window of equal length, for the comparison arrows
+	prev_to = add_days(from_date, -1)
+	prev_from = add_days(prev_to, -(days - 1))
+
+	where_scope = " and sr.dealer in %(scope)s" if scope is not None else ""
+	args = {"f": from_date, "t": to_date, "pf": prev_from, "pt": prev_to, "scope": scope}
+
+	def one(sql):
+		return flt(frappe.db.sql(sql, args)[0][0] or 0)
+
+	# ---------------------------------------------------------------- complaints
+	raised = one(
+		f"""select count(*) from `tabService Request` sr
+		    where sr.docstatus < 2 and date(sr.reported_on) between %(f)s and %(t)s
+		    {where_scope}"""
+	)
+	raised_prev = one(
+		f"""select count(*) from `tabService Request` sr
+		    where sr.docstatus < 2 and date(sr.reported_on) between %(pf)s and %(pt)s
+		    {where_scope}"""
+	)
+	resolved = one(
+		f"""select count(*) from `tabService Request` sr
+		    where sr.docstatus < 2 and sr.resolved_on is not null
+		      and date(sr.resolved_on) between %(f)s and %(t)s {where_scope}"""
+	)
+	resolved_prev = one(
+		f"""select count(*) from `tabService Request` sr
+		    where sr.docstatus < 2 and sr.resolved_on is not null
+		      and date(sr.resolved_on) between %(pf)s and %(pt)s {where_scope}"""
+	)
+	# Open is a snapshot of NOW, not of the window: a manager wants to know what
+	# is on the desk today, not what happened to be open on an arbitrary date.
+	open_now = one(
+		f"""select count(*) from `tabService Request` sr
+		    where sr.docstatus < 2 and sr.resolved_on is null
+		      and sr.status not in ('Closed', 'Cancelled') {where_scope}"""
+	)
+	late_now = one(
+		f"""select count(*) from `tabService Request` sr
+		    where sr.docstatus < 2 and sr.resolved_on is null
+		      and sr.status not in ('Closed', 'Cancelled')
+		      and sr.resolution_due_on < now() {where_scope}"""
+	)
+	unanswered = one(
+		f"""select count(*) from `tabService Request` sr
+		    where sr.docstatus < 2 and sr.first_response_on is null
+		      and sr.status not in ('Closed', 'Cancelled') {where_scope}"""
+	)
+	avg_days = one(
+		f"""select avg(datediff(sr.resolved_on, sr.reported_on)) from `tabService Request` sr
+		    where sr.docstatus < 2 and sr.resolved_on is not null
+		      and date(sr.resolved_on) between %(f)s and %(t)s {where_scope}"""
+	)
+	free_visits = one(
+		f"""select count(*) from `tabService Request` sr
+		    where sr.docstatus < 2 and sr.is_under_warranty = 1
+		      and date(sr.reported_on) between %(f)s and %(t)s {where_scope}"""
+	)
+	repeat = one(
+		f"""select count(*) from `tabService Request` sr
+		    where sr.docstatus < 2 and sr.is_repeat_failure = 1
+		      and date(sr.reported_on) between %(f)s and %(t)s {where_scope}"""
+	)
+
+	sla = frappe.db.sql(
+		f"""select sr.sla_status as status, count(*) as n from `tabService Request` sr
+		    where sr.docstatus < 2 and date(sr.reported_on) between %(f)s and %(t)s
+		    {where_scope} group by sr.sla_status""",
+		args,
+		as_dict=True,
+	)
+	sla_map = {r.status or "Ongoing": cint(r.n) for r in sla}
+	sla_judged = sum(v for k, v in sla_map.items() if k in ("Responded", "Fulfilled", "Failed"))
+	sla_met = sla_map.get("Responded", 0) + sla_map.get("Fulfilled", 0)
+
+	# ------------------------------------------------------------------- claims
+	claim_scope = " and wc.dealer in %(scope)s" if scope is not None else ""
+	claims_raised = one(
+		f"""select count(*) from `tabKumar Warranty Claim` wc
+		    where wc.docstatus < 2 and wc.claim_date between %(f)s and %(t)s {claim_scope}"""
+	)
+	claims_settled = one(
+		f"""select count(*) from `tabKumar Warranty Claim` wc
+		    where wc.docstatus < 2 and wc.settled_on between %(f)s and %(t)s {claim_scope}"""
+	)
+	claims_open = one(
+		f"""select count(*) from `tabKumar Warranty Claim` wc
+		    where wc.docstatus < 2 and wc.settled_on is null
+		      and ifnull(wc.workflow_state,'Draft') not in ('Rejected') {claim_scope}"""
+	)
+	claim_value = one(
+		f"""select ifnull(sum(wc.claim_amount),0) from `tabKumar Warranty Claim` wc
+		    where wc.docstatus < 2 and wc.claim_date between %(f)s and %(t)s {claim_scope}"""
+	)
+	claim_approved = one(
+		f"""select ifnull(sum(wc.approved_amount),0) from `tabKumar Warranty Claim` wc
+		    where wc.docstatus < 2 and wc.claim_date between %(f)s and %(t)s {claim_scope}"""
+	)
+	claim_states = frappe.db.sql(
+		f"""select ifnull(wc.workflow_state,'Draft') as state, count(*) as n,
+		           ifnull(sum(wc.claim_amount),0) as value
+		    from `tabKumar Warranty Claim` wc
+		    where wc.docstatus < 2 {claim_scope}
+		    group by ifnull(wc.workflow_state,'Draft') order by count(*) desc""",
+		args,
+		as_dict=True,
+	)
+
+	# ------------------------------------------------------------------ series
+	raised_by_day = frappe.db.sql(
+		f"""select date(sr.reported_on) as day, count(*) as total from `tabService Request` sr
+		    where sr.docstatus < 2 and date(sr.reported_on) between %(f)s and %(t)s
+		    {where_scope} group by date(sr.reported_on)""",
+		args,
+		as_dict=True,
+	)
+	resolved_by_day = frappe.db.sql(
+		f"""select date(sr.resolved_on) as day, count(*) as total from `tabService Request` sr
+		    where sr.docstatus < 2 and sr.resolved_on is not null
+		      and date(sr.resolved_on) between %(f)s and %(t)s
+		    {where_scope} group by date(sr.resolved_on)""",
+		args,
+		as_dict=True,
+	)
+
+	# ------------------------------------------------------------------ tables
+	by_category = frappe.db.sql(
+		f"""select sr.complaint_category as label, count(*) as raised,
+		           sum(case when sr.resolved_on is not null then 1 else 0 end) as resolved,
+		           sum(case when sr.is_under_warranty = 1 then 1 else 0 end) as in_warranty
+		    from `tabService Request` sr
+		    where sr.docstatus < 2 and date(sr.reported_on) between %(f)s and %(t)s
+		    {where_scope} group by sr.complaint_category order by count(*) desc""",
+		args,
+		as_dict=True,
+	)
+	by_root_cause = frappe.db.sql(
+		f"""select ifnull(nullif(sr.root_cause,''),'Not recorded') as label, count(*) as total
+		    from `tabService Request` sr
+		    where sr.docstatus < 2 and sr.resolved_on is not null
+		      and date(sr.resolved_on) between %(f)s and %(t)s
+		    {where_scope} group by ifnull(nullif(sr.root_cause,''),'Not recorded')
+		    order by count(*) desc""",
+		args,
+		as_dict=True,
+	)
+
+	# The service-centre table is the one a manager acts on: it says which centre
+	# is drowning. `service_centre` is a Dealer, so it names a real branch.
+	by_centre = frappe.db.sql(
+		f"""select ifnull(nullif(sr.service_centre,''),'Not assigned') as centre,
+		           count(*) as raised,
+		           sum(case when sr.resolved_on is not null then 1 else 0 end) as resolved,
+		           sum(case when sr.resolved_on is null
+		                     and sr.status not in ('Closed','Cancelled') then 1 else 0 end) as open_now,
+		           sum(case when sr.resolved_on is null
+		                     and sr.status not in ('Closed','Cancelled')
+		                     and sr.resolution_due_on < now() then 1 else 0 end) as late,
+		           avg(case when sr.resolved_on is not null
+		                    then datediff(sr.resolved_on, sr.reported_on) end) as avg_days,
+		           sum(case when sr.sla_status in ('Responded','Fulfilled') then 1 else 0 end) as sla_ok,
+		           sum(case when sr.sla_status = 'Failed' then 1 else 0 end) as sla_bad
+		    from `tabService Request` sr
+		    where sr.docstatus < 2 and date(sr.reported_on) between %(f)s and %(t)s
+		    {where_scope} group by ifnull(nullif(sr.service_centre,''),'Not assigned')
+		    order by count(*) desc""",
+		args,
+		as_dict=True,
+	)
+	for row in by_centre:
+		judged = cint(row.sla_ok) + cint(row.sla_bad)
+		row["sla_pct"] = _pct(cint(row.sla_ok), judged)
+		row["close_pct"] = _pct(cint(row.resolved), cint(row.raised))
+		row["avg_days"] = flt(row.avg_days, 1)
+
+	by_technician = frappe.db.sql(
+		f"""select ifnull(nullif(sr.assigned_technician,''),'Not assigned') as technician,
+		           count(*) as raised,
+		           sum(case when sr.resolved_on is not null then 1 else 0 end) as resolved,
+		           avg(case when sr.resolved_on is not null
+		                    then datediff(sr.resolved_on, sr.reported_on) end) as avg_days
+		    from `tabService Request` sr
+		    where sr.docstatus < 2 and date(sr.reported_on) between %(f)s and %(t)s
+		    {where_scope} group by ifnull(nullif(sr.assigned_technician,''),'Not assigned')
+		    order by count(*) desc limit 12""",
+		args,
+		as_dict=True,
+	)
+	for row in by_technician:
+		row["avg_days"] = flt(row.avg_days, 1)
+		row["close_pct"] = _pct(cint(row.resolved), cint(row.raised))
+
+	by_dealer = frappe.db.sql(
+		f"""select sr.dealer as dealer, count(*) as raised,
+		           sum(case when sr.resolved_on is not null then 1 else 0 end) as resolved,
+		           sum(case when sr.resolved_on is null
+		                     and sr.status not in ('Closed','Cancelled') then 1 else 0 end) as open_now,
+		           sum(case when sr.is_under_warranty = 1 then 1 else 0 end) as in_warranty
+		    from `tabService Request` sr
+		    where sr.docstatus < 2 and date(sr.reported_on) between %(f)s and %(t)s
+		    {where_scope} group by sr.dealer order by count(*) desc limit 15""",
+		args,
+		as_dict=True,
+	)
+	for row in by_dealer:
+		row["close_pct"] = _pct(cint(row.resolved), cint(row.raised))
+
+	# Which model keeps coming back. This is the number the factory acts on.
+	by_model = frappe.db.sql(
+		f"""select sr.pump_model as model, count(*) as complaints,
+		           sum(case when sr.root_cause = 'Manufacturing Defect' then 1 else 0 end) as defects
+		    from `tabService Request` sr
+		    where sr.docstatus < 2 and ifnull(sr.pump_model,'') != ''
+		      and date(sr.reported_on) between %(f)s and %(t)s
+		    {where_scope} group by sr.pump_model order by count(*) desc limit 12""",
+		args,
+		as_dict=True,
+	)
+
+	# The oldest things still open - a manager's actual to-do list.
+	oldest = frappe.db.sql(
+		f"""select sr.name, sr.dealer, sr.serial_no, sr.pump_model, sr.complaint_category,
+		           sr.status, sr.priority, sr.reported_on, sr.resolution_due_on,
+		           sr.end_customer_name, sr.end_customer_mobile, sr.assigned_technician,
+		           sr.first_response_on,
+		           datediff(now(), sr.reported_on) as age_days
+		    from `tabService Request` sr
+		    where sr.docstatus < 2 and sr.resolved_on is null
+		      and sr.status not in ('Closed','Cancelled') {where_scope}
+		    order by sr.reported_on asc limit 25""",
+		args,
+		as_dict=True,
+	)
+	for row in oldest:
+		row["late"] = (
+			1 if row.resolution_due_on and str(row.resolution_due_on) < str(frappe.utils.now()) else 0
+		)
+		row["answered"] = 1 if row.first_response_on else 0
+
+	return {
+		"from_date": str(from_date),
+		"to_date": str(to_date),
+		"days": days,
+		"tiles": {
+			"resolved": cint(resolved),
+			"resolved_growth": _growth(resolved, resolved_prev),
+			"raised": cint(raised),
+			"raised_growth": _growth(raised, raised_prev),
+			"open_now": cint(open_now),
+			"late_now": cint(late_now),
+			"unanswered": cint(unanswered),
+			# Closed against raised in the same window. Over 100% means the desk
+			# is eating into a backlog, which is worth seeing rather than capping.
+			"close_rate": _pct(resolved, raised),
+			"avg_days": flt(avg_days, 1),
+			"sla_pct": _pct(sla_met, sla_judged),
+			"free_visits": cint(free_visits),
+			"repeat_failures": cint(repeat),
+			"per_day": flt(raised / days, 1),
+			"claims_raised": cint(claims_raised),
+			"claims_settled": cint(claims_settled),
+			"claims_open": cint(claims_open),
+			"claim_value": flt(claim_value),
+			"claim_approved": flt(claim_approved),
+		},
+		"raised_series": _series(raised_by_day, from_date, to_date),
+		"resolved_series": _series(resolved_by_day, from_date, to_date),
+		"sla_mix": [{"label": k, "total": v} for k, v in sla_map.items()],
+		"claim_states": claim_states,
+		"by_category": by_category,
+		"by_root_cause": by_root_cause,
+		"by_centre": by_centre,
+		"by_technician": by_technician,
+		"by_dealer": by_dealer,
+		"by_model": by_model,
+		"oldest_open": oldest,
+	}

@@ -262,12 +262,19 @@ frappe.pages["dealer-conversations"].on_page_load = function (wrapper) {
 					<div class="kv-reply">
 						<textarea class="form-control kv-msg" rows="3"
 							placeholder="${__("What should the dealer be told? Plain words - they read this on a phone.")}"></textarea>
+						<div class="kv-queued"></div>
 						<div class="kv-reply-foot">
 							<label class="kv-check">
 								<input type="checkbox" class="kv-sla" checked>
 								${__("Record this as the first response for the SLA")}
 							</label>
-							<button class="btn btn-sm btn-primary kv-send">${__("Send to Dealer")}</button>
+							<div style="display:flex;gap:10px;align-items:center">
+								<label class="kv-pickfile">
+									&#128206; ${__("Attach")}
+									<input type="file" class="kv-file" multiple accept="image/*,application/pdf">
+								</label>
+								<button class="btn btn-sm btn-primary kv-send">${__("Send to Dealer")}</button>
+							</div>
 						</div>
 						<div class="kv-canned">
 							${[
@@ -281,6 +288,50 @@ frappe.pages["dealer-conversations"].on_page_load = function (wrapper) {
 						</div>
 					</div>`);
 
+				// Attach a credit note or an inspection photo. Read in the browser
+				// and posted with the message, so there is no half-finished upload
+				// to clean up if the reply is abandoned.
+				const queued = [];
+				const $queue = $box.find(".kv-queued");
+				const drawQueue = () => {
+					$queue.html(
+						queued.map((q, i) =>
+							`<span class="kv-qfile">${esc(q.filename)}<b data-drop="${i}">&times;</b></span>`
+						).join("")
+					);
+					$queue.find("[data-drop]").on("click", function () {
+						queued.splice(parseInt($(this).data("drop"), 10), 1);
+						drawQueue();
+					});
+				};
+				$box.find(".kv-file").on("change", function () {
+					const files = Array.from(this.files || []);
+					const input = this;
+					let pending = files.length;
+					files.forEach((file) => {
+						if (file.size > 8 * 1024 * 1024) {
+							frappe.show_alert({
+								message: __("{0} is too large. The limit is {1} MB.", [file.name, 8]),
+								indicator: "red",
+							});
+							if (--pending === 0) { input.value = ""; drawQueue(); }
+							return;
+						}
+						const fr = new FileReader();
+						fr.onload = () => {
+							queued.push({
+								filename: file.name,
+								content: String(fr.result).split(",")[1] || "",
+							});
+							if (--pending === 0) { input.value = ""; drawQueue(); }
+						};
+						fr.onerror = () => {
+							if (--pending === 0) { input.value = ""; drawQueue(); }
+						};
+						fr.readAsDataURL(file);
+					});
+				});
+
 				// Canned lines, because a service desk answers the same four
 				// questions all day and typing them out is what stops people replying.
 				$box.find(".kv-can").on("click", function () {
@@ -292,7 +343,9 @@ frappe.pages["dealer-conversations"].on_page_load = function (wrapper) {
 				$box.find(".kv-send").on("click", function () {
 					const $btn = $(this);
 					const message = $box.find(".kv-msg").val();
-					if (!(message || "").trim()) {
+					// an attachment on its own is a valid reply - a credit note needs
+					// no covering letter
+					if (!(message || "").trim() && !queued.length) {
 						frappe.show_alert({ message: __("Write a message before sending"), indicator: "orange" });
 						return;
 					}
@@ -304,6 +357,7 @@ frappe.pages["dealer-conversations"].on_page_load = function (wrapper) {
 							name,
 							message,
 							mark_responded: $box.find(".kv-sla").is(":checked") ? 1 : 0,
+							attachments: JSON.stringify(queued),
 						},
 						callback(r) {
 							const d = r.message || {};
@@ -327,6 +381,22 @@ frappe.pages["dealer-conversations"].on_page_load = function (wrapper) {
 			$box.html(`<div class="kv-empty small">${__("Nothing said yet.")}</div>`);
 			return;
 		}
+		const files = (list) =>
+			!list || !list.length
+				? ""
+				: `<div class="kv-atts">` +
+					list
+						.map((a) =>
+							a.is_image
+								? `<a class="kv-att" href="${esc(a.file_url)}" target="_blank"
+										rel="noopener" title="${esc(a.file_name)}">
+										<img src="${esc(a.file_url)}" alt=""></a>`
+								: `<a class="kv-att" href="${esc(a.file_url)}" target="_blank"
+										rel="noopener">&#128206; ${esc(a.file_name)}</a>`
+						)
+						.join("") +
+					`</div>`;
+
 		$box.html(
 			`<div class="kv-msgs">` +
 				thread
@@ -336,6 +406,7 @@ frappe.pages["dealer-conversations"].on_page_load = function (wrapper) {
 					<div class="kv-bubble-who">${esc(m.from_dealer ? __("Dealer") : "KUMAR")}
 						&middot; ${esc(m.by || "")} &middot; ${esc(when(m.on))}</div>
 					<div>${esc(m.message)}</div>
+					${files(m.attachments)}
 				</div>`
 					)
 					.join("") +

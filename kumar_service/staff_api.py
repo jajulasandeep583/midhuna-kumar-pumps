@@ -228,7 +228,7 @@ def conversation(kind, name):
 
 
 @frappe.whitelist()
-def reply_to_dealer(kind, name, message, mark_responded=1):
+def reply_to_dealer(kind, name, message, mark_responded=1, attachments=None, attach_urls=None):
 	"""KUMAR answering a dealer, and stopping the SLA response clock.
 
 	`mark_responded` is why this exists rather than just a comment: the first real
@@ -260,7 +260,14 @@ def reply_to_dealer(kind, name, message, mark_responded=1):
 			parent = frappe.db.get_value("Dealer", parent, "parent_dealer")
 			hops += 1
 
-	add_reply(doctype, name, message, notify_users=notify)
+	# Two attachment routes because the two callers differ: the Conversations page
+	# reads files in the browser and posts base64 (`attachments`); the form's
+	# Attach field uploads through frappe first and hands back a URL
+	# (`attach_urls`). Either is how a credit note reaches the dealer.
+	add_reply(
+		doctype, name, message,
+		notify_users=notify, attachments=attachments, attach_urls=attach_urls,
+	)
 
 	responded = 0
 	if cint(mark_responded) and doctype == "Service Request":

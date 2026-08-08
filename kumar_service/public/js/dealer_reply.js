@@ -53,8 +53,15 @@ kumar.reply.dialog = function (frm) {
 				fieldtype: "Small Text",
 				fieldname: "message",
 				label: __("Message to the dealer"),
-				reqd: 1,
+				// not reqd: an attachment alone is a valid reply, and the check in
+				// primary_action covers the "neither" case with a clearer message
 				description: __("They read this on a phone. Plain words, no jargon."),
+			},
+			{
+				fieldtype: "Attach",
+				fieldname: "attachment",
+				label: __("Attach a photo or a credit note"),
+				description: __("Optional. The dealer sees it under your message."),
 			},
 			{
 				fieldtype: "Check",
@@ -69,6 +76,15 @@ kumar.reply.dialog = function (frm) {
 		],
 		primary_action_label: __("Send to Dealer"),
 		primary_action(values) {
+			// an attachment on its own is a valid reply - a credit note needs no
+			// covering letter
+			if (!(values.message || "").trim() && !values.attachment) {
+				frappe.show_alert({
+					message: __("Write a message before sending"),
+					indicator: "orange",
+				});
+				return;
+			}
 			d.set_primary_action(__("Sending..."));
 			d.disable_primary_action();
 			frappe.call({
@@ -78,6 +94,8 @@ kumar.reply.dialog = function (frm) {
 					name: frm.doc.name,
 					message: values.message,
 					mark_responded: values.mark_responded ? 1 : 0,
+					// already uploaded by the Attach field, so send the URL
+					attach_urls: values.attachment ? JSON.stringify([values.attachment]) : null,
 				},
 				callback(r) {
 					const res = r.message || {};

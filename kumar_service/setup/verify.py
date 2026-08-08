@@ -25,8 +25,8 @@ COUNT_DOCTYPES = [
 ]
 
 PAGES = [
-	"management-dashboard", "dealer-network", "dealer-conversations", "my-business",
-	"sales-analytics",
+	"management-dashboard", "dealer-network", "dealer-conversations",
+	"service-command-centre", "my-business", "sales-analytics",
 	"purchase-analytics", "production-daily", "people-payroll", "pump-lookup",
 	"historical-import",
 ]
@@ -34,6 +34,7 @@ PAGES = [
 ENDPOINTS = [
 	"management_overview", "dealer_distribution", "sales_analytics",
 	"purchase_analytics", "production_daily", "dealer_cockpit", "people_overview",
+	"service_command_centre",
 ]
 
 

@@ -264,6 +264,23 @@
                  border:1px solid var(--line); }
   .kp-replybox textarea { min-height:70px; }
   .kp-replied { background:var(--ok-bg); color:var(--ok); }
+  /* attachments on a message: a thumbnail strip, because a photo of a burnt
+     winding is the message */
+  .kp-atts { display:flex; gap:7px; flex-wrap:wrap; margin-top:8px; }
+  .kp-att { display:inline-flex; align-items:center; gap:6px; font-size:11.5px;
+            font-weight:600; text-decoration:none; padding:5px 9px; border-radius:8px;
+            background:rgba(255,255,255,.22); color:inherit; }
+  .kp-bub.dealer .kp-att { background:#dfe6ed; color:var(--ink); }
+  .kp-att:hover { text-decoration:none; opacity:.85; }
+  .kp-att img { width:56px; height:56px; object-fit:cover; border-radius:7px; display:block; }
+  .kp-pickfile { display:inline-flex; align-items:center; gap:7px; cursor:pointer;
+                 font-size:13px; font-weight:700; color:var(--blue); }
+  .kp-pickfile input { display:none; }
+  .kp-queued { margin-top:8px; display:flex; gap:7px; flex-wrap:wrap; }
+  .kp-queued span { font-size:11.5px; background:#e8f2fd; color:var(--info);
+                    border:1px solid #bcd9f5; border-radius:20px; padding:4px 10px;
+                    font-weight:600; }
+  .kp-queued b { cursor:pointer; margin-left:5px; }
 
   /* ---------- contacts ---------- */
   .kp-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(255px,1fr)); gap:13px; }
@@ -364,6 +381,8 @@
       <svg><use href="#kp-art-complaint"></use></svg>{{ _("Raise a Complaint") }}</button>
     <button class="kp-tab" data-tab="claim">
       <svg><use href="#kp-art-claim"></use></svg>{{ _("Warranty Claim") }}</button>
+    <button class="kp-tab" data-tab="sold">
+      <svg><use href="#kp-art-certificate"></use></svg>{{ _("What I Sold") }}</button>
     <button class="kp-tab" data-tab="tickets">
       <svg><use href="#kp-art-ticket"></use></svg>{{ _("My Tickets") }}
       {% if tickets.open %}<span class="n">{{ tickets.open }}</span>{% endif %}</button>
@@ -694,6 +713,128 @@
         <button type="submit" class="kp-btn wide" id="kw-submit">{{ _("Lodge Claim with KUMAR") }}</button>
         <div id="kw-done"></div>
       </form>
+    </div>
+  </div>
+
+  {# ============================================================= WHAT I SOLD #}
+  <div class="kp-panel" data-panel="sold">
+    <div class="kp-stats">
+      <div class="kp-stat c1"><b>{{ sold_summary.total }}</b><span>{{ _("Pumps you sold") }}</span></div>
+      <div class="kp-stat c2"><b>{{ sold_summary.in_warranty }}</b><span>{{ _("In Warranty") }}</span></div>
+      <div class="kp-stat c4"><b>{{ sold_summary.expiring }}</b><span>{{ _("Expiring in 45 Days") }}</span></div>
+      <div class="kp-stat c5"><b>{{ sold_summary.expired }}</b><span>{{ _("Expired") }}</span></div>
+    </div>
+
+    <div class="kp-sec">
+      <div class="kp-h"><svg><use href="#kp-art-certificate"></use></svg>{{ _("Every Pump You Have Sold") }}</div>
+      <div class="kp-hint">
+        {{ _("Search by customer name, mobile, village or serial number. A pump whose warranty is running out is a customer worth ringing.") }}
+      </div>
+
+      {# Filters. Everything is already on the page, so this is instant even on a
+         weak connection - and a dealer looking for one customer should not wait
+         on a round trip. #}
+      <div class="kp-row">
+        <div>
+          <label for="ks-search">{{ _("Search") }}</label>
+          <input id="ks-search" type="search" autocomplete="off"
+                 placeholder="{{ _('Customer, mobile, village or serial') }}">
+        </div>
+        <div>
+          <label for="ks-warranty">{{ _("Warranty") }}</label>
+          <select id="ks-warranty">
+            <option value="">{{ _("Any") }}</option>
+            <option value="In Warranty">{{ _("In Warranty") }}</option>
+            <option value="Expiring Soon">{{ _("Expiring Soon") }}</option>
+            <option value="Expired">{{ _("Expired") }}</option>
+          </select>
+        </div>
+        <div>
+          <label for="ks-model">{{ _("Model") }}</label>
+          <select id="ks-model">
+            <option value="">{{ _("Any model") }}</option>
+            {% for m in sold_models %}<option value="{{ m }}">{{ m }}</option>{% endfor %}
+          </select>
+        </div>
+        {% if sold_districts %}
+        <div>
+          <label for="ks-district">{{ _("District") }}</label>
+          <select id="ks-district">
+            <option value="">{{ _("Any district") }}</option>
+            {% for d in sold_districts %}<option value="{{ d }}">{{ d }}</option>{% endfor %}
+          </select>
+        </div>
+        {% endif %}
+      </div>
+      <div class="kp-row" style="margin-top:12px">
+        <div>
+          <label for="ks-from">{{ _("Sold From") }}</label>
+          <input id="ks-from" type="date">
+        </div>
+        <div>
+          <label for="ks-to">{{ _("Sold To") }}</label>
+          <input id="ks-to" type="date">
+        </div>
+        <div style="align-self:end">
+          <button type="button" class="kp-btn sec" id="ks-clear">{{ _("Clear filters") }}</button>
+        </div>
+      </div>
+      <div id="ks-count" class="kp-hint" style="margin:14px 0 8px"></div>
+
+      {% if my_serials %}
+      <div class="kp-scroll">
+        <table class="kp-t" id="ks-table">
+          <thead><tr>
+            <th>{{ _("Serial") }}</th><th>{{ _("Customer") }}</th>
+            <th>{{ _("Where") }}</th><th>{{ _("Sold") }}</th>
+            <th>{{ _("Warranty") }}</th><th></th>
+          </tr></thead>
+          <tbody>
+          {% for r in my_serials %}
+            <tr data-warranty="{{ r.warranty_state }}"
+                data-model="{{ r.pump_model or '' }}"
+                data-district="{{ r.district or '' }}"
+                data-sold="{{ r.sale_date or '' }}"
+                data-search="{{ ((r.serial_no or '') ~ ' ' ~ (r.pump_model or '') ~ ' '
+                                 ~ (r.end_customer_name or '') ~ ' ' ~ (r.end_customer_mobile or '')
+                                 ~ ' ' ~ (r.installation_address or '') ~ ' ' ~ (r.district or '')
+                                 ~ ' ' ~ (r.invoice_no or ''))|lower }}">
+              <td><b>{{ r.serial_no }}</b><br>
+                <small style="color:#5f7183">{{ r.pump_model or "" }}</small></td>
+              <td>{{ r.end_customer_name }}<br>
+                {%- if r.end_customer_mobile %}
+                  <a href="tel:{{ r.end_customer_mobile }}" style="font-size:12.5px">
+                    {{ r.end_customer_mobile }}</a>
+                {% endif %}</td>
+              <td><small>{{ r.installation_address or "" }}
+                {%- if r.district %}<br>{{ r.district }}{% endif %}</small></td>
+              <td>{{ frappe.utils.format_date(r.sale_date) }}</td>
+              <td>
+                {%- set tone = 'ok' if r.warranty_state == 'In Warranty'
+                               else 'warn' if r.warranty_state == 'Expiring Soon'
+                               else 'bad' if r.warranty_state == 'Expired' else 'mute' -%}
+                <span class="kp-pill {{ tone }}">{{ _(r.warranty_state) }}</span><br>
+                <small style="color:#5f7183">
+                  {{ frappe.utils.format_date(r.warranty_expiry_date) }}
+                  {%- if r.days_left is not none and r.days_left >= 0 %}
+                    &middot; {{ _("{0} days left").format(r.days_left) }}
+                  {% endif %}</small>
+              </td>
+              <td>
+                <a class="kp-btn sec sm" href="{{ r.certificate_url }}" target="_blank"
+                   rel="noopener">{{ _("Print") }}</a>
+                <button type="button" class="kp-btn sm ks-complain"
+                        data-serial="{{ r.serial_no }}"
+                        style="margin-top:5px">{{ _("Complaint") }}</button>
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <div class="kp-empty">{{ _("You have not registered a pump yet. Use the blue button above.") }}</div>
+      {% endif %}
     </div>
   </div>
 
@@ -1177,6 +1318,71 @@ frappe.ready(function () {
       }));
   })();
 
+  /* --------------------------------------------------- what I sold
+     Five filters that combine, applied in the browser. The dealer's whole sales
+     history is already in the page, so "which pump did I sell to Ramesh" is
+     answered as fast as they can type it. */
+  (function sold() {
+    const table = $("ks-table");
+    if (!table) return;
+    const rows = Array.from(table.querySelectorAll("tbody tr"));
+    const controls = ["ks-search", "ks-warranty", "ks-model", "ks-district", "ks-from", "ks-to"]
+      .map((id) => $(id))
+      .filter(Boolean);
+
+    function apply() {
+      const q = (($("ks-search") || {}).value || "").trim().toLowerCase();
+      const warranty = (($("ks-warranty") || {}).value || "");
+      const model = (($("ks-model") || {}).value || "");
+      const district = (($("ks-district") || {}).value || "");
+      const from = (($("ks-from") || {}).value || "");
+      const to = (($("ks-to") || {}).value || "");
+
+      let shown = 0;
+      rows.forEach((tr) => {
+        const sold = tr.dataset.sold || "";
+        const keep =
+          (!q || (tr.dataset.search || "").indexOf(q) !== -1) &&
+          (!warranty || tr.dataset.warranty === warranty) &&
+          (!model || tr.dataset.model === model) &&
+          (!district || tr.dataset.district === district) &&
+          // ISO dates compare correctly as strings, which is why sale_date is
+          // rendered raw into data-sold rather than formatted
+          (!from || (sold && sold >= from)) &&
+          (!to || (sold && sold <= to));
+        tr.style.display = keep ? "" : "none";
+        if (keep) shown += 1;
+      });
+      $("ks-count").textContent =
+        shown === rows.length
+          ? __("Showing all {0}", [rows.length])
+          : __("Showing {0} of {1}", [shown, rows.length]);
+    }
+
+    controls.forEach((el) =>
+      el.addEventListener(el.tagName === "SELECT" ? "change" : "input", apply));
+    $("ks-clear").addEventListener("click", function () {
+      controls.forEach((el) => { el.value = ""; });
+      apply();
+    });
+
+    // straight from a sold pump into raising its complaint
+    table.querySelectorAll(".ks-complain").forEach((b) =>
+      b.addEventListener("click", function () {
+        const serial = b.dataset.serial;
+        show("complaint");
+        const input = $("kc-serial");
+        if (input) {
+          input.value = serial;
+          const pick = $("kc-pick");
+          if (pick) pick.value = serial;
+          describePump(serial, "kc-pump");
+        }
+      }));
+
+    apply();
+  })();
+
   /* ------------------------------------------------------- tickets */
   (function tickets() {
     const list = $("kp-tlist");
@@ -1233,6 +1439,34 @@ frappe.ready(function () {
        The dealer can read what KUMAR said and write back. Same Comment thread the
        staff screen and the Service Request form use, so there is exactly one
        version of the conversation. */
+    // Files are read in the browser and posted as base64 with the message, so
+    // there is no separate upload step to fail halfway on a weak connection.
+    const MAX_MB = 8;
+    function readFile(file) {
+      return new Promise((resolve, reject) => {
+        const fr = new FileReader();
+        fr.onload = () =>
+          resolve({
+            filename: file.name,
+            // strip the "data:...;base64," prefix the server does not want
+            content: String(fr.result).split(",")[1] || "",
+          });
+        fr.onerror = reject;
+        fr.readAsDataURL(file);
+      });
+    }
+
+    function attachmentHtml(list) {
+      if (!list || !list.length) return "";
+      return `<div class="kp-atts">` + list.map((a) =>
+        a.is_image
+          ? `<a class="kp-att" href="${esc(a.file_url)}" target="_blank" rel="noopener"
+                title="${esc(a.file_name)}"><img src="${esc(a.file_url)}" alt=""></a>`
+          : `<a class="kp-att" href="${esc(a.file_url)}" target="_blank" rel="noopener">
+                &#128206; ${esc(a.file_name)}</a>`
+      ).join("") + `</div>`;
+    }
+
     function drawChat(box, thread, kind, name) {
       const bubbles = thread.length
         ? `<div class="kp-chat">` + thread.map((m) => `
@@ -1240,6 +1474,7 @@ frappe.ready(function () {
               <div class="kp-bub-who">${esc(m.from_dealer ? __("You") : "KUMAR")}
                 &middot; ${esc(frappe.datetime.str_to_user(m.on))}</div>
               <div>${esc(m.message)}</div>
+              ${attachmentHtml(m.attachments)}
             </div>`).join("") + `</div>`
         : `<div class="kp-msg info">${__("No messages yet. Write below and KUMAR will see it.")}</div>`;
 
@@ -1248,20 +1483,67 @@ frappe.ready(function () {
           <label>${__("Write to KUMAR")}</label>
           <textarea class="kp-chat-msg"
             placeholder="${__("Ask for an update, or tell KUMAR what the customer is saying")}"></textarea>
-          <button type="button" class="kp-btn sm kp-chat-send"
-                  style="margin-top:10px">${__("Send")}</button>
+          <div class="kp-queued"></div>
+          <div style="margin-top:10px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+            <button type="button" class="kp-btn sm kp-chat-send">${__("Send")}</button>
+            <label class="kp-pickfile">
+              &#128247; ${__("Add a photo")}
+              <input type="file" class="kp-chat-file" multiple
+                     accept="image/*,application/pdf">
+            </label>
+            <span style="font-size:11.5px;color:var(--mut)">
+              ${__("Photos or PDF, up to {0} MB each", [MAX_MB])}</span>
+          </div>
         </div>`;
+
+      const queued = [];
+      const $queue = box.querySelector(".kp-queued");
+      const drawQueue = () => {
+        $queue.innerHTML = queued.map((q, i) =>
+          `<span>${esc(q.filename)}<b data-drop="${i}">&times;</b></span>`).join("");
+        $queue.querySelectorAll("[data-drop]").forEach((x) =>
+          x.addEventListener("click", () => {
+            queued.splice(parseInt(x.dataset.drop, 10), 1);
+            drawQueue();
+          }));
+      };
+
+      box.querySelector(".kp-chat-file").addEventListener("change", async function () {
+        for (const file of Array.from(this.files || [])) {
+          if (file.size > MAX_MB * 1024 * 1024) {
+            frappe.show_alert({
+              message: __("{0} is too large. The limit is {1} MB.", [file.name, MAX_MB]),
+              indicator: "red",
+            });
+            continue;
+          }
+          try {
+            queued.push(await readFile(file));
+          } catch (e) {
+            frappe.show_alert({ message: __("That file could not be read. Try again."),
+              indicator: "red" });
+          }
+        }
+        this.value = "";
+        drawQueue();
+      });
 
       const send = box.querySelector(".kp-chat-send");
       send.addEventListener("click", function () {
         const ta = box.querySelector(".kp-chat-msg");
         const message = (ta.value || "").trim();
-        if (!message) return;
+        // a photo on its own is a valid message
+        if (!message && !queued.length) return;
         send.disabled = true;
         send.textContent = __("Sending...");
         frappe.call({
           method: "kumar_service.portal_api.post_reply",
-          args: { kind: kind, name: name, message: message },
+          args: {
+            kind: kind,
+            name: name,
+            message: message,
+            attachments: JSON.stringify(queued),
+          },
           callback: function (r) {
             const d = r.message || {};
             drawChat(box, d.thread || [], kind, name);

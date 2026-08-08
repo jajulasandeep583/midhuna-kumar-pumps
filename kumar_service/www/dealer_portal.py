@@ -105,16 +105,48 @@ def get_context(context):
 	context.contacts = portal_api.my_contacts()
 	context.outlet = context.contacts["outlet"]
 
-	# Serials this dealer sold, for the complaint and claim pickers. A dealer
-	# should never have to remember a serial number to raise a complaint.
+	# Everything this dealer sold. Feeds three things at once: the complaint and
+	# claim pickers, and the "What I Sold" tab - which is filtered in the browser,
+	# so a dealer looking for one customer gets an answer with no round trip.
+	from frappe.utils import getdate
+
 	context.my_serials = frappe.get_all(
 		"Pump Registration",
 		filters={"dealer": ["in", scope], "docstatus": 1},
-		fields=["serial_no", "pump_model", "end_customer_name", "end_customer_mobile",
-		        "warranty_expiry_date"],
-		order_by="sale_date desc",
-		limit=300,
+		fields=["name", "serial_no", "pump_model", "end_customer_name", "end_customer_mobile",
+		        "sale_date", "warranty_expiry_date", "installation_address", "district",
+		        "application_type", "invoice_no", "sales_invoice", "dealer"],
+		order_by="sale_date desc, creation desc",
+		limit=600,
 	)
+
+	today = getdate(nowdate())
+	soon = add_days(today, 45)
+	for r in context.my_serials:
+		expiry = getdate(r.warranty_expiry_date) if r.warranty_expiry_date else None
+		if not expiry:
+			r["warranty_state"] = "Not Registered"
+		elif expiry < today:
+			r["warranty_state"] = "Expired"
+		elif expiry <= soon:
+			# 45 days, not 30: this list is a selling tool, and a dealer wants a
+			# little warning before the warranty actually runs out
+			r["warranty_state"] = "Expiring Soon"
+		else:
+			r["warranty_state"] = "In Warranty"
+		r["days_left"] = (expiry - today).days if expiry else None
+		r["certificate_url"] = certificate_url(r["name"])
+
+	# Filter options built from what this dealer actually sold, so no dropdown
+	# ever offers a model they have never touched.
+	context.sold_models = sorted({r.pump_model for r in context.my_serials if r.pump_model})
+	context.sold_districts = sorted({r.district for r in context.my_serials if r.district})
+	context.sold_summary = {
+		"total": len(context.my_serials),
+		"in_warranty": sum(1 for r in context.my_serials if r["warranty_state"] == "In Warranty"),
+		"expiring": sum(1 for r in context.my_serials if r["warranty_state"] == "Expiring Soon"),
+		"expired": sum(1 for r in context.my_serials if r["warranty_state"] == "Expired"),
+	}
 
 	# Spare parts a claim can be raised against, priced from the item master.
 	from kumar_service.setup.masters import ITEM_GROUP_COMPONENTS

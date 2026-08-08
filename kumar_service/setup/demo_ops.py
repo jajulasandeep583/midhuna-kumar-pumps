@@ -16,9 +16,10 @@ must not abort the run.
 """
 
 import random
+from datetime import timedelta
 
 import frappe
-from frappe.utils import add_days, cint, flt, getdate
+from frappe.utils import add_days, cint, flt, get_datetime, getdate, now_datetime
 
 from kumar_service.setup.demo import (
 	ABBR,
@@ -1562,8 +1563,143 @@ def build_all():
 	print("attributing dealer requests to the portal...")
 	attribute_portal_requests()
 
+	print("first responses on the complaints...")
+	settle_service_responses()
+
+	print("resolution dates inside the promised window...")
+	settle_service_sla()
+
 	print("conversations between KUMAR and the dealers...")
 	seed_dealer_conversations()
 
 	frappe.db.commit()
 	print("DEMO OPS DONE")
+
+
+def settle_service_sla(on_time_share=0.85):
+	"""Pull resolution dates inside the promised window for most complaints.
+
+	`settle_service_responses` fixes the response leg; this fixes the resolution
+	leg. The seeded data closed complaints on a date chosen for the story, with no
+	regard for `resolution_due_on`, so 31 of 43 came out "Failed" and the command
+	centre reported a service desk that misses almost everything. A real desk
+	closes most complaints inside the window it promised and misses a minority.
+
+	Only moves `resolved_on` EARLIER, never later, and never before the first
+	response - so no complaint is made to look resolved before it was answered.
+	"""
+	rng = random.Random(20260809)
+	rows = frappe.get_all(
+		"Service Request",
+		filters={"docstatus": ["<", 2], "resolved_on": ["is", "set"]},
+		fields=["name", "reported_on", "first_response_on", "resolved_on", "resolution_due_on"],
+	)
+
+	touched = 0
+	for r in rows:
+		if not (r.resolved_on and r.resolution_due_on and r.reported_on):
+			continue
+		resolved = get_datetime(r.resolved_on)
+		due = get_datetime(r.resolution_due_on)
+		earliest = get_datetime(r.first_response_on or r.reported_on)
+
+		if resolved <= due:
+			sla = "Fulfilled"
+			stamp = resolved
+		elif rng.random() <= on_time_share:
+			# bring it inside the window, somewhere after the first response
+			span = max((due - earliest).total_seconds(), 60)
+			stamp = earliest + timedelta(seconds=rng.uniform(span * 0.35, span * 0.95))
+			sla = "Fulfilled"
+		else:
+			# a genuine miss - the command centre should have some of these
+			stamp = resolved
+			sla = "Failed"
+
+		if stamp == resolved and sla == "Failed":
+			# nothing to change, but make sure the status agrees with the dates
+			frappe.db.set_value("Service Request", r.name, "sla_status", "Failed",
+				update_modified=False)
+			continue
+
+		frappe.db.set_value(
+			"Service Request",
+			r.name,
+			{"resolved_on": stamp, "sla_status": sla},
+			update_modified=False,
+		)
+		touched += 1
+
+	frappe.db.commit()
+	print(f"  {touched} complaints brought inside the resolution window")
+	return touched
+
+
+def settle_service_responses(answered_share=0.88, on_time_share=0.9):
+	"""Give the demo's complaints a believable response history.
+
+	Every seeded Service Request had `first_response_on` empty, so the command
+	centre reported an 11.9% SLA and 43 unanswered complaints - which is not a
+	demo of a working service desk, it is a demo of a broken one. A real desk
+	answers most complaints inside the promised window, misses a few, and has a
+	handful genuinely still waiting.
+
+	Writes with db.set_value and re-derives `sla_status` with the controller's own
+	rule, because `first_response_on` has no allow_on_submit and validate() will
+	not run on a submitted request.
+	"""
+	rng = random.Random(20260809)
+	rows = frappe.get_all(
+		"Service Request",
+		filters={"docstatus": ["<", 2]},
+		fields=["name", "reported_on", "response_due_on", "resolution_due_on",
+		        "resolved_on", "first_response_on"],
+	)
+
+	touched = 0
+	for r in rows:
+		if r.first_response_on or not r.reported_on:
+			continue
+		# a few are genuinely still unanswered - that is what the "no reply yet"
+		# tile on the command centre is for
+		if rng.random() > answered_share:
+			continue
+
+		reported = get_datetime(r.reported_on)
+		due = get_datetime(r.response_due_on) if r.response_due_on else None
+
+		if due and rng.random() <= on_time_share:
+			# answered inside the window, somewhere between the call and the deadline
+			span = max((due - reported).total_seconds(), 60)
+			stamp = reported + timedelta(seconds=rng.uniform(span * 0.1, span * 0.85))
+		else:
+			base = due or reported
+			stamp = base + timedelta(hours=rng.uniform(2, 30))
+
+		# never after it was resolved, and never in the future
+		if r.resolved_on:
+			stamp = min(stamp, get_datetime(r.resolved_on))
+		stamp = min(stamp, now_datetime())
+		if stamp < reported:
+			stamp = reported + timedelta(minutes=20)
+
+		# the controller's rule: resolution outcome wins, else response timing
+		if r.resolved_on and r.resolution_due_on:
+			met = get_datetime(r.resolved_on) <= get_datetime(r.resolution_due_on)
+			sla = "Fulfilled" if met else "Failed"
+		elif due:
+			sla = "Responded" if stamp <= due else "Failed"
+		else:
+			sla = "Responded"
+
+		frappe.db.set_value(
+			"Service Request",
+			r.name,
+			{"first_response_on": stamp, "sla_status": sla},
+			update_modified=False,
+		)
+		touched += 1
+
+	frappe.db.commit()
+	print(f"  {touched} complaints given a first response")
+	return touched
