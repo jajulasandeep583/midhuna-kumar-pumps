@@ -500,38 +500,157 @@ MAX_ATTACHMENT_MB = 8
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".heic", ".gif"}
 
 
-def _attachments_for(comment_names):
-	"""Files hung on each message, in one query rather than one per message."""
-	if not comment_names:
-		return {}
-	found = {}
-	for f in frappe.get_all(
-		"File",
-		filters={"attached_to_doctype": "Comment", "attached_to_name": ["in", comment_names]},
-		fields=["name", "file_name", "file_url", "file_size", "attached_to_name"],
-		order_by="creation asc",
+def _is_image(name_or_url):
+	value = (name_or_url or "").split("?")[0]
+	ext = ("." + value.rsplit(".", 1)[-1]).lower() if "." in value else ""
+	return ext in IMAGE_EXTENSIONS
+
+
+def _parse_attachments(content):
+	"""Read a message's attachments back out of its own rendered block.
+
+	The File row lives on the TICKET, not on the Comment, and this is why:
+	frappe's File controller RENAMES a second row that points at an existing
+	file (`photo.jpeg` becomes `photoe9f33e.jpeg`), so keeping one row per
+	message and another per ticket silently produced two different URLs - the
+	timeline showed one file and the Attachments sidebar another. One row, on the
+	ticket, gets the sidebar and the private-file permission right; the message
+	link is carried by the block we rendered into the comment, which is the
+	source of truth for "which message did this come with".
+	"""
+	import html
+	import re
+
+	block = re.search(
+		rf'<div class="{ATTACH_MARKER}">(.*?)</div>', content or "", flags=re.S
+	)
+	if not block:
+		return []
+	out = []
+	for href, data_name in re.findall(
+		r'<a[^>]+href="([^"]+)"[^>]*data-name="([^"]*)"', block.group(1)
 	):
-		ext = ("." + (f.file_name or "").rsplit(".", 1)[-1]).lower() if "." in (f.file_name or "") else ""
-		found.setdefault(f.attached_to_name, []).append(
+		# stdlib: frappe.utils has escape_html but no unescape_html
+		url = html.unescape(href)
+		name = html.unescape(data_name) or url.rsplit("/", 1)[-1]
+		out.append({"file_url": url, "file_name": name, "is_image": _is_image(name)})
+	return out
+
+
+#: Attachments are rendered into the Comment's own HTML inside this marker, so
+#: frappe's native desk timeline shows them without knowing anything about us.
+#: `thread_for` strips the block back out before handing the plain message to our
+#: own screens, or the portal would print the markup twice.
+ATTACH_MARKER = "kumar-attachments"
+
+
+def _attachment_block(files):
+	"""The HTML frappe's timeline renders under a comment."""
+	if not files:
+		return ""
+	parts = []
+	for f in files:
+		url = frappe.utils.escape_html(f.get("file_url") or "")
+		label = frappe.utils.escape_html(f.get("file_name") or "attachment")
+		# data-name is what `_parse_attachments` reads back, so it is not
+		# decoration - drop it and the chat panels lose their file names
+		common = f'href="{url}" data-name="{label}" target="_blank" rel="noopener"'
+		if f.get("is_image"):
+			parts.append(
+				f'<a {common} title="{label}">'
+				f'<img src="{url}" alt="{label}" '
+				f'style="max-width:200px;max-height:200px;border-radius:8px;'
+				f'margin:6px 6px 0 0;vertical-align:top"></a>'
+			)
+		else:
+			parts.append(
+				f'<a {common} '
+				f'style="display:inline-block;margin:6px 8px 0 0;font-weight:600">'
+				f"&#128206; {label}</a>"
+			)
+	# one flat div, no nesting: `_strip_attachment_block` matches to the first
+	# closing tag and nesting would break that
+	return f'<div class="{ATTACH_MARKER}">' + "".join(parts) + "</div>"
+
+
+def _strip_attachment_block(content):
+	"""Remove the rendered block so the plain message can be read back out."""
+	import re
+
+	return re.sub(
+		rf'<div class="{ATTACH_MARKER}">.*?</div>', "", content or "", flags=re.S
+	)
+
+
+def _write_attachment_block(comment_name, files):
+	"""Render a message's files into its own HTML.
+
+	This is what makes them visible in the DESK: frappe's timeline renders the
+	comment's content, so an `<img>` in there is the whole fix. It is also where
+	our own chat panels read the message's attachments back from.
+	"""
+	content = frappe.db.get_value("Comment", comment_name, "content") or ""
+	fresh = _strip_attachment_block(content).rstrip() + _attachment_block(files)
+	frappe.db.set_value("Comment", comment_name, "content", fresh, update_modified=False)
+
+
+def repair_message_attachments():
+	"""Backfill anything attached to a message before it was visible in the desk.
+
+	The first cut of message attachments hung the File on the Comment only, so a
+	dealer's photograph existed but the Service Request's Attachments sidebar was
+	empty and frappe's timeline showed nothing - the file was effectively lost to
+	anyone working in the desk. Idempotent, and called from `run_data_setup`, so an
+	existing site is repaired on migrate rather than by hand.
+	"""
+	fixed = 0
+	for row in frappe.db.sql(
+		"""select f.name, f.file_url, f.file_name, f.attached_to_name as comment,
+		          c.reference_doctype, c.reference_name
+		   from   `tabFile` f
+		   join   `tabComment` c on c.name = f.attached_to_name
+		   where  f.attached_to_doctype = 'Comment'
+		     and  ifnull(c.reference_doctype,'') != ''""",
+		as_dict=True,
+	):
+		# Re-point the single File row at the ticket instead of creating a second
+		# one. Written with db.set_value on purpose: File.validate() renames a row
+		# whose file already exists on disk, which is exactly the bug that made
+		# the desk and the timeline disagree about the URL.
+		frappe.db.set_value(
+			"File",
+			row.name,
 			{
-				"name": f.name,
-				"file_name": f.file_name,
-				"file_url": f.file_url,
-				"size": f.file_size,
-				"is_image": ext in IMAGE_EXTENSIONS,
-			}
+				"attached_to_doctype": row.reference_doctype,
+				"attached_to_name": row.reference_name,
+			},
+			update_modified=False,
 		)
-	return found
+		_write_attachment_block(
+			row.comment,
+			[
+				{
+					"file_url": row.file_url,
+					"file_name": row.file_name,
+					"is_image": _is_image(row.file_name),
+				}
+			],
+		)
+		fixed += 1
+
+	if fixed:
+		frappe.db.commit()
+		print(f"  repaired {fixed} message attachment(s) so the desk can see them")
+	return fixed
 
 
 def attach_to_message(comment_name, filename, content_base64, ticket_doctype=None,
 		ticket_name=None):
-	"""Save one file against a message.
+	"""Save one file for a message.
 
-	Attached to the Comment, not to the ticket: the file belongs to the thing
-	that was said, and both the portal and the Dealer Conversations screen render
-	it under that message. `ticket_doctype`/`ticket_name` are recorded on the File
-	as a folder hint only.
+	The File row is attached to the TICKET, not to the Comment - see
+	`_parse_attachments` for why. `comment_name` is still taken so the caller
+	cannot forget to render the block that links file to message.
 	"""
 	import base64
 	import os
@@ -559,21 +678,26 @@ def attach_to_message(comment_name, filename, content_base64, ticket_doctype=Non
 		{
 			"doctype": "File",
 			"file_name": filename,
-			"attached_to_doctype": "Comment",
-			"attached_to_name": comment_name,
+			# on the ticket, so it shows in the desk's Attachments sidebar and a
+			# private file's permission resolves through a document staff can read
+			"attached_to_doctype": ticket_doctype,
+			"attached_to_name": ticket_name,
 			"content": content,
 			"decode": False,
-			# a message on a dealer's ticket is not public; it is reachable only
-			# through the endpoints that check the dealer's scope
+			# a message on a dealer's ticket is not public
 			"is_private": 1,
 		}
 	)
 	doc.flags.ignore_permissions = True
 	doc.insert(ignore_permissions=True)
-	return {"file_url": doc.file_url, "file_name": doc.file_name}
+	return {
+		"file_url": doc.file_url,
+		"file_name": doc.file_name,
+		"is_image": _is_image(doc.file_name),
+	}
 
 
-def link_file_to_message(comment_name, file_url):
+def link_file_to_message(comment_name, file_url, ticket_doctype=None, ticket_name=None):
 	"""Hang an ALREADY-uploaded file on a message.
 
 	The desk's Attach field uploads through frappe and hands back a URL, so there
@@ -592,14 +716,18 @@ def link_file_to_message(comment_name, file_url):
 			"doctype": "File",
 			"file_url": file_url,
 			"file_name": (source or {}).get("file_name") or file_url.rsplit("/", 1)[-1],
-			"attached_to_doctype": "Comment",
-			"attached_to_name": comment_name,
+			"attached_to_doctype": ticket_doctype,
+			"attached_to_name": ticket_name,
 			"is_private": (source or {}).get("is_private", 1),
 		}
 	)
 	doc.flags.ignore_permissions = True
 	doc.insert(ignore_permissions=True)
-	return doc.file_url
+	return {
+		"file_url": doc.file_url,
+		"file_name": doc.file_name,
+		"is_image": _is_image(doc.file_name),
+	}
 
 
 def thread_for(doctype, name, portal_users=None):
@@ -621,21 +749,24 @@ def thread_for(doctype, name, portal_users=None):
 		fields=["name", "content", "owner", "creation", "comment_by"],
 		order_by="creation asc",
 	)
-	files = _attachments_for([r.name for r in rows])
 	thread = []
 	for r in rows:
 		from_dealer = r.owner in portal_users
 		thread.append(
 			{
 				"name": r.name,
-				"message": frappe.utils.strip_html(r.content or "").strip(),
+				# the rendered attachment block is stripped first, or the portal
+				# would print the file names again under the bubble
+				"message": frappe.utils.strip_html(
+					_strip_attachment_block(r.content or "")
+				).strip(),
 				"html": r.content,
 				"by": r.comment_by or r.owner,
 				"from_dealer": 1 if from_dealer else 0,
 				"side": "dealer" if from_dealer else "kumar",
 				"who": _("Dealer") if from_dealer else "KUMAR",
 				"on": r.creation,
-				"attachments": files.get(r.name, []),
+				"attachments": _parse_attachments(r.content),
 			}
 		)
 	return thread
@@ -677,16 +808,27 @@ def add_reply(doctype, name, message, notify_users=None, attachments=None, attac
 	comment.flags.ignore_permissions = True
 	comment.insert(ignore_permissions=True)
 
+	saved = []
 	for row in attachments:
-		attach_to_message(
-			comment.name,
-			(row or {}).get("filename"),
-			(row or {}).get("content"),
-			ticket_doctype=doctype,
-			ticket_name=name,
+		saved.append(
+			attach_to_message(
+				comment.name,
+				(row or {}).get("filename"),
+				(row or {}).get("content"),
+				ticket_doctype=doctype,
+				ticket_name=name,
+			)
 		)
 	for url in attach_urls:
-		link_file_to_message(comment.name, url)
+		saved.append(
+			link_file_to_message(comment.name, url, ticket_doctype=doctype, ticket_name=name)
+		)
+
+	# Render the files into the comment itself. This is what makes them visible in
+	# the desk - frappe's timeline renders comment HTML - and it is also how the
+	# message keeps its link to the files now that the File rows sit on the ticket.
+	if saved:
+		_write_attachment_block(comment.name, saved)
 
 	for user in {u for u in (notify_users or []) if u and u != frappe.session.user}:
 		try:

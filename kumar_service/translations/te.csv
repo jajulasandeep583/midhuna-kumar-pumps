@@ -193,6 +193,7 @@ Contact KUMAR,KUMAR ను సంప్రదించండి
 Contact Person,సంప్రదించాల్సిన వ్యక్తి
 Continuous R &amp; D,నిరంతర పరిశోధన &amp; అభివృద్ధి
 Conversation ({0}),సంభాషణ ({0})
+Conversation with Dealer,డీలర్‌తో సంభాషణ
 Copper,రాగి
 Copper Wire Batch,రాగి తీగ బ్యాచ్
 Could not load this screen. You may not have permission for it.,ఈ స్క్రీన్ లోడ్ కాలేదు. మీకు దీనికి అనుమతి లేకపోవచ్చు.
@@ -587,6 +588,7 @@ Nothing is open. Every query has been closed.,ఏదీ తెరిచి ల�
 Nothing open. All your customers are looked after.,ఏదీ పెండింగ్‌లో లేదు. మీ కస్టమర్లందరినీ చూసుకున్నారు.
 Nothing purchased in this period.,ఈ కాలంలో ఏమీ కొనలేదు.
 Nothing said yet.,ఇంకా ఏమీ చెప్పలేదు.
+Nothing said yet. Write below and the dealer sees it in the portal.,"ఇంకా ఏమీ చెప్పలేదు. కింద రాయండి, డీలర్ పోర్టల్‌లో చూస్తారు."
 Nothing was built in this period.,ఈ కాలంలో ఏమీ తయారు కాలేదు.
 OUT OF SPEC: {0},స్పెక్ దాటింది: {0}
 Oldest Still Open,"అత్యంత పాతవి, ఇంకా తెరిచి ఉన్నవి"
@@ -759,6 +761,7 @@ Receivable Ageing,రావాల్సిన బాకీల వయస్సు
 Received,అందింది
 "Received, not invoiced","వచ్చింది, బిల్లు రాలేదు"
 Recent Registrations,ఇటీవలి రిజిస్ట్రేషన్లు
+Record as first response,మొదటి స్పందనగా నమోదు చేయి
 "Record the heat number and winding batch on this card at the point of use, and enter them into the system at final assembly. Every finished pump must carry a serial number before it leaves the test bay.","హీట్ నంబర్ మరియు వైండింగ్ బ్యాచ్‌ను ఉపయోగించే చోటే ఈ కార్డు మీద రాయండి, ఫైనల్ అసెంబ్లీ దగ్గర సిస్టమ్‌లో నమోదు చేయండి. టెస్ట్ బే నుండి బయటకు వెళ్ళే ముందు ప్రతి పంప్‌కు సీరియల్ నంబర్ ఉండాలి."
 Record this as the first response for the SLA,SLA కోసం దీన్ని మొదటి స్పందనగా నమోదు చేయి
 Record why {0} stators were rejected,{0} స్టేటర్లు ఎందుకు తిరస్కరించారో నమోదు చేయండి
@@ -1005,6 +1008,7 @@ Thermoplastic,థర్మోప్లాస్టిక్
 These elements are out of spec: {0}. A Quality Engineer must record an override reason to approve anyway.,ఈ మూలకాలు స్పెక్ దాటాయి: {0}. అయినా ఆమోదించాలంటే క్వాలిటీ ఇంజనీర్ ఒక కారణాన్ని నమోదు చేయాలి.
 These units cannot be dispatched until their Pump Test Certificate passes:<ul>{0}</ul>,పంప్ టెస్ట్ సర్టిఫికెట్ పాస్ అయ్యేవరకు ఈ యూనిట్లను పంపడం కుదరదు:<ul>{0}</ul>
 "They read this on a phone. Plain words, no jargon.",వారు ఇది ఫోన్‌లో చదువుతారు. సులభమైన మాటల్లో రాయండి.
+They see this in the dealer portal,డీలర్ పోర్టల్‌లో వారు ఇది చూస్తారు
 This Financial Year,ఈ ఆర్థిక సంవత్సరం
 This Month,ఈ నెల
 This Quarter,ఈ త్రైమాసికం
@@ -1144,6 +1148,7 @@ Workshop,వర్క్‌షాప్
 Workstation,వర్క్‌స్టేషన్
 Write a message before sending,పంపే ముందు ఒక సందేశం రాయండి
 Write to KUMAR,KUMAR కు రాయండి
+Write to the dealer... they read this on a phone,డీలర్‌కు రాయండి... వారు ఇది ఫోన్‌లో చదువుతారు
 Yes,అవును
 You,మీరు
 You Owe KUMAR,మీరు KUMAR కు చెల్లించాల్సినది

@@ -85,6 +85,13 @@ def run_data_setup():
 
 	icons.install()
 	desktop_icons.install()
+
+	# a message attachment that only hangs on its Comment is invisible in the
+	# desk; repair any left by an older version of the portal
+	from kumar_service.portal_api import repair_message_attachments
+
+	repair_message_attachments()
+
 	frappe.db.commit()
 
 

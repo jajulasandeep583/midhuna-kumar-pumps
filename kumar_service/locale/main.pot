@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kumar Service and Traceability VERSION\n"
 "Report-Msgid-Bugs-To: aimidhunatech@gmail.com\n"
-"POT-Creation-Date: 2026-08-08 18:48+0000\n"
-"PO-Revision-Date: 2026-08-08 18:48+0000\n"
+"POT-Creation-Date: 2026-08-08 19:14+0000\n"
+"PO-Revision-Date: 2026-08-08 19:14+0000\n"
 "Last-Translator: aimidhunatech@gmail.com\n"
 "Language-Team: aimidhunatech@gmail.com\n"
 "MIME-Version: 1.0\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.16.0\n"
 
-#: kumar_service/portal_api.py:665
+#: kumar_service/portal_api.py:796
 msgid "(photo attached)"
 msgstr ""
 
@@ -458,6 +458,7 @@ msgid "At work"
 msgstr ""
 
 #: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:273
+#: kumar_service/public/js/dealer_chat.js:48
 msgid "Attach"
 msgstr ""
 
@@ -1030,6 +1031,10 @@ msgstr ""
 msgid "Conversation ({0})"
 msgstr ""
 
+#: kumar_service/public/js/dealer_chat.js:58
+msgid "Conversation with Dealer"
+msgstr ""
+
 #. Option for the 'Rotor Type' (Select) field in DocType 'Pump Model'
 #: kumar_service/kumar_service/doctype/pump_model/pump_model.json
 msgid "Copper"
@@ -1220,7 +1225,8 @@ msgstr ""
 #: kumar_service/kumar_service/page/service_command_centre/service_command_centre.js:101
 #: kumar_service/kumar_service/workspace/management/management.json
 #: kumar_service/kumar_service/workspace/masters/masters.json
-#: kumar_service/portal_api.py:636 kumar_service/public/js/dealer_reply.js:129
+#: kumar_service/portal_api.py:767 kumar_service/public/js/dealer_chat.js:220
+#: kumar_service/public/js/dealer_reply.js:129
 msgid "Dealer"
 msgstr ""
 
@@ -1944,7 +1950,7 @@ msgstr ""
 msgid "Head Min (m)"
 msgstr ""
 
-#: kumar_service/portal_api.py:783
+#: kumar_service/portal_api.py:925
 msgid "Head office"
 msgstr ""
 
@@ -2467,6 +2473,7 @@ msgstr ""
 #: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:75
 #: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:245
 #: kumar_service/kumar_service/page/service_command_centre/service_command_centre.js:131
+#: kumar_service/public/js/dealer_chat.js:41
 #: kumar_service/public/js/kumar_dashboard.js:351
 #: kumar_service/www/dealer_portal.html:1569
 #: kumar_service/www/dealer_portal.html:1592
@@ -2786,7 +2793,7 @@ msgstr ""
 msgid "New Service Request"
 msgstr ""
 
-#: kumar_service/portal_api.py:696
+#: kumar_service/portal_api.py:838
 msgid "New message on {0}"
 msgstr ""
 
@@ -2944,7 +2951,8 @@ msgstr ""
 #: kumar_service/api.py:349 kumar_service/dashboard.py:54
 #: kumar_service/portal_api.py:207 kumar_service/portal_api.py:376
 #: kumar_service/portal_api.py:415 kumar_service/portal_api.py:482
-#: kumar_service/staff_api.py:35 kumar_service/www/dealer_portal.html:1578
+#: kumar_service/public/js/dealer_chat.js:180 kumar_service/staff_api.py:35
+#: kumar_service/www/dealer_portal.html:1578
 #: kumar_service/www/dealer_portal.html:1653
 msgid "Not permitted"
 msgstr ""
@@ -2980,6 +2988,10 @@ msgstr ""
 
 #: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:381
 msgid "Nothing said yet."
+msgstr ""
+
+#: kumar_service/public/js/dealer_chat.js:191
+msgid "Nothing said yet. Write below and the dealer sees it in the portal."
 msgstr ""
 
 #: kumar_service/kumar_service/page/production_daily/production_daily.js:194
@@ -3839,6 +3851,10 @@ msgstr ""
 msgid "Recent Registrations"
 msgstr ""
 
+#: kumar_service/public/js/dealer_chat.js:52
+msgid "Record as first response"
+msgstr ""
+
 #: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:269
 #: kumar_service/public/js/dealer_reply.js:69
 msgid "Record this as the first response for the SLA"
@@ -3856,6 +3872,7 @@ msgstr ""
 #: kumar_service/kumar_service/page/purchase_analytics/purchase_analytics.js:21
 #: kumar_service/kumar_service/page/sales_analytics/sales_analytics.js:17
 #: kumar_service/kumar_service/page/service_command_centre/service_command_centre.js:39
+#: kumar_service/public/js/dealer_chat.js:39
 #: kumar_service/public/js/kumar_dashboard.js:99
 msgid "Refresh"
 msgstr ""
@@ -4339,6 +4356,9 @@ msgstr ""
 msgid "Selling / Silent"
 msgstr ""
 
+#: kumar_service/public/js/dealer_chat.js:54
+#: kumar_service/public/js/dealer_chat.js:145
+#: kumar_service/public/js/dealer_chat.js:153
 #: kumar_service/www/dealer_portal.html:1488
 #: kumar_service/www/dealer_portal.html:1554
 msgid "Send"
@@ -4358,6 +4378,7 @@ msgid "Send to KUMAR"
 msgstr ""
 
 #: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:352
+#: kumar_service/public/js/dealer_chat.js:129
 #: kumar_service/public/js/dealer_reply.js:88
 #: kumar_service/www/dealer_portal.html:1206
 #: kumar_service/www/dealer_portal.html:1280
@@ -4365,7 +4386,7 @@ msgstr ""
 msgid "Sending..."
 msgstr ""
 
-#: kumar_service/portal_api.py:744
+#: kumar_service/portal_api.py:886
 msgid "Sent to KUMAR."
 msgstr ""
 
@@ -4597,7 +4618,7 @@ msgstr ""
 msgid "Service Visit"
 msgstr ""
 
-#: kumar_service/portal_api.py:789
+#: kumar_service/portal_api.py:931
 msgid "Service centre"
 msgstr ""
 
@@ -5098,11 +5119,11 @@ msgstr ""
 msgid "Tested By"
 msgstr ""
 
-#: kumar_service/portal_api.py:549 kumar_service/www/dealer_portal.html:1523
+#: kumar_service/portal_api.py:668 kumar_service/www/dealer_portal.html:1523
 msgid "That file could not be read. Try again."
 msgstr ""
 
-#: kumar_service/portal_api.py:552
+#: kumar_service/portal_api.py:671
 msgid "That file is empty."
 msgstr ""
 
@@ -5154,6 +5175,10 @@ msgstr ""
 
 #: kumar_service/public/js/dealer_reply.js:58
 msgid "They read this on a phone. Plain words, no jargon."
+msgstr ""
+
+#: kumar_service/public/js/dealer_chat.js:37
+msgid "They see this in the dealer portal"
 msgstr ""
 
 #: kumar_service/kumar_service/page/my_business/my_business.js:36
@@ -5851,12 +5876,16 @@ msgid "Workstation"
 msgstr ""
 
 #: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:349
-#: kumar_service/portal_api.py:663 kumar_service/public/js/dealer_reply.js:83
+#: kumar_service/portal_api.py:794 kumar_service/public/js/dealer_reply.js:83
 msgid "Write a message before sending"
 msgstr ""
 
 #: kumar_service/www/dealer_portal.html:1483
 msgid "Write to KUMAR"
+msgstr ""
+
+#: kumar_service/public/js/dealer_chat.js:44
+msgid "Write to the dealer... they read this on a phone"
 msgstr ""
 
 #: kumar_service/kumar_service/page/service_command_centre/service_command_centre.js:113
@@ -5889,7 +5918,7 @@ msgstr ""
 msgid "Your Outlet"
 msgstr ""
 
-#: kumar_service/portal_api.py:780
+#: kumar_service/portal_api.py:922
 msgid "Your branch office"
 msgstr ""
 
@@ -6044,7 +6073,7 @@ msgstr ""
 msgid "{0} a day on average"
 msgstr ""
 
-#: kumar_service/portal_api.py:543
+#: kumar_service/portal_api.py:662
 msgid "{0} cannot be attached. Send a photo or a PDF."
 msgstr ""
 
@@ -6109,7 +6138,8 @@ msgid "{0} is required"
 msgstr ""
 
 #: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:314
-#: kumar_service/portal_api.py:555 kumar_service/www/dealer_portal.html:1515
+#: kumar_service/portal_api.py:674 kumar_service/public/js/dealer_chat.js:100
+#: kumar_service/www/dealer_portal.html:1515
 msgid "{0} is too large. The limit is {1} MB."
 msgstr ""
 

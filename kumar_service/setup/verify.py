@@ -613,9 +613,58 @@ def run():
 	) or ""
 	check("the Service Request form has a Reply to Dealer button",
 		"Reply to Dealer" in reply_js and "Service Request" in reply_js)
-	check("the reply button is loaded by the desk bundle",
-		"dealer_reply.js" in (frappe.read_file(
-			frappe.get_app_path("kumar_service", "public", "js", "kumar.bundle.js")) or ""))
+
+	bundle = frappe.read_file(
+		frappe.get_app_path("kumar_service", "public", "js", "kumar.bundle.js")
+	) or ""
+	check("the reply button is loaded by the desk bundle", "dealer_reply.js" in bundle)
+
+	# The chat panel on the document, so the desk shows the conversation the way
+	# staff read every other conversation they have.
+	chat_js = frappe.read_file(
+		frappe.get_app_path("kumar_service", "public", "js", "dealer_chat.js")
+	) or ""
+	check("the form carries a chat panel", "Conversation with Dealer" in chat_js)
+	check("the chat panel sends through the staff endpoint",
+		"staff_api.reply_to_dealer" in chat_js)
+	check("the chat panel can attach a file", "readAsDataURL" in chat_js)
+	check("the chat panel is loaded by the desk bundle", "dealer_chat.js" in bundle)
+
+	css = frappe.read_file(
+		frappe.get_app_path("kumar_service", "public", "css", "kumar.bundle.css")
+	) or ""
+	for needed in (".kchat-stream", ".kchat-bub", ".kchat-atts", ".kumar-attachments"):
+		check(f"the chat panel is styled: {needed}", needed in css)
+
+	# Attachments have to be visible in the DESK, not only in our own screens:
+	# once on the ticket for the Attachments sidebar (which is also what makes a
+	# private file readable by staff), and once inside the comment HTML for
+	# frappe's own timeline.
+	portal_py = frappe.read_file(frappe.get_app_path("kumar_service", "portal_api.py")) or ""
+	check("attachments are rendered into the comment for the desk timeline",
+		"_write_attachment_block" in portal_py)
+	check("the message keeps its link to its files", "_parse_attachments" in portal_py)
+
+	# A File row still stuck on a Comment is invisible in the desk: it appears in
+	# no Attachments sidebar, and a private one 403s for staff. This is the exact
+	# state the first cut left behind.
+	stranded = frappe.db.count("File", {"attached_to_doctype": "Comment"})
+	check("no attachment is stranded on a Comment", stranded == 0,
+		f"{stranded} would be invisible in the desk")
+
+	# Every file a message points at must exist, or the timeline shows a broken
+	# image and the chat panel a dead link.
+	broken = 0
+	for content in frappe.db.sql_list(
+		"""select content from `tabComment`
+		   where comment_type = 'Comment' and content like %s""",
+		f"%{portal_api.ATTACH_MARKER}%",
+	):
+		for a in portal_api._parse_attachments(content):
+			if not frappe.db.exists("File", {"file_url": a["file_url"]}):
+				broken += 1
+	check("every attachment a message points at still exists", broken == 0,
+		f"{broken} broken links")
 
 	print()
 	print("=" * 92)

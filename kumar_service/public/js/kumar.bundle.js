@@ -13,3 +13,6 @@ import "./kumar_dashboard.js";
 // already have a script of their own, and its handlers simply never fire
 // anywhere else.
 import "./dealer_reply.js";
+// The chat panel on the Service Request / Warranty Claim form. Same two
+// doctypes, same reason for living in the shared bundle.
+import "./dealer_chat.js";
