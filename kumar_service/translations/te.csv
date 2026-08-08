@@ -26,6 +26,7 @@
 A CSV with the right columns and two worked examples taken from your own masters. Delete the examples before you upload.,"సరైన కాలమ్‌లతో, మీ సొంత మాస్టర్ల నుండి తీసిన రెండు నమూనా వరుసలతో ఉన్న CSV. అప్‌లోడ్ చేసే ముందు నమూనాలను తొలగించండి."
 A KUMAR branch invoices the customer itself. An authorised distributor buys on our invoice and raises its own to the customer - and the warranty is ours in both cases.,"KUMAR బ్రాంచ్ కస్టమర్‌కు తనే ఇన్‌వాయిస్ ఇస్తుంది. అధీకృత డిస్ట్రిబ్యూటర్ మన ఇన్‌వాయిస్ మీద కొని, కస్టమర్‌కు తన సొంత ఇన్‌వాయిస్ ఇస్తారు - రెండు సందర్భాల్లోనూ వారంటీ మనదే."
 A complaint against one physical pump. Enter the serial and everything else fills itself.,"ఒక పంప్ మీద ఫిర్యాదు. సీరియల్ నంబర్ ఇవ్వండి, మిగిలినవన్నీ వాటంతట అవే నిండిపోతాయి."
+A complaint raised here reaches KUMAR immediately and starts the response clock. Ringing the branch does not.,ఇక్కడ పెట్టిన ఫిర్యాదు వెంటనే KUMAR కు చేరి స్పందన సమయం మొదలవుతుంది. బ్రాంచ్‌కు ఫోన్ చేయడం వల్ల అది జరగదు.
 A customer has a problem. We tell you at once if the visit is free.,కస్టమర్‌కు సమస్య ఉంది. సందర్శన ఉచితమా కాదా వెంటనే చెబుతాం.
 A first response is already recorded on this request.,ఈ రిక్వెస్ట్‌కు మొదటి స్పందన ఇప్పటికే నమోదైంది.
 A sale date needs a dealer - who sold it?,అమ్మిన తేదీకి డీలర్ కావాలి - ఎవరు అమ్మారు?
@@ -59,6 +60,7 @@ Aluminium Die Cast,అల్యూమినియం డై కాస్ట్
 Amended From,సవరించిన మూలం
 Amount,మొత్తం
 Analysis,విశ్లేషణ
+Announcements,ప్రకటనలు
 Answered,బదులిచ్చినవి
 Any,ఏదైనా
 Any district,ఏ జిల్లా అయినా
@@ -75,7 +77,7 @@ Ask KUMAR to settle a failure under warranty. Name the parts and say what the te
 "Ask KUMAR to settle a part, a whole unit or a repair bill.","ఒక పార్ట్, పూర్తి యూనిట్ లేదా మరమ్మతు బిల్లును సెటిల్ చేయమని KUMAR ను అడగండి."
 "Ask for an update, or tell KUMAR what the customer is saying","అప్‌డేట్ అడగండి, లేదా కస్టమర్ ఏం చెబుతున్నారో KUMAR కు తెలియజేయండి"
 Assembly,అసెంబ్లీ
-Assigned,కేటాయించినవి
+Assigned,కేటాయించబడింది
 At work,పనిలో ఉన్నారు
 Attach,జతచేయి
 Attach a photo or a credit note,ఫోటో లేదా క్రెడిట్ నోట్ జతచేయండి
@@ -310,6 +312,7 @@ Every configurable assumption lives here - nothing is hardcoded.,మార్చ
 Every order has been received and billed.,"అన్ని ఆర్డర్‌లు అందాయి, బిల్లులూ వచ్చాయి."
 Every outlet moved stock,ప్రతి అవుట్‌లెట్ స్టాక్ అమ్మింది
 "Every pump component machined on computerised machines, so parts are interchangeable across a production run.","ప్రతి పంప్ భాగాన్ని కంప్యూటరైజ్డ్ మెషీన్ల మీద తయారు చేస్తాం, అందుకే ఒక ఉత్పత్తి బ్యాచ్‌లో భాగాలు ఒకదానికొకటి సరిపోతాయి."
+Every pump tested on the bench before it leaves the factory,ఫ్యాక్టరీ నుండి బయటకు వెళ్ళే ముందు ప్రతి పంప్‌ను బెంచ్ మీద పరీక్షిస్తాం
 "Every pump we build carries its own history - the melt its casing came from, the winding lot in its stator, the test bench reading before it left, and the warranty that started the day a dealer sold it. One serial number answers all of it.","మేము తయారు చేసే ప్రతి పంప్‌కు దాని సొంత చరిత్ర ఉంటుంది - దాని కేసింగ్ ఏ మెల్ట్ నుండి వచ్చింది, స్టేటర్‌లో ఏ వైండింగ్ లాట్ ఉంది, బయటకు వెళ్ళే ముందు టెస్ట్ బెంచ్ మీద ఏ రీడింగ్ వచ్చింది, డీలర్ అమ్మిన రోజు మొదలైన వారంటీ ఏది. ఒక సీరియల్ నంబర్ ఇవన్నీ చెబుతుంది."
 Everything,అన్నీ
 Evidence,ఆధారాలు
@@ -462,6 +465,7 @@ KUMAR Pumps & Motors,KUMAR పంపులు & మోటార్లు
 KUMAR Pumps &amp; Motors,KUMAR పంపులు &amp; మోటార్లు
 KUMAR Pumps - Warranty Check,KUMAR పంపులు - వారంటీ తనిఖీ
 KUMAR brand since 1973,1973 నుండి KUMAR బ్రాండ్
+KUMAR has replied on {0} of your tickets. Open My Tickets to read them.,మీ {0} టికెట్ల మీద KUMAR బదులిచ్చారు. చదవడానికి నా టికెట్లు తెరవండి.
 KUMAR replied,KUMAR బదులిచ్చారు
 KUMAR warranty on this pump,ఈ పంప్ మీద KUMAR వారంటీ
 "Kumar Building, Wahab Road, Tenali - 522 201, Guntur Dist., Andhra Pradesh","కుమార్ బిల్డింగ్, వాహబ్ రోడ్, తెనాలి - 522 201, గుంటూరు జిల్లా, ఆంధ్రప్రదేశ్"
@@ -536,6 +540,7 @@ My Tickets,నా టికెట్లు
 NOT REGISTERED,రిజిస్టర్ కాలేదు
 NOT REGISTERED - ask the dealer to complete registration first,రిజిస్టర్ కాలేదు - ముందు రిజిస్ట్రేషన్ పూర్తి చేయమని డీలర్‌ను అడగండి
 Name,పేరు
+National Quality Award 2010 for submersible pumps,సబ్‌మెర్సిబుల్ పంపులకు జాతీయ నాణ్యత పురస్కారం 2010
 Net,నికరం
 Net Paid,చెల్లించిన నికరం
 Net of Tax,పన్ను మినహాయించి
@@ -737,6 +742,7 @@ Qty,పరిమాణం
 Qty Passed,పాస్ అయిన పరిమాణం
 Qty Produced,తయారైన పరిమాణం
 Qty Rejected,తిరస్కరించిన పరిమాణం
+Quality,నాణ్యత
 Quality Engineer,క్వాలిటీ ఇంజనీర్
 "Quality is a process, not a promise","నాణ్యత ఒక ప్రక్రియ, కేవలం మాట కాదు"
 Quantity,పరిమాణం
@@ -761,6 +767,7 @@ Receivable Ageing,రావాల్సిన బాకీల వయస్సు
 Received,అందింది
 "Received, not invoiced","వచ్చింది, బిల్లు రాలేదు"
 Recent Registrations,ఇటీవలి రిజిస్ట్రేషన్లు
+Recognised,గుర్తింపు
 Record as first response,మొదటి స్పందనగా నమోదు చేయి
 "Record the heat number and winding batch on this card at the point of use, and enter them into the system at final assembly. Every finished pump must carry a serial number before it leaves the test bay.","హీట్ నంబర్ మరియు వైండింగ్ బ్యాచ్‌ను ఉపయోగించే చోటే ఈ కార్డు మీద రాయండి, ఫైనల్ అసెంబ్లీ దగ్గర సిస్టమ్‌లో నమోదు చేయండి. టెస్ట్ బే నుండి బయటకు వెళ్ళే ముందు ప్రతి పంప్‌కు సీరియల్ నంబర్ ఉండాలి."
 Record this as the first response for the SLA,SLA కోసం దీన్ని మొదటి స్పందనగా నమోదు చేయి
@@ -772,6 +779,7 @@ Register Sale,అమ్మకం నమోదు చేయి
 Register a Pump,పంప్ రిజిస్టర్ చేయండి
 Register a Pump You Have Sold,మీరు అమ్మిన పంప్‌ను రిజిస్టర్ చేయండి
 Register a Sale,అమ్మకాన్ని నమోదు చేయండి
+"Register every pump you sell on the day you sell it. The warranty only starts when the sale is registered, and the certificate is generated from it.","మీరు అమ్మిన ప్రతి పంప్‌ను అమ్మిన రోజే రిజిస్టర్ చేయండి. అమ్మకం రిజిస్టర్ అయినప్పుడే వారంటీ మొదలవుతుంది, సర్టిఫికెట్ కూడా దాని నుండే తయారవుతుంది."
 Registered By,రిజిస్టర్ చేసినవారు
 Registered {0} pump(s) and started their warranty.,{0} పంప్(లు) రిజిస్టర్ చేసి వారంటీ మొదలుపెట్టాం.
 "Registered, All Time",మొత్తం రిజిస్టర్ చేసినవి
@@ -1024,6 +1032,7 @@ Through Dealer - Dealer's Own Invoice,డీలర్ ద్వారా - డ�
 Through Dealers,డీలర్ల ద్వారా
 "Tick for a branch or showroom KUMAR owns: its sale to the end customer is a KUMAR invoice in our own books. Leave clear for an independent firm - it buys from us on our invoice, then raises its own invoice to the customer, which never enters our books.","KUMAR సొంత బ్రాంచ్ లేదా షోరూమ్ అయితే టిక్ చేయండి: దాని అమ్మకానికి మన పుస్తకాల్లోనే KUMAR ఇన్‌వాయిస్ ఉంటుంది. స్వతంత్ర సంస్థ అయితే ఖాళీగా వదిలేయండి - అది మన ఇన్‌వాయిస్ మీద మన నుండి కొని, కస్టమర్‌కు తన సొంత ఇన్‌వాయిస్ ఇస్తుంది; అది మన పుస్తకాల్లోకి రాదు."
 Tickets,టికెట్లు
+Tickets Assigned,కేటాయించిన టికెట్లు
 Today's Visits,ఈ రోజు సందర్శనలు
 Too many lookups from this address. Please wait a minute and try again.,ఈ చిరునామా నుండి చాలా ఎక్కువ ప్రయత్నాలు జరిగాయి. ఒక నిమిషం ఆగి మళ్ళీ ప్రయత్నించండి.
 Top Customers,ముఖ్య కస్టమర్లు
@@ -1172,6 +1181,7 @@ e.g. bearing seized,ఉదా. బేరింగ్ జామ్ అయిం�
 ends {0},{0} న ముగుస్తుంది
 from the date you sell it,మీరు అమ్మిన తేదీ నుండి
 group,గ్రూప్
+models across {0} product families,{0} ఉత్పత్తి కుటుంబాల్లో మోడల్‌లు
 months,నెలలు
 never,ఎప్పుడూ లేదు
 never sold,ఎప్పుడూ అమ్మలేదు
@@ -1186,6 +1196,7 @@ vs the period before,గత కాలంతో పోలిస్తే
 vs {0} before,గతంలో {0} తో పోలిస్తే
 warranty to {0},వారంటీ {0} వరకు
 years of manufacturing,సంవత్సరాల తయారీ అనుభవం
+"years of manufacturing at Tenali, since 1971",1971 నుండి తెనాలిలో తయారీ అనుభవం (సంవత్సరాలు)
 {0} - {1} at {2},"{0} - {1}, {2} వద్ద"
 {0} KUMAR branches &middot; {1},{0} KUMAR బ్రాంచీలు &middot; {1}
 {0} a day on average,రోజుకు సగటున {0}
@@ -1208,11 +1219,14 @@ years of manufacturing,సంవత్సరాల తయారీ అనుభ�
 {0} kg charged,{0} కేజీలు ఛార్జ్ చేయబడ్డాయి
 {0} more than the period before ({1}),గత కాలం కంటే {0} ఎక్కువ ({1})
 {0} must be 10 digits starting with 6-9,{0} 6-9 తో మొదలై 10 అంకెలు ఉండాలి
+{0} of your customers have an open complaint.,మీ {0} కస్టమర్లకు తెరిచి ఉన్న ఫిర్యాదు ఉంది.
+{0} of your tickets are with KUMAR and awaiting a reply.,"మీ {0} టికెట్లు KUMAR దగ్గర ఉన్నాయి, బదులు కోసం ఎదురుచూస్తున్నాయి."
 {0} on approved leave,{0} ఆమోదిత సెలవులో
 "{0} orders, {1} deliveries, {2} invoices in this period","ఈ కాలంలో {0} ఆర్డర్‌లు, {1} డెలివరీలు, {2} ఇన్‌వాయిస్‌లు"
 {0} past the promised date,{0} చెప్పిన తేదీ దాటాయి
 {0} production runs,{0} ఉత్పత్తి రన్‌లు
 {0} pump(s) registered and warranty started: {1},"{0} పంప్(లు) రిజిస్టర్ అయ్యాయి, వారంటీ మొదలైంది: {1}"
+{0} pumps you sold come out of warranty within 30 days. Ring those customers - it is an AMC or a new pump.,మీరు అమ్మిన {0} పంపుల వారంటీ 30 రోజుల్లో ముగుస్తుంది. ఆ కస్టమర్లకు ఫోన్ చేయండి - అది AMC లేదా కొత్త పంప్ అవకాశం.
 {0} raised in this period,ఈ కాలంలో {0} వచ్చాయి
 {0} raised this period,ఈ కాలంలో {0} వచ్చాయి
 {0} rows queued. They are being written in the background - reload this page in a few minutes and run the reconciliation report.,{0} వరుసలు క్యూలో ఉన్నాయి. అవి బ్యాక్‌గ్రౌండ్‌లో సేవ్ అవుతున్నాయి - కొన్ని నిమిషాల తర్వాత ఈ పేజీని రిఫ్రెష్ చేసి సరిపోలిక రిపోర్టును చూడండి.

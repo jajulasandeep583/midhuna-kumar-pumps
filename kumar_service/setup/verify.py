@@ -481,7 +481,23 @@ def run():
 	# The canvas fix. Without a tinted page, white cards on frappe's white web
 	# shell read as one blank sheet - which is exactly how this screen looked
 	# before, and the sort of thing no unit test would ever notice.
-	check("the portal tints the page behind its cards", "background:#eaf1f8" in portal_html)
+	# Two layout faults reported from a screenshot, both worth guarding: the page
+	# read as white, and the content sat in an A4-width column on a wide monitor.
+	check("the portal tints the page behind its cards",
+		"linear-gradient(180deg, #cfe0f2" in portal_html)
+	check("the portal is not stuck in frappe's reading column",
+		"max-width:none !important" in portal_html)
+	check("the portal still bounds its text width", "max-width:1560px" in portal_html)
+	check("the portal carries an announcements strip", "kp-notices" in portal_html)
+	check("the portal carries the brand banner row", "kp-banners" in portal_html)
+
+	# Same treatment on the other two public pages, or the brand falls apart the
+	# moment a visitor moves between them.
+	for page in ("home.html", "warranty_check.html"):
+		page_html = frappe.read_file(
+			frappe.get_app_path("kumar_service", "www", page)
+		) or ""
+		check(f"/{page} tints its canvas too", "background-attachment: fixed" in page_html)
 	check("the portal hides frappe's duplicate page header",
 		"page-header-wrapper" in portal_html)
 	check("the tab bar sticks while scrolling", "position:sticky" in portal_html)

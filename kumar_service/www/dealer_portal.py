@@ -161,6 +161,15 @@ def get_context(context):
 
 	# Which pumps of theirs KUMAR has flagged as coming off warranty - the
 	# dealer's best reason to ring a customer.
+	context.notices = _notices(context, scope)
+
+	# the brand banner row: the company, on the dealer's own screen
+	context.years = frappe.utils.now_datetime().year - 1971
+	context.catalogue_models = frappe.db.count("Pump Model", {"is_active": 1})
+	context.catalogue_families = len(
+		frappe.get_all("Pump Category", filters={"is_active": 1}, pluck="name")
+	)
+
 	context.product_families = frappe.db.sql(
 		"""
 		select   c.name as category, count(*) as sold
@@ -176,6 +185,87 @@ def get_context(context):
 		as_dict=True,
 	)
 	return context
+
+
+#: Standing notices from head office. Kept in code rather than a DocType because
+#: they change with company policy, not with data - and a dealer should see the
+#: same wording whoever they are.
+STANDING_NOTICES = (
+	(
+		"info",
+		"Register every pump you sell on the day you sell it. The warranty only "
+		"starts when the sale is registered, and the certificate is generated from it.",
+	),
+	(
+		"info",
+		"A complaint raised here reaches KUMAR immediately and starts the response "
+		"clock. Ringing the branch does not.",
+	),
+)
+
+
+def _notices(context, scope):
+	"""The announcements strip at the top of the portal.
+
+	Mostly COMPUTED, not typed: a notice a dealer can act on today ("five of your
+	tickets are waiting on KUMAR") is worth more than a permanent banner nobody
+	reads. The standing notices are policy and come last, so today's business is
+	always on top.
+	"""
+	notices = []
+
+	# KUMAR has come back on something - the most useful thing a dealer can be
+	# told when they open the page
+	replied = sum(1 for t in (context.tickets or {}).get("tickets", []) if t.get("kumar_replied"))
+	if replied:
+		notices.append(
+			{
+				"tone": "good",
+				"text": _("KUMAR has replied on {0} of your tickets. Open My Tickets to read them.").format(replied),
+				"goto": "tickets",
+			}
+		)
+
+	waiting = sum(
+		1
+		for t in (context.tickets or {}).get("tickets", [])
+		if not t.get("closed") and not t.get("kumar_replied") and t.get("replies")
+	)
+	if waiting:
+		notices.append(
+			{
+				"tone": "info",
+				"text": _("{0} of your tickets are with KUMAR and awaiting a reply.").format(waiting),
+				"goto": "tickets",
+			}
+		)
+
+	# warranties about to run out: the dealer's best selling opportunity, and the
+	# one thing on this page that earns them money
+	expiring = len(context.expiring or [])
+	if expiring:
+		notices.append(
+			{
+				"tone": "warn",
+				"text": _("{0} pumps you sold come out of warranty within 30 days. Ring those customers - it is an AMC or a new pump.").format(expiring),
+				"goto": "sold",
+			}
+		)
+
+	open_complaints = (context.counts or {}).get("open") or 0
+	if open_complaints:
+		notices.append(
+			{
+				"tone": "bad" if open_complaints > 4 else "info",
+				"text": _("{0} of your customers have an open complaint.").format(open_complaints),
+				"goto": "tickets",
+			}
+		)
+
+	for tone, text in STANDING_NOTICES:
+		notices.append({"tone": tone, "text": _(text), "goto": None})
+
+	return notices
 
 
 def _performance(scope, dealer):

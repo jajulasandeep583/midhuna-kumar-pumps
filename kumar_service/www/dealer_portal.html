@@ -21,13 +21,34 @@
 
 <style>
   /* ---------- the canvas ----------
-     The single biggest reason this screen used to read as "white": frappe's web
-     shell paints body, main.container and .page_content white, and every card
-     here is also white, so there was nothing for the cards to sit ON. Tint the
-     page and the white cards become cards. */
-  body { background:#eaf1f8 !important; }
+     Two problems this fixes, both of which came from frappe's web shell.
+
+     1. It paints body, main.container and .page_content white, and every card
+        here is also white, so there was nothing for the cards to sit ON.
+     2. main.container is a ~1140px reading column, so on any real monitor the
+        portal rendered as an A4 sheet floating in empty space.
+
+     So: a KUMAR-blue canvas with a deeper band behind the header, and the
+     container widened to the screen. The wrap still stops at 1560px, because
+     text that runs the full width of a 27" monitor is unreadable - the colour
+     goes edge to edge, the content does not. */
+  body {
+    background:
+      radial-gradient(1200px 420px at 12% -8%, rgba(26,116,196,.20), transparent 70%),
+      radial-gradient(900px 380px at 88% -4%, rgba(11,83,148,.16), transparent 70%),
+      linear-gradient(180deg, #cfe0f2 0%, #e2ecf7 300px, #eaf1f8 720px, #eef4fa 100%)
+      !important;
+    background-attachment: fixed !important;
+  }
   main.container, .page_content, .page-content-wrapper { background:transparent !important; }
-  main.container { max-width:1180px !important; }
+  main.container {
+    max-width:none !important;
+    padding-left:26px !important;
+    padding-right:26px !important;
+  }
+  @media (max-width:700px) {
+    main.container { padding-left:10px !important; padding-right:10px !important; }
+  }
 
   /* frappe's generic web page header repeats the page name above our own
      branded bar and breaks the illusion that this is a product rather than a
@@ -46,7 +67,9 @@
         --amber:#a86a00; --amber-bg:#fff3d9; --rose:#b02a54; --rose-bg:#fdecf2;
         font-family:"Inter","Segoe UI",Arial,"Noto Sans Telugu","Nirmala UI",sans-serif;
         color:var(--ink); }
-  .kp-wrap { max-width:1080px; margin:0 auto; padding:0 14px 70px; }
+  /* colour goes edge to edge; text does not - a line running the full width of a
+     27" monitor is unreadable */
+  .kp-wrap { max-width:1560px; margin:0 auto; padding:0 0 70px; }
 
   /* ---------- top bar ---------- */
   .kp-bar { display:flex; align-items:center; justify-content:space-between; gap:12px;
@@ -66,6 +89,57 @@
   .kp-lang a { color:var(--blue); text-decoration:none; padding:3px 8px; border-radius:6px;
                font-size:13px; }
   .kp-lang a.on { background:var(--blue); color:#fff; font-weight:700; }
+
+  /* ---------- announcements ----------
+     Head office talking to the whole network. Mostly computed, so this strip
+     tells a dealer what to do TODAY rather than carrying a permanent banner
+     nobody reads. Clickable ones jump to the tab that answers them. */
+  .kp-notices { background:#fff; border:1px solid var(--line); border-radius:16px;
+                padding:6px 4px; margin-bottom:16px; overflow:hidden;
+                box-shadow:0 2px 10px rgba(11,83,148,.07); }
+  .kp-notice { display:flex; gap:11px; align-items:flex-start; padding:9px 15px;
+               font-size:13.5px; line-height:1.55; border-left:4px solid transparent;
+               border-radius:8px; }
+  .kp-notice + .kp-notice { border-top:1px solid #f1f5f9; }
+  .kp-notice.clickable { cursor:pointer; }
+  .kp-notice.clickable:hover { background:#f7fafd; }
+  .kp-notice .dot { flex:0 0 8px; width:8px; height:8px; border-radius:50%; margin-top:6px; }
+  .kp-notice.good { border-left-color:var(--ok); }
+  .kp-notice.good .dot { background:var(--ok); }
+  .kp-notice.good b { color:var(--ok); }
+  .kp-notice.warn { border-left-color:var(--warn); }
+  .kp-notice.warn .dot { background:var(--warn); }
+  .kp-notice.warn b { color:var(--warn); }
+  .kp-notice.bad  { border-left-color:var(--bad); }
+  .kp-notice.bad .dot  { background:var(--bad); }
+  .kp-notice.bad  { font-weight:600; color:var(--bad); }
+  .kp-notice.info { border-left-color:var(--info); }
+  .kp-notice.info .dot { background:var(--info); }
+  .kp-notice-head { display:flex; align-items:center; gap:8px; padding:8px 15px 6px;
+                    font-size:11px; letter-spacing:1.6px; text-transform:uppercase;
+                    font-weight:800; color:var(--blue); }
+  .kp-notice-head svg { width:15px; height:15px; }
+
+  /* ---------- brand banner row ----------
+     The company, on the dealer's own screen. A dealer selling KUMAR should be
+     reminded what they are selling - it is the same instinct as the "Spirit of
+     the group" board on a distributor's wall. */
+  .kp-banners { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+                gap:13px; margin-bottom:16px; }
+  .kp-banner { position:relative; overflow:hidden; border-radius:16px; padding:18px 20px;
+               color:#fff; min-height:118px;
+               box-shadow:0 4px 16px rgba(11,83,148,.16); }
+  .kp-banner.b1 { background:linear-gradient(130deg,#1a74c4,#0b5394); }
+  .kp-banner.b2 { background:linear-gradient(130deg,#0d7a72,#075c56); }
+  .kp-banner.b3 { background:linear-gradient(130deg,#a86a00,#7a4d00); }
+  .kp-banner.b4 { background:linear-gradient(130deg,#6b3fa0,#4c2b74); }
+  .kp-banner .big { font-size:31px; font-weight:800; line-height:1.05;
+                    font-variant-numeric:tabular-nums; }
+  .kp-banner .lbl { font-size:11px; letter-spacing:2px; text-transform:uppercase;
+                    font-weight:700; opacity:.82; }
+  .kp-banner .sub { font-size:12.5px; line-height:1.5; margin-top:7px; opacity:.92; }
+  .kp-banner svg { position:absolute; right:-8px; bottom:-8px; width:88px; height:88px;
+                   opacity:.20; pointer-events:none; }
 
   /* ---------- hero banner ---------- */
   .kp-hero { position:relative; overflow:hidden; border-radius:20px; color:#fff;
@@ -333,6 +407,49 @@
       {{ _("Your login is not linked to a dealer record. Ask the branch office to set Portal User on your Dealer.") }}
     </div>
   {% else %}
+
+  {# ------------------------------------------------------- announcements #}
+  {% if notices %}
+  <div class="kp-notices">
+    <div class="kp-notice-head">
+      <svg><use href="#kp-art-complaint"></use></svg>{{ _("Announcements") }}
+    </div>
+    {% for n in notices %}
+      <div class="kp-notice {{ n.tone }}{{ ' clickable' if n.goto else '' }}"
+           {% if n.goto %}data-goto="{{ n.goto }}"{% endif %}>
+        <span class="dot"></span><span>{{ n.text }}</span>
+      </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {# --------------------------------------------------------- who they sell #}
+  <div class="kp-banners">
+    <div class="kp-banner b1">
+      <div class="lbl">{{ _("KUMAR Pumps &amp; Motors") }}</div>
+      <div class="big">{{ years }}</div>
+      <div class="sub">{{ _("years of manufacturing at Tenali, since 1971") }}</div>
+      <svg><use href="#kp-art-monobloc"></use></svg>
+    </div>
+    <div class="kp-banner b2">
+      <div class="lbl">{{ _("Quality") }}</div>
+      <div class="big">ISO 9001</div>
+      <div class="sub">{{ _("Every pump tested on the bench before it leaves the factory") }}</div>
+      <svg><use href="#kp-art-borewell"></use></svg>
+    </div>
+    <div class="kp-banner b3">
+      <div class="lbl">{{ _("Recognised") }}</div>
+      <div class="big">MSME</div>
+      <div class="sub">{{ _("National Quality Award 2010 for submersible pumps") }}</div>
+      <svg><use href="#kp-art-openwell"></use></svg>
+    </div>
+    <div class="kp-banner b4">
+      <div class="lbl">{{ _("Catalogue") }}</div>
+      <div class="big">{{ catalogue_models }}</div>
+      <div class="sub">{{ _("models across {0} product families").format(catalogue_families) }}</div>
+      <svg><use href="#kp-art-jet"></use></svg>
+    </div>
+  </div>
 
   {# ---------------------------------------------------------------- hero #}
   <div class="kp-hero">

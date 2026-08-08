@@ -76,7 +76,7 @@ frappe.pages["service-command-centre"].on_page_load = function (wrapper) {
 
 	const TECH_COLUMNS = [
 		{ key: "technician", label: __("Technician") },
-		{ key: "raised", label: __("Assigned"), align: "right", format: num },
+		{ key: "raised", label: __("Tickets Assigned"), align: "right", format: num },
 		{ key: "resolved", label: __("Resolved"), align: "right", format: num },
 		{ key: "close_pct", label: __("Closed %"), align: "right", format: pct },
 		{ key: "avg_days", label: __("Avg Days"), align: "right" },

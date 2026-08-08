@@ -4,9 +4,28 @@
 
 {% block page_content %}
 <style>
+  /* Same canvas treatment as the dealer portal, for the same reason: frappe's
+     web shell paints body/container/page_content white and caps the container at
+     a reading column, so any page of ours reads as an A4 sheet on a blank desk
+     unless it says otherwise. Colour edge to edge, content still bounded. */
+  body {
+    background:
+      radial-gradient(1100px 400px at 10% -6%, rgba(26,116,196,.18), transparent 70%),
+      linear-gradient(180deg, #d3e2f3 0%, #e6eff8 340px, #f0f5fa 100%) !important;
+    background-attachment: fixed !important;
+  }
+  main.container, .page_content, .page-content-wrapper { background:transparent !important; }
+  main.container { max-width:none !important; padding-left:24px !important;
+                   padding-right:24px !important; }
+  @media (max-width:700px) {
+    main.container { padding-left:10px !important; padding-right:10px !important; }
+  }
+
   .kh { --blue:#0b5394; --blue-d:#08406f; --ink:#1a2733; --mut:#5b6b7d; --line:#dde5ee;
         color:var(--ink); font-family:"Inter","Segoe UI",Arial,"Noto Sans Telugu","Nirmala UI",sans-serif; }
-  .kh-wrap { max-width:1080px; margin:0 auto; padding:0 18px 70px; }
+  .kh-wrap { max-width:1400px; margin:0 auto; padding:0 0 70px; }
+  /* cards need a white ground now that the page behind them is tinted */
+  .kh-card, .kh-stat, .kh-fam div, table.kh-tbl { background:#fff; }
 
   /* hero */
   .kh-hero { background:linear-gradient(135deg,#1567b4,#08406f); color:#fff; border-radius:20px;

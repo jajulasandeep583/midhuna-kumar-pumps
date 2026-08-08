@@ -4,7 +4,20 @@
 
 {% block page_content %}
 <style>
-  .kw-shell { max-width: 640px; margin: 0 auto; padding: 24px 16px 60px; }
+  /* This page stays a narrow column on purpose - it is one question and one
+     answer, read on a phone by a customer standing next to their pump. Only the
+     canvas changes, so it matches the rest of the brand instead of sitting on
+     frappe's blank white. */
+  body {
+    background:
+      radial-gradient(900px 340px at 50% -10%, rgba(26,116,196,.18), transparent 70%),
+      linear-gradient(180deg, #d9e6f5 0%, #eaf1f8 320px, #f2f6fb 100%) !important;
+    background-attachment: fixed !important;
+  }
+  main.container, .page_content, .page-content-wrapper { background: transparent !important; }
+  .kw-shell { max-width: 660px; margin: 0 auto; padding: 24px 16px 60px; }
+  /* the answer card needs a white ground against the tinted page */
+  .kw-card, .kw-form input { background: #fff; }
   .kw-brand { font-size: 34px; font-weight: 800; color: #0b5394; letter-spacing: 1px; }
   .kw-tag { color: #666; font-size: 13px; margin-bottom: 26px; }
   .kw-form { display: flex; gap: 10px; margin-bottom: 26px; flex-wrap: wrap; }
