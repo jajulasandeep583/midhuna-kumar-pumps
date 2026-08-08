@@ -64,6 +64,7 @@ Announcements,ప్రకటనలు
 Answered,బదులిచ్చినవి
 Any,ఏదైనా
 Any district,ఏ జిల్లా అయినా
+Any family,ఏ కుటుంబం అయినా
 Any model,ఏ మోడల్ అయినా
 Any status,ఏ స్థితి అయినా
 Application,ఉపయోగం
@@ -697,6 +698,7 @@ Print Warranty Certificate,వారంటీ సర్టిఫికెట్ 
 Print this on the nameplate. A phone camera opens the warranty page.,దీన్ని నేమ్‌ప్లేట్ మీద ప్రింట్ చేయండి. ఫోన్ కెమెరాతో వారంటీ పేజీ తెరుచుకుంటుంది.
 Priority,ప్రాధాన్యత
 Produced,ఉత్పత్తి అయింది
+Product Family,ఉత్పత్తి కుటుంబం
 "Product family, e.g. Submersible Pumps. Drives the default warranty period.","ఉత్పత్తి కుటుంబం, ఉదా. సబ్‌మెర్సిబుల్ పంపులు. డిఫాల్ట్ వారంటీ కాలాన్ని ఇది నిర్ణయిస్తుంది."
 Product range,ఉత్పత్తి శ్రేణి
 Production,ఉత్పత్తి
@@ -867,6 +869,7 @@ Scanned {0},{0} స్కాన్ చేయబడింది
 Seal Failure,సీల్ లోపం
 Search,వెతకండి
 "Search by customer name, mobile, village or serial number. A pump whose warranty is running out is a customer worth ringing.","కస్టమర్ పేరు, మొబైల్, గ్రామం లేదా సీరియల్ నంబర్‌తో వెతకండి. వారంటీ ముగుస్తున్న పంప్ ఉన్న కస్టమర్‌కు ఫోన్ చేయడం మంచిది."
+See all,అన్నీ చూడు
 Self-Priming Monobloc,సెల్ఫ్-ప్రైమింగ్ మోనోబ్లాక్
 Selling / Silent,అమ్ముతున్నవారు / మౌనంగా ఉన్నవారు
 Send,పంపండి
@@ -888,6 +891,7 @@ Serial {0} appears twice in this file,{0} సీరియల్ ఈ ఫైల్
 Serial {0} is already registered ({1}).,{0} సీరియల్ ఇప్పటికే రిజిస్టర్ అయింది ({1}).
 Serial {0} is already registered under {1}. Amend that registration instead.,{0} సీరియల్ ఇప్పటికే {1} కింద రిజిస్టర్ అయింది. దాన్నే సవరించండి.
 Serial {0} is not a KUMAR pump we have any record of.,{0} సీరియల్ మా రికార్డులో ఉన్న KUMAR పంప్ కాదు.
+"Serial, customer or mobile","సీరియల్, కస్టమర్ లేదా మొబైల్"
 "Serial, customer, mobile or ticket number","సీరియల్, కస్టమర్, మొబైల్ లేదా టికెట్ నంబర్"
 Serials created,సృష్టించిన సీరియల్‌లు
 Series,సిరీస్
@@ -919,6 +923,8 @@ Shift {0},షిఫ్ట్ {0}
 Shortcuts,షార్ట్‌కట్‌లు
 Show,చూపించు
 Show QR,QR చూపు
+Show all {0},మొత్తం {0} చూపు
+Show less,తక్కువ చూపు
 Showing all {0},మొత్తం {0} చూపుతోంది
 Showing {0} of {1},{1} లో {0} చూపుతోంది
 Sign / QC,సంతకం / QC
@@ -1169,7 +1175,7 @@ Your branch office,మీ బ్రాంచ్ ఆఫీసు
 "Your branch office, the service centre and head office.","మీ బ్రాంచ్ ఆఫీసు, సర్వీస్ సెంటర్ మరియు ప్రధాన కార్యాలయం."
 Your login is not linked to a dealer record. Ask the branch office to set Portal User on your Dealer.,మీ లాగిన్ ఏ డీలర్ రికార్డుతోనూ అనుసంధానం కాలేదు. మీ డీలర్ రికార్డులో పోర్టల్ యూజర్ పెట్టమని బ్రాంచ్ ఆఫీసును అడగండి.
 Your own branch office handles you. Head office is for anything they cannot settle.,మీ సొంత బ్రాంచ్ ఆఫీసే మీ పని చూస్తుంది. వారు పరిష్కరించలేని విషయాలకు ప్రధాన కార్యాలయం.
-"Your own sales by product family, all time.",ఉత్పత్తి కుటుంబం వారీగా మీ మొత్తం అమ్మకాలు.
+"Your own sales by product family, all time. Click a family to see only those pumps.",ఉత్పత్తి కుటుంబం వారీగా మీ మొత్తం అమ్మకాలు. ఆ పంపులు మాత్రమే చూడాలంటే కుటుంబం మీద క్లిక్ చేయండి.
 Your recent sales,మీ ఇటీవలి అమ్మకాలు
 against {0} in the 30 days before that,అంతకు ముందు 30 రోజుల్లో {0} తో పోలిస్తే
 catalogue models,కేటలాగ్ మోడల్‌లు

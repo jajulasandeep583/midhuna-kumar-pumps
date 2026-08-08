@@ -490,6 +490,38 @@ def run():
 	check("the portal still bounds its text width", "max-width:1560px" in portal_html)
 	check("the portal carries an announcements strip", "kp-notices" in portal_html)
 	check("the portal carries the brand banner row", "kp-banners" in portal_html)
+	check("long announcement lists collapse", "kp-notice-toggle" in portal_html)
+	# The product-family tiles are filters, not decoration.
+	check("the family tiles filter the sales list", "kp-fam-pick" in portal_html)
+	check("the sales list can filter by family", 'id="ks-category"' in portal_html)
+	# Filters where a dealer is already looking, not only on another tab.
+	for control in ("kr-search", "kr-from", "kr-to", "kr-clear"):
+		check(f"Recent Registrations has the {control} filter",
+			f'id="{control}"' in portal_html)
+
+	# The urgent notice must never be the one hidden behind the toggle - the
+	# template shows two and collapses the rest, so ordering is load-bearing.
+	original_user = frappe.session.user
+	misordered = []
+	for login in frappe.get_all(
+		"Dealer", filters={"portal_user": ["!=", ""], "status": "Active"},
+		fields=["name", "portal_user"], limit=4,
+	):
+		try:
+			frappe.set_user(login.portal_user)
+			from kumar_service.www.dealer_portal import get_context as portal_context
+
+			ctx = frappe._dict()
+			portal_context(ctx)
+			tones = [n["tone"] for n in (ctx.notices or [])]
+			if "bad" in tones and tones.index("bad") > 1:
+				misordered.append(f"{login.name}: bad at {tones.index('bad')}")
+		except Exception as exc:  # noqa: BLE001
+			misordered.append(f"{login.name}: {type(exc).__name__}")
+		finally:
+			frappe.set_user(original_user)
+	check("an urgent announcement is never collapsed out of sight", not misordered,
+		str(misordered[:2]))
 
 	# Same treatment on the other two public pages, or the brand falls apart the
 	# moment a visitor moves between them.

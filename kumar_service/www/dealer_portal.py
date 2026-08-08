@@ -120,9 +120,18 @@ def get_context(context):
 		limit=600,
 	)
 
+	# model -> category, so the "What You Sell" family tiles on Home can act as
+	# filters into the full sales list
+	categories = dict(
+		frappe.get_all(
+			"Pump Model", fields=["name", "pump_category"], as_list=True, limit_page_length=0
+		)
+	)
+
 	today = getdate(nowdate())
 	soon = add_days(today, 45)
 	for r in context.my_serials:
+		r["category"] = categories.get(r.pump_model) or ""
 		expiry = getdate(r.warranty_expiry_date) if r.warranty_expiry_date else None
 		if not expiry:
 			r["warranty_state"] = "Not Registered"
@@ -140,6 +149,7 @@ def get_context(context):
 	# Filter options built from what this dealer actually sold, so no dropdown
 	# ever offers a model they have never touched.
 	context.sold_models = sorted({r.pump_model for r in context.my_serials if r.pump_model})
+	context.sold_categories = sorted({r["category"] for r in context.my_serials if r["category"]})
 	context.sold_districts = sorted({r.district for r in context.my_serials if r.district})
 	context.sold_summary = {
 		"total": len(context.my_serials),
@@ -265,6 +275,12 @@ def _notices(context, scope):
 	for tone, text in STANDING_NOTICES:
 		notices.append({"tone": tone, "text": _(text), "goto": None})
 
+	# Sort by urgency, because the template shows only the first two until the
+	# dealer expands the strip. Unsorted, the red "ten of your customers have an
+	# open complaint" was landing third and being hidden by default - the exact
+	# opposite of what the strip is for.
+	order = {"bad": 0, "warn": 1, "good": 2, "info": 3}
+	notices.sort(key=lambda n: order.get(n["tone"], 9))
 	return notices
 
 

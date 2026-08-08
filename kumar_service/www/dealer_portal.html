@@ -94,31 +94,43 @@
      Head office talking to the whole network. Mostly computed, so this strip
      tells a dealer what to do TODAY rather than carrying a permanent banner
      nobody reads. Clickable ones jump to the tab that answers them. */
-  .kp-notices { background:#fff; border:1px solid var(--line); border-radius:16px;
-                padding:6px 4px; margin-bottom:16px; overflow:hidden;
-                box-shadow:0 2px 10px rgba(11,83,148,.07); }
-  .kp-notice { display:flex; gap:11px; align-items:flex-start; padding:9px 15px;
-               font-size:13.5px; line-height:1.55; border-left:4px solid transparent;
-               border-radius:8px; }
-  .kp-notice + .kp-notice { border-top:1px solid #f1f5f9; }
+  .kp-notices { background:linear-gradient(180deg,#ffffff,#f8fbff);
+                border:1px solid #d5e3f2; border-radius:18px;
+                padding:0 0 6px; margin-bottom:16px; overflow:hidden;
+                box-shadow:0 4px 18px rgba(11,83,148,.10); }
+  .kp-notice-head { display:flex; align-items:center; gap:10px;
+                    padding:13px 18px; background:linear-gradient(90deg,#0b5394,#1a74c4);
+                    color:#fff; font-size:12px; letter-spacing:2.2px; text-transform:uppercase;
+                    font-weight:800; }
+  .kp-notice-head svg { width:17px; height:17px; }
+  .kp-notice-head .count { margin-left:auto; display:flex; align-items:center; gap:8px;
+                           background:rgba(255,255,255,.20); border:1px solid rgba(255,255,255,.38);
+                           border-radius:20px; padding:3px 12px; font-size:11px;
+                           letter-spacing:.6px; cursor:pointer; }
+  .kp-notice-head .count:hover { background:rgba(255,255,255,.30); }
+  .kp-notice-head .caret { transition:transform .18s; font-size:10px; }
+  .kp-notices.open .kp-notice-head .caret { transform:rotate(180deg); }
+
+  /* bigger, bolder words - these are announcements, not footnotes */
+  .kp-notice { display:flex; gap:13px; align-items:flex-start; padding:14px 18px;
+               font-size:15.5px; line-height:1.55; font-weight:600;
+               border-left:5px solid transparent; }
+  .kp-notice + .kp-notice { border-top:1px solid #eef3f9; }
   .kp-notice.clickable { cursor:pointer; }
-  .kp-notice.clickable:hover { background:#f7fafd; }
-  .kp-notice .dot { flex:0 0 8px; width:8px; height:8px; border-radius:50%; margin-top:6px; }
-  .kp-notice.good { border-left-color:var(--ok); }
+  .kp-notice.clickable:hover { background:#eff6ff; }
+  .kp-notice .dot { flex:0 0 10px; width:10px; height:10px; border-radius:50%; margin-top:6px; }
+  .kp-notice.good { border-left-color:var(--ok); background:#f4fcf7; color:#0b6b3a; }
   .kp-notice.good .dot { background:var(--ok); }
-  .kp-notice.good b { color:var(--ok); }
-  .kp-notice.warn { border-left-color:var(--warn); }
+  .kp-notice.warn { border-left-color:var(--warn); background:#fffaf0; color:#8a5200; }
   .kp-notice.warn .dot { background:var(--warn); }
-  .kp-notice.warn b { color:var(--warn); }
-  .kp-notice.bad  { border-left-color:var(--bad); }
+  .kp-notice.bad  { border-left-color:var(--bad); background:#fef5f4; color:var(--bad);
+                    font-weight:800; }
   .kp-notice.bad .dot  { background:var(--bad); }
-  .kp-notice.bad  { font-weight:600; color:var(--bad); }
-  .kp-notice.info { border-left-color:var(--info); }
+  .kp-notice.info { border-left-color:var(--info); color:#123c66; }
   .kp-notice.info .dot { background:var(--info); }
-  .kp-notice-head { display:flex; align-items:center; gap:8px; padding:8px 15px 6px;
-                    font-size:11px; letter-spacing:1.6px; text-transform:uppercase;
-                    font-weight:800; color:var(--blue); }
-  .kp-notice-head svg { width:15px; height:15px; }
+  /* collapsed by default past the first two, so five notices do not push the
+     dealer's own numbers off the screen */
+  .kp-notices:not(.open) .kp-notice.extra { display:none; }
 
   /* ---------- brand banner row ----------
      The company, on the dealer's own screen. A dealer selling KUMAR should be
@@ -165,8 +177,13 @@
   /* ---------- stat strip ---------- */
   .kp-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(158px,1fr)); gap:11px;
               margin-bottom:18px; }
-  .kp-stat { border:1px solid var(--line); border-radius:14px; padding:14px 15px; background:#fff;
-             border-top:3px solid var(--blue); box-shadow:0 2px 10px rgba(11,83,148,.07); }
+  /* a faint tint from the card's own accent, so six stat cards are not six white
+     rectangles */
+  .kp-stat { border:1px solid var(--line); border-radius:14px; padding:15px 16px;
+             background:linear-gradient(180deg,#fbfdff,#ffffff);
+             border-top:3px solid var(--blue); box-shadow:0 3px 12px rgba(11,83,148,.09);
+             transition:transform .12s, box-shadow .12s; }
+  .kp-stat:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(11,83,148,.15); }
   .kp-stat b { display:block; font-size:25px; font-weight:800; line-height:1.15;
                font-variant-numeric:tabular-nums; }
   .kp-stat span { font-size:12px; color:var(--mut); font-weight:600; }
@@ -222,9 +239,14 @@
             box-shadow:0 3px 14px rgba(11,83,148,.08); }
   /* a tinted header strip per section, so a long page reads as a stack of
      panels rather than one undifferentiated white sheet */
-  .kp-sec > .kp-h { margin:0; padding:16px 20px 14px;
-                    background:linear-gradient(180deg,#f4f9ff,#ffffff);
-                    border-bottom:1px solid var(--line); }
+  .kp-sec > .kp-h { margin:0; padding:17px 20px 15px;
+                    background:linear-gradient(180deg,#eaf3fd,#f7fbff);
+                    border-bottom:1px solid #d9e6f3; }
+  /* a brand rail down the left of every section head, so a long page reads as a
+     stack of panels rather than one sheet */
+  .kp-sec > .kp-h::before { content:""; position:absolute; left:0; top:0; bottom:0;
+                            width:4px; background:linear-gradient(180deg,#1a74c4,#0b5394); }
+  .kp-sec > .kp-h { position:relative; }
   .kp-sec > .kp-hint, .kp-sec > :not(.kp-h) { margin-left:20px; margin-right:20px; }
   .kp-sec > .kp-hint { margin-top:14px; }
   .kp-sec > *:last-child { margin-bottom:20px; }
@@ -284,14 +306,27 @@
               border-radius:13px; padding:15px; margin-top:12px; font-size:15px; }
   .kp-warr { margin-top:8px; font-size:13.5px; color:var(--info); }
 
-  .kp-t { width:100%; border-collapse:collapse; font-size:13.5px; }
-  .kp-t th { text-align:left; font-size:11px; letter-spacing:1.1px; text-transform:uppercase;
-             color:var(--mut); border-bottom:2px solid var(--line); padding:9px 10px; font-weight:800; }
-  .kp-t td { padding:11px 10px; border-bottom:1px solid #f0f4f8; vertical-align:top; }
-  .kp-t tr:hover td { background:#f8fbfe; }
-  .kp-scroll { overflow-x:auto; }
-  .kp-empty { text-align:center; padding:30px 16px; color:var(--mut); font-size:14px;
-              background:var(--bg); border-radius:13px; }
+  /* A table that reads as part of the product rather than a spreadsheet paste:
+     tinted sticky header, zebra rows, and a brand rail that appears on hover so
+     the eye can hold its place across a wide row. */
+  .kp-t { width:100%; border-collapse:separate; border-spacing:0; font-size:13.5px;
+          border-radius:12px; overflow:hidden; }
+  .kp-t thead th { text-align:left; font-size:11px; letter-spacing:1.2px;
+                   text-transform:uppercase; color:#33475b; font-weight:800;
+                   background:linear-gradient(180deg,#eef5fd,#e3eefb);
+                   border-bottom:1px solid #cfdcea; padding:11px 12px;
+                   position:sticky; top:0; z-index:2; }
+  .kp-t td { padding:12px; border-bottom:1px solid #eff3f8; vertical-align:top; }
+  .kp-t tbody tr:nth-child(even) td { background:#fbfdff; }
+  .kp-t tbody tr:hover td { background:#eff7ff; }
+  .kp-t tbody tr { box-shadow:inset 3px 0 0 transparent; transition:box-shadow .12s; }
+  .kp-t tbody tr:hover { box-shadow:inset 3px 0 0 var(--blue-l); }
+  .kp-t tbody tr:last-child td { border-bottom:0; }
+  .kp-scroll { overflow-x:auto; border:1px solid var(--line); border-radius:12px;
+               background:#fff; }
+  .kp-empty { text-align:center; padding:34px 18px; color:var(--mut); font-size:14px;
+              background:linear-gradient(180deg,#f7fafd,#eef4fa);
+              border:1px dashed #cfdcea; border-radius:14px; }
 
   /* ---------- status pills ---------- */
   .kp-pill { display:inline-block; padding:4px 11px; border-radius:20px; font-size:11.5px;
@@ -368,13 +403,29 @@
                  font-weight:800; color:var(--blue); text-decoration:none; }
   .kp-ct a.tel svg { width:16px; height:16px; }
 
-  /* ---------- family strip ---------- */
-  .kp-fam { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:11px; }
-  .kp-fam div { border:1px solid var(--line); border-radius:14px; padding:15px; background:#fff;
-                text-align:center; }
-  .kp-fam svg { width:38px; height:38px; color:var(--blue); }
-  .kp-fam b { display:block; font-size:21px; font-weight:800; color:var(--blue); margin-top:6px; }
-  .kp-fam span { font-size:12px; color:var(--mut); font-weight:600; }
+  /* ---------- family strip ----------
+     Was six white boxes with a blue glyph, which read as a placeholder. Each
+     family now owns a colour, and the whole tile is a FILTER - click a family
+     and the full sales list opens showing only those pumps. */
+  .kp-fam { display:grid; grid-template-columns:repeat(auto-fit,minmax(158px,1fr)); gap:12px; }
+  .kp-fam button { border:0; cursor:pointer; font-family:inherit; text-align:center;
+                   border-radius:16px; padding:17px 14px; color:#fff; width:100%;
+                   position:relative; overflow:hidden;
+                   transition:transform .13s, box-shadow .13s;
+                   box-shadow:0 3px 14px rgba(11,83,148,.16); }
+  .kp-fam button:hover { transform:translateY(-3px); box-shadow:0 9px 24px rgba(11,83,148,.24); }
+  .kp-fam svg { width:40px; height:40px; color:#fff; opacity:.9; }
+  .kp-fam b { display:block; font-size:27px; font-weight:800; margin-top:5px; line-height:1.05;
+              font-variant-numeric:tabular-nums; }
+  .kp-fam span { font-size:12px; font-weight:700; opacity:.92; display:block; margin-top:2px; }
+  .kp-fam .go { position:absolute; right:11px; top:9px; font-size:12px; opacity:.55; }
+  /* six hues, cycled by position so the strip never repeats a colour side by side */
+  .kp-fam button:nth-child(6n+1) { background:linear-gradient(135deg,#1a74c4,#0b5394); }
+  .kp-fam button:nth-child(6n+2) { background:linear-gradient(135deg,#12907f,#0a6357); }
+  .kp-fam button:nth-child(6n+3) { background:linear-gradient(135deg,#c07a12,#8a5200); }
+  .kp-fam button:nth-child(6n+4) { background:linear-gradient(135deg,#7d4bb0,#553080); }
+  .kp-fam button:nth-child(6n+5) { background:linear-gradient(135deg,#c33a63,#8e2545); }
+  .kp-fam button:nth-child(6n+6) { background:linear-gradient(135deg,#2a8f57,#17603a); }
 </style>
 
 <div class="kp"><div class="kp-wrap">
@@ -410,12 +461,18 @@
 
   {# ------------------------------------------------------- announcements #}
   {% if notices %}
-  <div class="kp-notices">
+  <div class="kp-notices" id="kp-notices">
     <div class="kp-notice-head">
       <svg><use href="#kp-art-complaint"></use></svg>{{ _("Announcements") }}
+      {% if notices|length > 2 %}
+        <span class="count" id="kp-notice-toggle">
+          <span class="label">{{ _("Show all {0}").format(notices|length) }}</span>
+          <span class="caret">&#9660;</span>
+        </span>
+      {% endif %}
     </div>
     {% for n in notices %}
-      <div class="kp-notice {{ n.tone }}{{ ' clickable' if n.goto else '' }}"
+      <div class="kp-notice {{ n.tone }}{{ ' clickable' if n.goto else '' }}{{ ' extra' if loop.index > 2 else '' }}"
            {% if n.goto %}data-goto="{{ n.goto }}"{% endif %}>
         <span class="dot"></span><span>{{ n.text }}</span>
       </div>
@@ -546,15 +603,18 @@
     {% if product_families %}
     <div class="kp-sec">
       <div class="kp-h"><svg><use href="#kp-art-borewell"></use></svg>{{ _("What You Sell") }}</div>
-      <div class="kp-hint">{{ _("Your own sales by product family, all time.") }}</div>
+      <div class="kp-hint">
+        {{ _("Your own sales by product family, all time. Click a family to see only those pumps.") }}
+      </div>
       <div class="kp-fam">
         {% for f in product_families %}
-        <div>
+        <button type="button" class="kp-fam-pick" data-category="{{ f.category }}">
+          <span class="go">&#8599;</span>
           <svg><use href="#kp-art-{{ 'borewell' if 'Submersible' in f.category and 'Openwell' not in f.category
                                     else 'openwell' if 'Openwell' in f.category
                                     else 'jet' if 'Jet' in f.category else 'monobloc' }}"></use></svg>
           <b>{{ f.sold }}</b><span>{{ _(f.category) }}</span>
-        </div>
+        </button>
         {% endfor %}
       </div>
     </div>
@@ -563,16 +623,44 @@
     <div class="kp-sec">
       <div class="kp-h"><svg><use href="#kp-art-certificate"></use></svg>{{ _("Recent Registrations") }}</div>
       <div class="kp-hint">{{ _("The last pumps you registered. The certificate is what you owe the customer.") }}</div>
+
+      {# A quick filter here too, because this is where a dealer is already
+         looking when they want one pump. The full set of filters - family, model,
+         district, warranty - lives on What I Sold. #}
+      <div class="kp-row" style="margin-bottom:14px">
+        <div>
+          <label for="kr-search">{{ _("Search") }}</label>
+          <input id="kr-search" type="search" autocomplete="off"
+                 placeholder="{{ _('Serial, customer or mobile') }}">
+        </div>
+        <div>
+          <label for="kr-from">{{ _("Sold From") }}</label>
+          <input id="kr-from" type="date">
+        </div>
+        <div>
+          <label for="kr-to">{{ _("Sold To") }}</label>
+          <input id="kr-to" type="date">
+        </div>
+        <div style="align-self:end;display:flex;gap:8px">
+          <button type="button" class="kp-btn sec" id="kr-clear">{{ _("Clear") }}</button>
+          <button type="button" class="kp-btn sec" data-goto="sold">{{ _("See all") }}</button>
+        </div>
+      </div>
+      <div id="kr-count" class="kp-hint" style="margin-bottom:8px"></div>
+
       {% if registrations %}
       <div class="kp-scroll">
-        <table class="kp-t">
+        <table class="kp-t" id="kr-table">
           <thead><tr>
             <th>{{ _("Serial") }}</th><th>{{ _("Customer") }}</th><th>{{ _("Sold") }}</th>
             <th>{{ _("Warranty Upto") }}</th><th>{{ _("Certificate") }}</th>
           </tr></thead>
           <tbody>
           {% for r in registrations %}
-            <tr>
+            <tr data-sold="{{ r.sale_date or '' }}"
+                data-search="{{ ((r.serial_no or '') ~ ' ' ~ (r.pump_model or '') ~ ' '
+                                 ~ (r.end_customer_name or '') ~ ' '
+                                 ~ (r.end_customer_mobile or ''))|lower }}">
               <td><b>{{ r.serial_no }}</b><br><small style="color:#5f7183">{{ r.pump_model or "" }}</small></td>
               <td>{{ r.end_customer_name }}<br>
                 <a href="tel:{{ r.end_customer_mobile }}" style="font-size:12.5px">{{ r.end_customer_mobile }}</a></td>
@@ -867,6 +955,13 @@
           </select>
         </div>
         <div>
+          <label for="ks-category">{{ _("Product Family") }}</label>
+          <select id="ks-category">
+            <option value="">{{ _("Any family") }}</option>
+            {% for c in sold_categories %}<option value="{{ c }}">{{ _(c) }}</option>{% endfor %}
+          </select>
+        </div>
+        <div>
           <label for="ks-model">{{ _("Model") }}</label>
           <select id="ks-model">
             <option value="">{{ _("Any model") }}</option>
@@ -910,6 +1005,7 @@
           {% for r in my_serials %}
             <tr data-warranty="{{ r.warranty_state }}"
                 data-model="{{ r.pump_model or '' }}"
+                data-category="{{ r.category or '' }}"
                 data-district="{{ r.district or '' }}"
                 data-sold="{{ r.sale_date or '' }}"
                 data-search="{{ ((r.serial_no or '') ~ ' ' ~ (r.pump_model or '') ~ ' '
@@ -1443,13 +1539,15 @@ frappe.ready(function () {
     const table = $("ks-table");
     if (!table) return;
     const rows = Array.from(table.querySelectorAll("tbody tr"));
-    const controls = ["ks-search", "ks-warranty", "ks-model", "ks-district", "ks-from", "ks-to"]
+    const controls = ["ks-search", "ks-warranty", "ks-category", "ks-model", "ks-district",
+      "ks-from", "ks-to"]
       .map((id) => $(id))
       .filter(Boolean);
 
     function apply() {
       const q = (($("ks-search") || {}).value || "").trim().toLowerCase();
       const warranty = (($("ks-warranty") || {}).value || "");
+      const category = (($("ks-category") || {}).value || "");
       const model = (($("ks-model") || {}).value || "");
       const district = (($("ks-district") || {}).value || "");
       const from = (($("ks-from") || {}).value || "");
@@ -1461,6 +1559,7 @@ frappe.ready(function () {
         const keep =
           (!q || (tr.dataset.search || "").indexOf(q) !== -1) &&
           (!warranty || tr.dataset.warranty === warranty) &&
+          (!category || tr.dataset.category === category) &&
           (!model || tr.dataset.model === model) &&
           (!district || tr.dataset.district === district) &&
           // ISO dates compare correctly as strings, which is why sale_date is
@@ -1497,8 +1596,77 @@ frappe.ready(function () {
         }
       }));
 
+    // a family tile on Home is a filter: open the full list showing only those
+    window.kpFilterFamily = function (category) {
+      controls.forEach((el) => { el.value = ""; });
+      const sel = $("ks-category");
+      if (sel) sel.value = category;
+      show("sold");
+      apply();
+    };
+
     apply();
   })();
+
+  /* ------------------------------- recent registrations, on Home
+     The same client-side filtering as What I Sold. A dealer hunting one pump is
+     usually already looking at this list, so making them change tab first would
+     be a small daily annoyance. */
+  (function recent() {
+    const table = $("kr-table");
+    if (!table) return;
+    const rows = Array.from(table.querySelectorAll("tbody tr"));
+    const ids = ["kr-search", "kr-from", "kr-to"];
+
+    function apply() {
+      const q = (($("kr-search") || {}).value || "").trim().toLowerCase();
+      const from = (($("kr-from") || {}).value || "");
+      const to = (($("kr-to") || {}).value || "");
+      let shown = 0;
+      rows.forEach((tr) => {
+        const sold = tr.dataset.sold || "";
+        const keep =
+          (!q || (tr.dataset.search || "").indexOf(q) !== -1) &&
+          (!from || (sold && sold >= from)) &&
+          (!to || (sold && sold <= to));
+        tr.style.display = keep ? "" : "none";
+        if (keep) shown += 1;
+      });
+      $("kr-count").textContent =
+        shown === rows.length
+          ? __("Showing all {0}", [rows.length])
+          : __("Showing {0} of {1}", [shown, rows.length]);
+    }
+
+    ids.forEach((id) => {
+      const el = $(id);
+      if (el) el.addEventListener("input", apply);
+    });
+    $("kr-clear").addEventListener("click", function () {
+      ids.forEach((id) => { const el = $(id); if (el) el.value = ""; });
+      apply();
+    });
+    apply();
+  })();
+
+  /* --------------------------------------------- announcements */
+  (function announcements() {
+    const box = $("kp-notices");
+    const toggle = $("kp-notice-toggle");
+    if (!box || !toggle) return;
+    const label = toggle.querySelector(".label");
+    const total = box.querySelectorAll(".kp-notice").length;
+    toggle.addEventListener("click", function () {
+      const open = box.classList.toggle("open");
+      label.textContent = open ? __("Show less") : __("Show all {0}", [total]);
+    });
+  })();
+
+  /* the coloured family tiles on Home jump into the filtered sales list */
+  document.querySelectorAll(".kp-fam-pick").forEach((b) =>
+    b.addEventListener("click", function () {
+      if (window.kpFilterFamily) window.kpFilterFamily(b.dataset.category);
+    }));
 
   /* ------------------------------------------------------- tickets */
   (function tickets() {
