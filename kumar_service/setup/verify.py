@@ -401,6 +401,136 @@ def run():
 
 	print()
 	print("=" * 92)
+	print("BRANDING")
+	print("=" * 92)
+
+	from kumar_service.setup import branding
+
+	ws = frappe.get_single("Website Settings")
+	check("app name is KUMAR, not Frappe", ws.app_name == branding.APP_NAME, ws.app_name or "-")
+	check("the desk navbar carries the KUMAR mark",
+		frappe.db.get_single_value("Navbar Settings", "app_logo") == branding.MARK)
+	check("favicon and splash are set", bool(ws.favicon and ws.splash_image))
+	check("System Settings app_name says KUMAR too",
+		frappe.db.get_single_value("System Settings", "app_name") == branding.APP_NAME,
+		frappe.db.get_single_value("System Settings", "app_name") or "-")
+	check("the website theme is ours", ws.website_theme == "KUMAR", ws.website_theme or "-")
+	# Every logo path must resolve on disk, or the navbar shows a broken image
+	# and that is the first thing anyone sees.
+	import os
+
+	from frappe import get_app_path
+
+	missing_assets = [
+		path
+		for path in (branding.LOGO, branding.MARK, branding.TILE, branding.SPLASH)
+		if not os.path.exists(
+			os.path.join(get_app_path("kumar_service"), "public", path.split("/assets/kumar_service/")[1])
+		)
+	]
+	check("every branded image exists on disk", not missing_assets, str(missing_assets))
+
+	company_desc = frappe.db.get_value("Company", branding.COMPANY, "company_description")
+	check("the company record tells the company's story", bool(company_desc),
+		f"{len(company_desc or '')} chars")
+
+	print()
+	print("=" * 92)
+	print("PUBLIC PAGES AND TELUGU")
+	print("=" * 92)
+
+	check("the site opens on the KUMAR landing page", ws.home_page == "home", ws.home_page or "-")
+
+	# Render each public page the way a visitor gets it, in both languages. This
+	# is the check that would have caught an untranslated status badge.
+	from frappe.translate import print_language
+
+	original = frappe.session.user
+	for route, module in (("home", "home"), ("warranty-check", "warranty_check")):
+		for lang in ("en", "te"):
+			label = f"/{route} renders in {lang}"
+			try:
+				with print_language(lang):
+					controller = frappe.get_module(f"kumar_service.www.{module}")
+					ctx = frappe._dict()
+					controller.get_context(ctx)
+					check(label, bool(ctx.get("title")), ctx.get("title") or "")
+			except Exception as exc:  # noqa: BLE001
+				check(label, False, str(exc)[:70])
+	frappe.set_user(original)
+
+	te = frappe.translate.get_all_translations("te")
+	check("the Telugu language is enabled on the site",
+		bool(frappe.db.get_value("Language", "te", "enabled")))
+	check("the shipped te.csv actually loads", len(te) > 900, f"{len(te)} strings")
+
+	# The two certificates are acceptance criterion #10: they must print in
+	# Telugu, not merely be translatable in principle.
+	for doctype, fmt, probe in (
+		("Pump Registration", "KUMAR Warranty Certificate", "వారంటీ సర్టిఫికెట్"),
+		("Pump Test Certificate", "KUMAR Pump Test Certificate", "పంప్ టెస్ట్ సర్టిఫికెట్"),
+	):
+		name = frappe.get_all(doctype, filters={"docstatus": 1}, limit=1, pluck="name")
+		label = f"{fmt} prints in Telugu"
+		if not name:
+			check(label, False, "nothing submitted to print")
+			continue
+		try:
+			with print_language("te"):
+				html = frappe.get_print(doctype, name[0], print_format=fmt, no_letterhead=0)
+			check(label, probe in html and 'k-wrap k-te' in html, name[0])
+		except Exception as exc:  # noqa: BLE001
+			check(label, False, str(exc)[:70])
+
+	# A translation whose placeholders do not match its source crashes at
+	# .format() time, in front of whoever triggered the message.
+	import re as _re
+
+	bad_placeholders = [
+		src
+		for src, dst in te.items()
+		if sorted(_re.findall(r"\{\d+\}", src)) != sorted(_re.findall(r"\{\d+\}", dst))
+	]
+	check("no Telugu string drops a {0} placeholder", not bad_placeholders,
+		str(bad_placeholders[:3]))
+
+	print()
+	print("=" * 92)
+	print("CATALOGUE AGAINST THE BROCHURE")
+	print("=" * 92)
+
+	families = dict(
+		frappe.db.sql("select family_code, count(*) from `tabPump Model` group by family_code")
+	)
+	for family in ("V3", "V4", "V6", "V8", "OW", "JM", "SMB", "HMB", "PP", "BP"):
+		check(f"family {family} is in the catalogue", families.get(family, 0) > 0,
+			f"{families.get(family, 0)} models")
+
+	# Borewell runs a copper rotor, openwell an aluminium one. Getting this
+	# backwards puts the wrong rotor on a test certificate.
+	wrong_rotor = frappe.get_all(
+		"Pump Model",
+		filters={"family_code": "OW", "rotor_type": ["!=", "Aluminium Die Cast"]},
+		pluck="name",
+	)
+	check("openwell models run an aluminium rotor", not wrong_rotor, str(wrong_rotor))
+	copper_wrong = frappe.get_all(
+		"Pump Model",
+		filters={"family_code": ["in", ["V3", "V4", "V6", "V8"]], "rotor_type": ["!=", "Copper"]},
+		pluck="name",
+	)
+	check("borewell submersibles run a copper rotor", not copper_wrong, str(copper_wrong))
+
+	# Each Pump Model must have its stock Item, or it cannot be built or sold.
+	modelless = one(
+		"""select count(*) from `tabPump Model` m
+		   where m.is_active = 1 and (m.item is null or m.item = ''
+		         or not exists (select 1 from `tabItem` i where i.name = m.item))"""
+	)
+	check("every active model has a real stock Item", modelless == 0, f"{modelless} without")
+
+	print()
+	print("=" * 92)
 	print(f"RESULT: {len(passed)} passed, {len(failed)} failed")
 	if failed:
 		for item in failed:

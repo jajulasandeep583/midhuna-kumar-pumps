@@ -43,7 +43,9 @@ ROOT_CAUSES = "\n".join(
 	]
 )
 
-FAMILY_CODES = "PP\nPPS\nPPS3PLG\nJM\nSMB\nHMB\nBP\nV3\nV4\nV6\nV8\nHAND\nMOTOR\nENGINE"
+# OW = openwell submersible. The brochure keeps it apart from the V-series
+# borewell families because it runs an aluminium rotor, not copper.
+FAMILY_CODES = "PP\nPPS\nPPS3PLG\nJM\nSMB\nHMB\nBP\nV3\nV4\nV6\nV8\nOW\nHAND\nMOTOR\nENGINE"
 
 # the channel strings live in utils so the runtime controller and the portal
 # can compare against them without importing this dev-time module

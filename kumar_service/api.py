@@ -184,18 +184,25 @@ def register_pump(**kwargs):
 	}
 
 
-def certificate_url(registration):
+def certificate_url(registration, lang=None):
 	"""The printable warranty certificate for a registration.
 
 	`format=` picks our A5 card rather than the standard form, and `no_letterhead=0`
 	keeps the KUMAR header on it - this is the sheet the customer keeps.
+
+	`lang` carries the reader's language into the print view, so a dealer working
+	in Telugu hands over a Telugu certificate rather than an English one.
 	"""
-	return (
+	url = (
 		"/printview?doctype=Pump%20Registration"
 		f"&name={quote(registration)}"
 		"&format=KUMAR%20Warranty%20Certificate"
 		"&no_letterhead=0&trigger_print=1"
 	)
+	lang = lang or getattr(frappe.local, "lang", None)
+	if lang and lang != "en":
+		url += f"&_lang={quote(lang)}"
+	return url
 
 
 @frappe.whitelist()

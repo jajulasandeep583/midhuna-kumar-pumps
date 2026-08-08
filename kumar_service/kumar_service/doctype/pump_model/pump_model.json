@@ -65,7 +65,7 @@
    "fieldtype": "Select",
    "in_standard_filter": 1,
    "label": "Family Code",
-   "options": "PP\nPPS\nPPS3PLG\nJM\nSMB\nHMB\nBP\nV3\nV4\nV6\nV8\nHAND\nMOTOR\nENGINE"
+   "options": "PP\nPPS\nPPS3PLG\nJM\nSMB\nHMB\nBP\nV3\nV4\nV6\nV8\nOW\nHAND\nMOTOR\nENGINE"
   },
   {
    "fieldname": "item",

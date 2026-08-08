@@ -1,0 +1,245 @@
+{% extends "templates/web.html" %}
+
+{% block title %}{{ _("KUMAR Pumps & Motors") }}{% endblock %}
+
+{% block page_content %}
+<style>
+  .kh { --blue:#0b5394; --blue-d:#08406f; --ink:#1a2733; --mut:#5b6b7d; --line:#dde5ee;
+        color:var(--ink); font-family:"Inter","Segoe UI",Arial,"Noto Sans Telugu","Nirmala UI",sans-serif; }
+  .kh-wrap { max-width:1080px; margin:0 auto; padding:0 18px 70px; }
+
+  /* hero */
+  .kh-hero { background:linear-gradient(135deg,#1567b4,#08406f); color:#fff; border-radius:20px;
+             padding:44px 38px; margin:14px 0 34px; position:relative; overflow:hidden; }
+  .kh-hero::after { content:""; position:absolute; right:-90px; top:-70px; width:340px; height:340px;
+                    border-radius:50%; background:rgba(255,255,255,.07); }
+  .kh-eyebrow { font-size:12px; letter-spacing:2.6px; font-weight:700; color:#a8d4f7;
+                text-transform:uppercase; }
+  .kh-h1 { font-size:40px; line-height:1.12; font-weight:800; margin:12px 0 14px; letter-spacing:-.5px; }
+  .kh-lead { font-size:17px; line-height:1.62; color:#dbeafe; max-width:660px; }
+  .kh-cta { margin-top:26px; display:flex; gap:12px; flex-wrap:wrap; }
+  .kh-btn { display:inline-block; padding:13px 24px; border-radius:10px; font-weight:700;
+            font-size:15px; text-decoration:none; }
+  .kh-btn.p { background:#fff; color:var(--blue); }
+  .kh-btn.s { background:rgba(255,255,255,.14); color:#fff; border:1px solid rgba(255,255,255,.4); }
+  .kh-btn:hover { text-decoration:none; opacity:.92; }
+
+  /* stat strip */
+  .kh-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px;
+              margin:-22px 0 40px; }
+  .kh-stat { background:#fff; border:1px solid var(--line); border-radius:14px; padding:18px 20px;
+             box-shadow:0 2px 10px rgba(11,83,148,.06); }
+  .kh-stat b { display:block; font-size:30px; font-weight:800; color:var(--blue); line-height:1.1; }
+  .kh-stat span { font-size:12.5px; color:var(--mut); }
+
+  .kh-sec { margin:44px 0 0; }
+  .kh-h2 { font-size:13px; letter-spacing:2.2px; text-transform:uppercase; font-weight:700;
+           color:var(--blue); margin-bottom:6px; }
+  .kh-h3 { font-size:26px; font-weight:800; margin:0 0 16px; letter-spacing:-.3px; }
+  .kh-p { color:var(--mut); line-height:1.68; max-width:760px; }
+
+  .kh-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:16px;
+             margin-top:20px; }
+  .kh-card { border:1px solid var(--line); border-radius:14px; padding:20px; background:#fff; }
+  .kh-card h4 { font-size:16px; font-weight:700; margin:0 0 7px; }
+  .kh-card p { font-size:13.5px; color:var(--mut); line-height:1.6; margin:0; }
+  .kh-ico { width:34px; height:34px; margin-bottom:11px; color:var(--blue); }
+  .kh-ico svg { width:34px; height:34px; }
+
+  table.kh-tbl { width:100%; border-collapse:collapse; margin-top:18px; font-size:14px; }
+  table.kh-tbl th { text-align:left; font-size:11.5px; letter-spacing:1.3px; text-transform:uppercase;
+                    color:var(--mut); border-bottom:2px solid var(--line); padding:9px 10px; font-weight:700; }
+  table.kh-tbl td { padding:10px; border-bottom:1px solid #eef2f7; }
+  table.kh-tbl tr:hover td { background:#f7fafd; }
+  .kh-scroll { overflow-x:auto; }
+  .kh-num { text-align:right; font-variant-numeric:tabular-nums; }
+
+  .kh-time { border-left:2px solid var(--line); margin-top:20px; padding-left:0; list-style:none; }
+  .kh-time li { position:relative; padding:0 0 16px 22px; }
+  .kh-time li::before { content:""; position:absolute; left:-6px; top:6px; width:10px; height:10px;
+                        border-radius:50%; background:var(--blue); }
+  .kh-time b { color:var(--blue); font-weight:800; margin-right:9px; font-variant-numeric:tabular-nums; }
+  .kh-time span { color:var(--mut); }
+
+  .kh-pills { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+  .kh-pill { background:#f2f6fb; border:1px solid var(--line); color:#33475b; border-radius:20px;
+             padding:6px 14px; font-size:13px; font-weight:600; }
+
+  .kh-lang { text-align:right; padding-top:14px; font-size:13px; }
+  .kh-lang a { color:var(--blue); text-decoration:none; padding:4px 9px; border-radius:6px; }
+  .kh-lang a.on { background:var(--blue); color:#fff; font-weight:700; }
+
+  .kh-foot { margin-top:46px; padding-top:20px; border-top:1px solid var(--line);
+             font-size:13px; color:var(--mut); line-height:1.7; }
+  @media (max-width:620px) { .kh-h1 { font-size:29px; } .kh-hero { padding:30px 22px; } }
+</style>
+
+{# Inline sprite. The desk sprite is injected by app_include_icons, which does
+   not apply to website pages, so these four live here. #}
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="kh-foundry" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+          stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 21h18M4 21V10l5 3V10l5 3V7l5 3v11"/><path d="M7 21v-4h3v4"/>
+  </symbol>
+  <symbol id="kh-furnace" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+          stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 3c1.8 3 3.6 4.7 3.6 7a3.6 3.6 0 0 1-7.2 0C8.4 7.7 10.2 6 12 3z"/>
+    <path d="M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/><path d="M9 17h6"/>
+  </symbol>
+  <symbol id="kh-cnc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+          stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="3.2"/>
+    <path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>
+  </symbol>
+  <symbol id="kh-balance" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+          stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="1.6"/>
+    <path d="M12 12 18 8M12 12l-2 7"/>
+  </symbol>
+</svg>
+
+<div class="kh"><div class="kh-wrap">
+
+  <div class="kh-lang">
+    {%- for code, label, url, active in lang_options %}
+      <a href="{{ url }}" class="{{ 'on' if active else '' }}" hreflang="{{ code }}">{{ label }}</a>
+    {%- endfor %}
+  </div>
+
+  <div class="kh-hero">
+    <div class="kh-eyebrow">{{ _("Sri Lakshmi Ganapathi Engineering Works") }} &middot; {{ _("Tenali") }}</div>
+    <h1 class="kh-h1">
+      <img src="/assets/kumar_service/images/kumar-mark.svg" alt=""
+           width="46" height="46" style="vertical-align:-8px;margin-right:12px">
+      {{ _("KUMAR Pumps &amp; Motors") }}
+    </h1>
+    <p class="kh-lead">
+      {{ _("Every pump we build carries its own history - the melt its casing came from, the winding lot in its stator, the test bench reading before it left, and the warranty that started the day a dealer sold it. One serial number answers all of it.") }}
+    </p>
+    <div class="kh-cta">
+      <a class="kh-btn p" href="/warranty-check{{ lang_q }}">{{ _("Check a warranty") }}</a>
+      <a class="kh-btn s" href="/dealer-portal{{ lang_q }}">{{ _("Dealer login") }}</a>
+      <a class="kh-btn s" href="/app">{{ _("Open the ERP") }}</a>
+    </div>
+  </div>
+
+  <div class="kh-stats">
+    <div class="kh-stat"><b>{{ years }}</b><span>{{ _("years of manufacturing") }}</span></div>
+    <div class="kh-stat"><b>{{ totals.models }}</b><span>{{ _("catalogue models") }}</span></div>
+    <div class="kh-stat"><b>{{ totals.categories }}</b><span>{{ _("product families") }}</span></div>
+    <div class="kh-stat"><b>{{ totals.states }}</b><span>{{ _("states served") }}</span></div>
+    <div class="kh-stat"><b>{{ totals.in_warranty }}</b><span>{{ _("pumps under warranty now") }}</span></div>
+  </div>
+
+  <div class="kh-sec">
+    <div class="kh-h2">{{ _("Product range") }}</div>
+    <h3 class="kh-h3">{{ _("What the plant builds") }}</h3>
+    <p class="kh-p">
+      {{ _("This table is not a brochure page - it is the live catalogue the factory raises work orders against. Change a model here and the warranty period, the test limits and the dealer's registration form all follow.") }}
+    </p>
+    <div class="kh-scroll">
+      <table class="kh-tbl">
+        <thead>
+          <tr>
+            <th>{{ _("Family") }}</th>
+            <th class="kh-num">{{ _("Models") }}</th>
+            <th class="kh-num">{{ _("HP") }}</th>
+            <th class="kh-num">{{ _("Head (m)") }}</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for r in product_range %}
+          <tr>
+            <td><b>{{ _(r.category) }}</b></td>
+            <td class="kh-num">{{ r.models }}</td>
+            <td class="kh-num">
+              {%- if r.hp_min -%}
+                {{ r.hp_min }}{% if r.hp_max != r.hp_min %} &ndash; {{ r.hp_max }}{% endif %}
+              {%- else -%}&mdash;{%- endif -%}
+            </td>
+            <td class="kh-num">
+              {%- if r.head_max -%}{{ r.head_min|int }} &ndash; {{ r.head_max|int }}
+              {%- else -%}&mdash;{%- endif -%}
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="kh-sec">
+    <div class="kh-h2">{{ _("How it is made") }}</div>
+    <h3 class="kh-h3">{{ _("Quality is a process, not a promise") }}</h3>
+    <div class="kh-grid">
+      {% for icon, title, body in capabilities %}
+      <div class="kh-card">
+        <div class="kh-ico"><svg><use href="#kh-{{ icon }}"></use></svg></div>
+        <h4>{{ _(title) }}</h4>
+        <p>{{ _(body) }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="kh-sec">
+    <div class="kh-h2">{{ _("Continuous R &amp; D") }}</div>
+    <h3 class="kh-h3">{{ _("Fifty years of upgrading the shop floor") }}</h3>
+    <ul class="kh-time">
+      {% for year, text in milestones %}
+        <li><b>{{ year }}</b><span>{{ _(text) }}</span></li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="kh-sec">
+    <div class="kh-h2">{{ _("Network") }}</div>
+    <h3 class="kh-h3">{{ _("Branch offices") }}</h3>
+    <p class="kh-p">
+      {{ _("A KUMAR branch invoices the customer itself. An authorised distributor buys on our invoice and raises its own to the customer - and the warranty is ours in both cases.") }}
+    </p>
+    <div class="kh-scroll">
+      <table class="kh-tbl">
+        <thead>
+          <tr>
+            <th>{{ _("City") }}</th><th>{{ _("Outlet") }}</th>
+            <th>{{ _("State") }}</th><th>{{ _("Contact") }}</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for b in branches %}
+          <tr>
+            <td><b>{{ b.city }}</b></td>
+            <td>{{ b.dealer_name }}</td>
+            <td>{{ b.state }}</td>
+            <td>{{ b.mobile_no or b.landline or "" }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if distributors %}
+      <h3 class="kh-h3" style="margin-top:30px">{{ _("Authorised distributors") }}</h3>
+      <div class="kh-pills">
+        {% for d in distributors %}
+          <span class="kh-pill">{{ d.dealer_name }} &middot; {{ d.state }}</span>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <h3 class="kh-h3" style="margin-top:30px">{{ _("Markets") }}</h3>
+    <div class="kh-pills">
+      {% for s in states %}<span class="kh-pill">{{ s }}</span>{% endfor %}
+    </div>
+  </div>
+
+  <div class="kh-foot">
+    <b>{{ _("Sri Lakshmi Ganapathi Engineering Works") }}</b><br>
+    {{ _("Kumar Building, Wahab Road, Tenali - 522 201, Guntur Dist., Andhra Pradesh") }}<br>
+    {{ _("KUMAR brand since 1973") }} &middot; ISO 9001:2015 &middot;
+    {{ _("MSME National Award 2010 for Outstanding Entrepreneurship") }}
+  </div>
+
+</div></div>
+{% endblock %}

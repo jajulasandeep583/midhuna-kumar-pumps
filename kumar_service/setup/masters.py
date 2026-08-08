@@ -15,6 +15,10 @@ CATEGORIES = [
 	("Piston Pumps", "PP", 12),
 	("Electrical Motors", "MOT", 12),
 	("Submersible Pumps", "SUB", 18),
+	# The brochure lists openwell separately and for a real reason: an openwell
+	# unit runs an ALUMINIUM rotor where a borewell unit runs copper. Same
+	# warranty as borewell, so recategorising a model does not move its expiry.
+	("Openwell Submersible Pumps", "OWS", 18),
 	("Centrifugal Monobloc", "CMB", 12),
 	("Agricultural Monobloc", "AMB", 12),
 	("High Pressure Pumps", "HPP", 12),
@@ -97,7 +101,88 @@ MODELS = [
 	("KMOT-3P-500", "Electrical Motors", "MOTOR", 5.0, "Three Phase", 2880, "", "", 0, 0, 0, 0, "LPM", "", "IS 7538"),
 	("KEDP-50-3x2.5", "Engine Driven Pumps", "ENGINE", 5.0, "", 1500, "3", "2.5", 6, 12, 900, 1320, "LPM", "Gunmetal", ""),
 	("KEDP-75-6x6", "Engine Driven Pumps", "ENGINE", 7.5, "", 1500, "6", "6", 6, 11, 1800, 3600, "LPM", "Gunmetal", ""),
+
+	# ------------------------------------------------------------------ 2026-08-08
+	# Everything below is read off the performance tables in the 2025 brochure,
+	# which gives ranges per bore size / delivery size / phase rather than model
+	# codes. The codes follow the scheme already in use above -
+	# K<family>-<phase>-<HP x 100>-<delivery> - and each row's head and discharge
+	# sit inside the band the brochure prints for that row.
+	#
+	# Borewell submersibles, V3 = 75 mm bore, copper rotor, 1" delivery
+	("KV3-1P-100-1", "Submersible Pumps", "V3", 1.0, "Single Phase", 2880, "", "1", 30, 43, 18, 36, "LPM", "Stainless Steel", "IS 8034"),
+	# V4 = 100 mm bore, single phase: 1¼" 0.5-3.0 HP, 1½" 1.5-3.0, 2" 2.0-3.0
+	("KV4-1P-050-1.25", "Submersible Pumps", "V4", 0.5, "Single Phase", 2880, "", "1.25", 22, 45, 30, 108, "LPM", "Stainless Steel", "IS 8034"),
+	("KV4-1P-200-1.25", "Submersible Pumps", "V4", 2.0, "Single Phase", 2880, "", "1.25", 40, 170, 12, 100, "LPM", "Stainless Steel", "IS 8034"),
+	("KV4-1P-300-1.25", "Submersible Pumps", "V4", 3.0, "Single Phase", 2880, "", "1.25", 50, 220, 12, 95, "LPM", "Stainless Steel", "IS 8034"),
+	("KV4-1P-150-1.5", "Submersible Pumps", "V4", 1.5, "Single Phase", 2880, "", "1.5", 31, 70, 60, 150, "LPM", "Stainless Steel", "IS 8034"),
+	("KV4-1P-300-1.5", "Submersible Pumps", "V4", 3.0, "Single Phase", 2880, "", "1.5", 60, 100, 42, 120, "LPM", "Stainless Steel", "IS 8034"),
+	("KV4-1P-200-2", "Submersible Pumps", "V4", 2.0, "Single Phase", 2880, "", "2", 15, 25, 200, 252, "LPM", "Stainless Steel", "IS 8034"),
+	("KV4-1P-300-2", "Submersible Pumps", "V4", 3.0, "Single Phase", 2880, "", "2", 20, 33, 180, 252, "LPM", "Stainless Steel", "IS 8034"),
+	# V4 three phase: 1¼" 1.0-5.0 HP head up to 308 m, 1½" 2.0-5.0, 2" 2.0-5.0, 2½" 3.0
+	("KV4-3P-100-1.25", "Submersible Pumps", "V4", 1.0, "Three Phase", 2880, "", "1.25", 27, 90, 12, 100, "LPM", "Stainless Steel", "IS 8034"),
+	("KV4-3P-300-1.25", "Submersible Pumps", "V4", 3.0, "Three Phase", 2880, "", "1.25", 60, 200, 12, 100, "LPM", "Stainless Steel", "IS 8034"),
+	("KV4-3P-500-1.25", "Submersible Pumps", "V4", 5.0, "Three Phase", 2880, "", "1.25", 100, 308, 12, 80, "LPM", "Stainless Steel", "IS 8034"),
+	("KV4-3P-500-1.5", "Submersible Pumps", "V4", 5.0, "Three Phase", 2880, "", "1.5", 40, 100, 42, 150, "LPM", "Stainless Steel", "IS 8034"),
+	("KV4-3P-300-2.5", "Submersible Pumps", "V4", 3.0, "Three Phase", 2880, "", "2.5", 23, 33, 180, 252, "LPM", "Stainless Steel", "IS 8034"),
+	# V6 = 150 mm bore, RADIAL flow, 2" delivery
+	("KV6R-3P-300-2", "Submersible Pumps", "V6", 3.0, "Three Phase", 2880, "", "2", 30, 70, 48, 396, "LPM", "Stainless Steel", "IS 8034"),
+	("KV6R-3P-750-2", "Submersible Pumps", "V6", 7.5, "Three Phase", 2880, "", "2", 60, 120, 48, 330, "LPM", "Stainless Steel", "IS 8034"),
+	("KV6R-3P-1500-2", "Submersible Pumps", "V6", 15.0, "Three Phase", 2880, "", "2", 100, 184, 48, 300, "LPM", "Stainless Steel", "IS 8034"),
+	("KV6R-1P-300-2", "Submersible Pumps", "V6", 3.0, "Single Phase", 2880, "", "2", 30, 60, 42, 312, "LPM", "Stainless Steel", "IS 8034"),
+	("KV6R-1P-500-2", "Submersible Pumps", "V6", 5.0, "Single Phase", 2880, "", "2", 45, 87, 42, 280, "LPM", "Stainless Steel", "IS 8034"),
+	# V6 MIXED flow: 2½" 3.0-17.5 HP, 3" 5.0-20.0, 4" 6.0-7.5
+	("KV6M-3P-300-2.5", "Submersible Pumps", "V6", 3.0, "Three Phase", 2880, "", "2.5", 14, 40, 180, 780, "LPM", "Stainless Steel", "IS 8034"),
+	("KV6M-3P-1750-2.5", "Submersible Pumps", "V6", 17.5, "Three Phase", 2880, "", "2.5", 60, 125, 180, 600, "LPM", "Stainless Steel", "IS 8034"),
+	("KV6M-3P-500-3", "Submersible Pumps", "V6", 5.0, "Three Phase", 2880, "", "3", 15, 45, 168, 1080, "LPM", "Stainless Steel", "IS 8034"),
+	("KV6M-3P-2000-3", "Submersible Pumps", "V6", 20.0, "Three Phase", 2880, "", "3", 70, 140, 168, 700, "LPM", "Stainless Steel", "IS 8034"),
+	("KV6M-3P-600-4", "Submersible Pumps", "V6", 6.0, "Three Phase", 2880, "", "4", 15, 30, 330, 1080, "LPM", "Stainless Steel", "IS 8034"),
+	("KV6M-1P-500-2.5", "Submersible Pumps", "V6", 5.0, "Single Phase", 2880, "", "2.5", 23, 33, 180, 570, "LPM", "Stainless Steel", "IS 8034"),
+	("KV6M-1P-750-3", "Submersible Pumps", "V6", 7.5, "Single Phase", 2880, "", "3", 30, 48, 276, 750, "LPM", "Stainless Steel", "IS 8034"),
+	# V8 = 200 mm bore, mixed flow, 4" delivery, 7.5-12.5 HP
+	("KV8-3P-750-4", "Submersible Pumps", "V8", 7.5, "Three Phase", 2880, "", "4", 17, 30, 300, 1200, "LPM", "Stainless Steel", "IS 8034"),
+	("KV8-3P-1250-4", "Submersible Pumps", "V8", 12.5, "Three Phase", 2880, "", "4", 28, 42, 300, 1000, "LPM", "Stainless Steel", "IS 8034"),
+	# Openwell submersibles - ALUMINIUM rotor, hence the separate family
+	("KOW-1P-050-1", "Openwell Submersible Pumps", "OW", 0.5, "Single Phase", 2880, "", "1", 12, 18, 90, 174, "LPM", "Cast Iron", "IS 8034"),
+	("KOW-3P-300-2", "Openwell Submersible Pumps", "OW", 3.0, "Three Phase", 2880, "", "2", 8, 20, 300, 1890, "LPM", "Cast Iron", "IS 8034"),
+	("KOW-3P-750-3", "Openwell Submersible Pumps", "OW", 7.5, "Three Phase", 2880, "", "3", 10, 27, 300, 1500, "LPM", "Cast Iron", "IS 8034"),
+
+	# Agriculture monobloc rows the brochure lists that were not seeded before
+	("KSMB30P3(3x3)", "Agricultural Monobloc", "SMB", 3.0, "Three Phase", 1440, "3", "3", 6, 12.4, 11, 18, "LPS", "Gunmetal", "IS 9079"),
+	("KSMB50P3(3x2.5)", "Agricultural Monobloc", "SMB", 5.0, "Three Phase", 1440, "3", "2.5", 6, 14, 15, 22, "LPS", "Gunmetal", "IS 9079"),
+	("KSMB50P3(5x5)", "Agricultural Monobloc", "SMB", 5.0, "Three Phase", 1440, "5", "5", 6, 8, 34, 40, "LPS", "Gunmetal", "IS 9079"),
+	("KSMB75P3(4x4)", "Agricultural Monobloc", "SMB", 7.5, "Three Phase", 1440, "4", "4", 6, 15, 22, 32, "LPS", "Gunmetal", "IS 9079"),
+	("KSMB20(3x3)", "Agricultural Monobloc", "SMB", 2.0, "Single Phase", 1440, "3", "3", 6, 11, 7.2, 18.5, "LPS", "Gunmetal", "IS 9079"),
+	("KSMB20(4x4)", "Agricultural Monobloc", "SMB", 2.0, "Single Phase", 1440, "4", "4", 6, 8, 16.2, 24, "LPS", "Gunmetal", "IS 9079"),
+	("KHMB30P3(3x2.5)", "Agricultural Monobloc", "HMB", 3.0, "Three Phase", 2880, "3", "2.5", 9, 18.5, 8.0, 17, "LPS", "Gunmetal", "IS 9079"),
+	("KHMB50P3(2.5x2)", "Agricultural Monobloc", "HMB", 5.0, "Three Phase", 2880, "2.5", "2", 16, 21, 8.7, 9.8, "LPS", "Gunmetal", "IS 9079"),
+	("KHMB50P3(4x3)", "Agricultural Monobloc", "HMB", 5.0, "Three Phase", 2880, "4", "3", 8, 12, 16.5, 18.5, "LPS", "Gunmetal", "IS 9079"),
+	("KHMB75P3(3x2.5)", "Agricultural Monobloc", "HMB", 7.5, "Three Phase", 2880, "3", "2.5", 25, 35, 11.0, 19.4, "LPS", "Gunmetal", "IS 9079"),
+	("KHMB75HHP3(4x3)", "Agricultural Monobloc", "HMB", 7.5, "Three Phase", 2880, "4", "3", 16, 32, 19, 28, "LPS", "Gunmetal", "IS 9079"),
+	("KHMB20(1.5x1.5)", "Centrifugal Monobloc", "HMB", 2.0, "Single Phase", 2880, "1.5", "1.5", 14, 24, 100, 265, "LPM", "Gunmetal", "IS 9079"),
+	# Mini monobloc, cast-iron variants
+	("KHMB05CMMB", "Centrifugal Monobloc", "HMB", 0.5, "Single Phase", 2880, "1", "1", 3, 30, 750, 3700, "LPH", "Cast Iron", "IS 9079"),
+	("KHMB10CMMB", "Centrifugal Monobloc", "HMB", 1.0, "Single Phase", 2880, "1", "1", 21, 53, 750, 3700, "LPH", "Cast Iron", "IS 9079"),
+	# Jet monobloc: the brochure ships every rating in gunmetal AND cast iron, in
+	# square base, round base and double-stage round base.
+	("KJM10CISB", "Jet Monobloc", "JM", 1.0, "Single Phase", 2880, "1.25", "1", 9, 39, 468, 1368, "LPH", "Cast Iron", "IS 9079"),
+	("KJM15CISB", "Jet Monobloc", "JM", 1.5, "Single Phase", 2880, "1.25", "1", 10, 50, 468, 1368, "LPH", "Cast Iron", "IS 9079"),
+	("KJM05GIRB", "Jet Monobloc", "JM", 0.5, "Single Phase", 2880, "1.25", "1", 9, 21, 900, 1368, "LPH", "Gunmetal", "IS 9079"),
+	("KJM05CIRB", "Jet Monobloc", "JM", 0.5, "Single Phase", 2880, "1.25", "1", 9, 21, 900, 1368, "LPH", "Cast Iron", "IS 9079"),
+	("KJM10GIRB", "Jet Monobloc", "JM", 1.0, "Single Phase", 2880, "1.25", "1", 9, 39, 468, 1368, "LPH", "Gunmetal", "IS 9079"),
+	("KJM10CIRB", "Jet Monobloc", "JM", 1.0, "Single Phase", 2880, "1.25", "1", 9, 39, 468, 1368, "LPH", "Cast Iron", "IS 9079"),
+	("KJM15GIRB", "Jet Monobloc", "JM", 1.5, "Single Phase", 2880, "1.25", "1", 10, 50, 468, 1368, "LPH", "Gunmetal", "IS 9079"),
+	("KJM15CIRB", "Jet Monobloc", "JM", 1.5, "Single Phase", 2880, "1.25", "1", 10, 50, 468, 1368, "LPH", "Cast Iron", "IS 9079"),
+	("KJM10DCI", "Jet Monobloc", "JM", 1.0, "Single Phase", 2880, "1.25", "1", 30, 50, 420, 900, "LPH", "Cast Iron", "IS 9079"),
+	("KJM15DGI", "Jet Monobloc", "JM", 1.5, "Single Phase", 2880, "1.25", "1", 30, 60, 450, 1100, "LPH", "Gunmetal", "IS 9079"),
+	("KJM20DCI", "Jet Monobloc", "JM", 2.0, "Single Phase", 2880, "1.25", "1", 30, 70, 450, 1100, "LPH", "Cast Iron", "IS 9079"),
 ]
+
+# Rotor material is a real product distinction the brochure keeps making, and it
+# does not follow from the category name alone: borewell submersibles run a
+# COPPER rotor, openwell submersibles an aluminium one. Everything else on the
+# monobloc side is aluminium pressure die cast.
+COPPER_ROTOR_FAMILIES = {"V3", "V4", "V6", "V8"}
 
 # name, type, parent, city, state, pincode, contact, mobile, address
 DEALERS = [
@@ -251,7 +336,11 @@ def models():
 				"suction_size_inch": suction,
 				"delivery_size_inch": delivery,
 				"impeller_material": impeller or None,
-				"rotor_type": "Copper" if "Submersible" in category else "Aluminium Die Cast",
+				# by family, not by category: "Openwell Submersible Pumps" also
+				# contains "Submersible" but runs an aluminium rotor
+				"rotor_type": (
+					"Copper" if family in COPPER_ROTOR_FAMILIES else "Aluminium Die Cast"
+				),
 				"head_min_m": hmin,
 				"head_max_m": hmax,
 				"discharge_min": dmin,
@@ -277,6 +366,37 @@ def models():
 				)
 		doc.flags.ignore_permissions = True
 		doc.insert(ignore_permissions=True)
+
+	repair_openwell_family()
+
+
+def repair_openwell_family():
+	"""Move the two openwell models built before the category existed.
+
+	`models()` skips a model that already exists, so an earlier seed left
+	KOW-1P-100-1 and KOW-3P-500-2.5 filed as borewell V4 units with a copper
+	rotor. Both are wrong on the shop floor and on the test certificate. Safe to
+	move because openwell and borewell carry the same 18-month warranty, so no
+	registration's expiry shifts.
+	"""
+	if not frappe.db.exists("Pump Category", "Openwell Submersible Pumps"):
+		return
+	for code in frappe.get_all(
+		"Pump Model", filters={"model_code": ["like", "KOW-%"]}, pluck="name"
+	):
+		current = frappe.db.get_value("Pump Model", code, ["pump_category", "family_code"])
+		if current == ("Openwell Submersible Pumps", "OW"):
+			continue
+		frappe.db.set_value(
+			"Pump Model",
+			code,
+			{
+				"pump_category": "Openwell Submersible Pumps",
+				"family_code": "OW",
+				"rotor_type": "Aluminium Die Cast",
+			},
+			update_modified=False,
+		)
 
 
 def item_groups():

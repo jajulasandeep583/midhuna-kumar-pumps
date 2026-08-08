@@ -66,15 +66,28 @@
              display:flex; flex-direction:column; justify-content:center; }
   .kp-rank-val { font-size:38px; font-weight:800; color:#0b5394; line-height:1; }
   .kp-rank-lbl { font-size:13px; color:#666; margin-top:6px; }
+  .kd-lang { margin-top:6px; text-align:right; font-size:13px; }
+  .kd-lang a { color:#0b5394; text-decoration:none; padding:3px 7px; border-radius:6px; }
+  .kd-lang a.on { background:#0b5394; color:#fff; font-weight:600; }
 </style>
 
 <div class="kd">
   <div class="kd-top">
     <div>
-      <div class="kd-brand">KUMAR</div>
+      <div class="kd-brand">
+        <img src="/assets/kumar_service/images/kumar-mark.svg" alt="KUMAR"
+             width="30" height="30" style="vertical-align:-6px;margin-right:7px">KUMAR
+      </div>
       <div class="kd-who">{{ _("Dealer Portal") }}</div>
     </div>
-    <div class="kd-who">{{ dealer or frappe.session.user }}</div>
+    <div>
+      <div class="kd-who">{{ dealer or frappe.session.user }}</div>
+      <div class="kd-lang">
+        {%- for code, label, url, active in lang_options %}
+          <a href="{{ url }}" class="{{ 'on' if active else '' }}" hreflang="{{ code }}">{{ label }}</a>
+        {%- endfor %}
+      </div>
+    </div>
   </div>
 
   {% if not_a_dealer %}
@@ -124,7 +137,7 @@
 
   <div class="kd-actions">
     <a class="kd-btn sec" href="/app/service-request/new">{{ _("Raise a Complaint") }}</a>
-    <a class="kd-btn sec" href="/warranty-check">{{ _("Warranty Check") }}</a>
+    <a class="kd-btn sec" href="/warranty-check{{ lang_q }}">{{ _("Warranty Check") }}</a>
     <a class="kd-btn sec" href="/app/dealer-desk">{{ _("Full Dealer Desk") }}</a>
   </div>
 

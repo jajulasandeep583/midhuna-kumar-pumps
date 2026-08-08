@@ -44,10 +44,12 @@ def create_roles():
 def run_data_setup():
 	"""Idempotent. Safe on every migrate."""
 	from kumar_service.setup import (
+		branding,
 		custom_fields,
 		desktop_icons,
 		icons,
 		indexes,
+		languages,
 		masters,
 		print_formats,
 		reports,
@@ -63,6 +65,10 @@ def run_data_setup():
 	custom_fields.build_all()
 	# after the custom fields exist, before anything queries across them
 	indexes.build_all()
+	# before the print formats: they are the screens that get printed in Telugu
+	languages.build_all()
+	# site chrome: app name, logo, favicon, theme, company record
+	branding.build_all()
 	masters.build_all()
 	workflows.build_all()
 	reports.build_all()

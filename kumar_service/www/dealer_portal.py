@@ -11,7 +11,10 @@ def get_context(context):
 	if frappe.session.user == "Guest":
 		frappe.throw(_("Please log in to use the dealer portal"), frappe.PermissionError)
 
+	from kumar_service.i18n import apply_language
+
 	context.no_cache = 1
+	apply_language(context)
 	context.title = _("KUMAR Dealer Portal")
 
 	# define everything the template reads up front - a staff login that is not

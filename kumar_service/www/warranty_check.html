@@ -26,10 +26,21 @@
   .kw-err { background: #fce8e6; border: 1px solid #a50e0e; color: #a50e0e;
             padding: 14px 16px; border-radius: 8px; }
   .kw-note { margin-top: 22px; font-size: 12px; color: #777; line-height: 1.6; }
+  .kw-lang { float: right; font-size: 13px; }
+  .kw-lang a { color: #0b5394; text-decoration: none; padding: 4px 8px; border-radius: 6px; }
+  .kw-lang a.kw-on { background: #0b5394; color: #fff; font-weight: 600; }
 </style>
 
 <div class="kw-shell">
-  <div class="kw-brand">KUMAR</div>
+  <div class="kw-lang">
+    {%- for code, label, url, active in lang_options %}
+      <a href="{{ url }}" class="{{ 'kw-on' if active else '' }}" hreflang="{{ code }}">{{ label }}</a>
+    {%- endfor %}
+  </div>
+  <div class="kw-brand">
+    <img src="/assets/kumar_service/images/kumar-mark.svg" alt="KUMAR"
+         width="38" height="38" style="vertical-align:-8px;margin-right:9px">KUMAR
+  </div>
   <div class="kw-tag">
     {{ _("Pumps & Motors") }} &middot; {{ _("Sri Lakshmi Ganapathi Engineering Works, Tenali") }}
   </div>
@@ -37,6 +48,8 @@
   <form class="kw-form" method="get" action="/warranty-check">
     <input type="text" name="sn" value="{{ serial_no or '' }}" autofocus
            placeholder="{{ _('Enter serial number from the nameplate') }}">
+    {# carry the language through the search, or the result page reverts to English #}
+    <input type="hidden" name="_lang" value="{{ lang_code }}">
     <button type="submit">{{ _("Check Warranty") }}</button>
   </form>
 
@@ -52,7 +65,7 @@
         {%- elif status == 'Expiring Soon' %} kw-soon
         {%- elif status == 'Expired' %} kw-out
         {%- else %} kw-grey{% endif %}">
-        {{ status|upper }}
+        {{ _(status)|upper }}
         {%- if result.days_remaining is not none and status in ('In Warranty', 'Expiring Soon') %}
           &middot; {{ result.days_remaining }} {{ _("days left") }}
         {%- endif %}
@@ -60,8 +73,10 @@
 
       <div class="kw-row"><span>{{ _("Serial Number") }}</span><span>{{ result.serial_no }}</span></div>
       <div class="kw-row"><span>{{ _("Model") }}</span><span>{{ result.model_code or "-" }}</span></div>
-      <div class="kw-row"><span>{{ _("Category") }}</span><span>{{ result.category or "-" }}</span></div>
-      <div class="kw-row"><span>{{ _("Rating") }}</span><span>{{ result.hp or "-" }} HP {{ result.phase or "" }}</span></div>
+      <div class="kw-row"><span>{{ _("Category") }}</span>
+        <span>{{ _(result.category) if result.category else "-" }}</span></div>
+      <div class="kw-row"><span>{{ _("Rating") }}</span>
+        <span>{{ result.hp or "-" }} {{ _("HP") }} {{ _(result.phase) if result.phase else "" }}</span></div>
       <div class="kw-row"><span>{{ _("Standard") }}</span><span>{{ result.bis_standard or "-" }}</span></div>
       <div class="kw-row"><span>{{ _("Manufactured") }}</span>
         <span>{{ frappe.utils.format_date(result.manufacturing_date) if result.manufacturing_date else "-" }}</span></div>

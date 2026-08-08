@@ -13,7 +13,11 @@ RATE_LIMIT_PER_MINUTE = 10
 
 
 def get_context(context):
+	from kumar_service.i18n import apply_language
+
 	context.no_cache = 1
+	# language first: the title and every message below is translated
+	apply_language(context)
 	context.title = _("KUMAR Pumps - Warranty Check")
 	context.result = None
 	context.error = None

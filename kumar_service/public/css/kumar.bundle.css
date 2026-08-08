@@ -26,6 +26,68 @@
 }
 
 /* ==================================================================
+   Desk chrome (2026-08-08)
+
+   Enough KUMAR to stop the desk reading as a stock ERPNext install, and no
+   more: the standard theme still owns layout, spacing and dark mode. Only
+   colour and weight are ours, so a frappe upgrade cannot break the layout
+   here - at worst an accent stops applying.
+   ================================================================== */
+
+/* a brand hairline under the navbar - the single cheapest "this is a product"
+   signal on the whole screen */
+header.navbar {
+	border-bottom: 2px solid var(--kumar-blue) !important;
+}
+
+.navbar-brand .app-logo,
+.navbar .app-logo {
+	height: 24px;
+	width: auto;
+}
+
+/* the workspace you are actually on, marked in brand colour rather than the
+   default grey wash */
+.workspace-sidebar .sidebar-item-container.selected > .desk-sidebar-item,
+.workspace-sidebar .sidebar-item-container .desk-sidebar-item.selected {
+	box-shadow: inset 3px 0 0 var(--kumar-blue);
+}
+
+.workspace-sidebar .sidebar-item-container.selected .sidebar-item-label {
+	color: var(--kumar-blue);
+	font-weight: 700;
+}
+
+/* page titles: the stock weight reads like a form label, not a screen name */
+.page-head .title-area .title-text,
+.page-title .title-text {
+	font-weight: 700;
+	letter-spacing: -0.2px;
+}
+
+/* primary actions in KUMAR blue, so "Register Pump" and "Submit" look like
+   the same product as the portal and the certificates */
+.page-actions .btn-primary,
+.modal-footer .btn-primary,
+.btn-modal-primary {
+	background-color: var(--kumar-blue);
+	border-color: var(--kumar-blue);
+}
+
+.page-actions .btn-primary:hover,
+.modal-footer .btn-primary:hover {
+	background-color: #08406f;
+	border-color: #08406f;
+}
+
+/* workspace section headings ("Shortcuts", "Reports & Masters") */
+.workspace-page .ce-header .h4 b,
+.workspace-page .ce-header b {
+	color: var(--kumar-blue);
+	letter-spacing: 0.3px;
+}
+
+/* ==================================================================
    Management screens (.kd-*)
 
    Dense by intention: head office reads these sitting down, on a
