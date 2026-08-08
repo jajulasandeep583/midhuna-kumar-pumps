@@ -94,7 +94,12 @@ EXTRA_ICONS = {
 	"Dealer Performance": "kumar-dealer",
 	"Model Reliability": "kumar-model",
 	"Warranty Cost Analysis": "kumar-claim",
+	"Stock vs Registration Reconciliation": "kumar-warehouse",
+	"Data Migration": "kumar-import",
 	# desk pages
+	"Historical Serial Import": "kumar-import",
+	"Historical Import": "kumar-import",
+	"historical-import": "kumar-import",
 	"Pump Lookup": "kumar-qr",
 	"pump-lookup": "kumar-qr",
 	"Management Dashboard": "kumar-report",

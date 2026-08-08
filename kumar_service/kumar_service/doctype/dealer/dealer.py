@@ -18,5 +18,7 @@ class Dealer(NestedSet):
 				)
 
 	def on_update(self):
+		# NestedSet.on_update already rebuilds the lft/rgt bounds. There is no
+		# second "update the model" step to call - reaching for one raised
+		# AttributeError on every dealer save.
 		super().on_update()
-		self.update_nsm_model()

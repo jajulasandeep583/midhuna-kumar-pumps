@@ -1,7 +1,7 @@
 {
  "app": "kumar_service",
  "charts": [],
- "content": "[{\"id\": \"e6e689107f\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>KUMAR Masters</b></span>\", \"col\": 12}}, {\"id\": \"5e57da8514\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Shortcuts</b></span>\", \"col\": 12}}, {\"id\": \"850478721f\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Pump Model\", \"col\": 3}}, {\"id\": \"ec3550b2c0\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Pump Category\", \"col\": 3}}, {\"id\": \"249c96dcd7\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Dealer Tree\", \"col\": 3}}, {\"id\": \"e6b0aadbb5\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Settings\", \"col\": 3}}, {\"id\": \"110a8ea5d8\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Items\", \"col\": 3}}, {\"id\": \"7a0a4357a8\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"8a0122215e\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Reports & Masters</b></span>\", \"col\": 12}}, {\"id\": \"26493a16b6\", \"type\": \"card\", \"data\": {\"card_name\": \"Catalogue\", \"col\": 4}}, {\"id\": \"3b95e007cf\", \"type\": \"card\", \"data\": {\"card_name\": \"Network\", \"col\": 4}}, {\"id\": \"8561b5f98d\", \"type\": \"card\", \"data\": {\"card_name\": \"Configuration\", \"col\": 4}}, {\"id\": \"9e01c73f72\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"88c82be829\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>How to use this screen</b></span>\", \"col\": 12}}, {\"id\": \"40bc1c41b3\", \"type\": \"paragraph\", \"data\": {\"text\": \"<div style='border:1px solid var(--border-color);border-radius:8px;padding:14px 16px;background:var(--fg-color)'><p style='margin:0 0 6px'><b>How to use KUMAR Masters</b></p><p style='margin:0 0 8px;color:var(--text-muted)'>The catalogue and the network. Change things here and the rest of the system follows - warranty periods, model specs, who a dealer reports to.</p><p style='margin:10px 0 4px'><b>Do this, in order</b></p><ol style='margin:0 0 4px 18px'><li><b>Pump Category</b> sets the default warranty months for a whole family.</li><li><b>Pump Model</b> holds the real specs from the brochure and can override the category's warranty. Each model points at one stock Item.</li><li><b>Dealer Tree</b> is a hierarchy: Branch - Distributor - Dealer - Sub-Dealer. A dealer login sees its own records and everything below it, nothing sideways.</li><li><b>Settings</b> holds every assumption - SLA hours, warranty basis, QC enforcement, QR base URL. Nothing is hardcoded.</li></ol><p style='margin:10px 0 4px'><b>Watch out for</b></p><ul style='margin:0 0 4px 18px'><li>Give a dealer a login by setting <b>Portal User</b> on the Dealer record. That single field is what row-level access is derived from.</li></ul></div>\", \"col\": 12}}]",
+ "content": "[{\"id\": \"a2645911f9\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>KUMAR Masters</b></span>\", \"col\": 12}}, {\"id\": \"a44cecf9a1\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Shortcuts</b></span>\", \"col\": 12}}, {\"id\": \"91757e5d8d\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Pump Model\", \"col\": 3}}, {\"id\": \"16e0403ee2\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Pump Category\", \"col\": 3}}, {\"id\": \"2266d2456a\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Dealer Tree\", \"col\": 3}}, {\"id\": \"2a8e7ad1fd\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Settings\", \"col\": 3}}, {\"id\": \"4528118904\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Historical Import\", \"col\": 3}}, {\"id\": \"d97646747d\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"9d77faeeb5\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Reports & Masters</b></span>\", \"col\": 12}}, {\"id\": \"4a08e9d809\", \"type\": \"card\", \"data\": {\"card_name\": \"Catalogue\", \"col\": 4}}, {\"id\": \"82f6cd66e0\", \"type\": \"card\", \"data\": {\"card_name\": \"Network\", \"col\": 4}}, {\"id\": \"4bd2848fac\", \"type\": \"card\", \"data\": {\"card_name\": \"Configuration\", \"col\": 4}}, {\"id\": \"d6dc60f54d\", \"type\": \"card\", \"data\": {\"card_name\": \"Data Migration\", \"col\": 4}}, {\"id\": \"bd5b615c38\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"98af0108aa\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>How to use this screen</b></span>\", \"col\": 12}}, {\"id\": \"886a11a093\", \"type\": \"paragraph\", \"data\": {\"text\": \"<div style='border:1px solid var(--border-color);border-radius:8px;padding:14px 16px;background:var(--fg-color)'><p style='margin:0 0 6px'><b>How to use KUMAR Masters</b></p><p style='margin:0 0 8px;color:var(--text-muted)'>The catalogue and the network. Change things here and the rest of the system follows - warranty periods, model specs, who a dealer reports to.</p><p style='margin:10px 0 4px'><b>Do this, in order</b></p><ol style='margin:0 0 4px 18px'><li><b>Pump Category</b> sets the default warranty months for a whole family.</li><li><b>Pump Model</b> holds the real specs from the brochure and can override the category's warranty. Each model points at one stock Item.</li><li><b>Dealer Tree</b> is a hierarchy: Branch - Distributor - Dealer - Sub-Dealer. A dealer login sees its own records and everything below it, nothing sideways.</li><li><b>Settings</b> holds every assumption - SLA hours, warranty basis, QC enforcement, QR base URL. Nothing is hardcoded.</li><li><b>Historical Serial Import</b> is for go-live: download the CSV template, fill in the pumps you built and sold before this system existed, check the file, then import. Rows with a sale date come in as submitted registrations with the warranty already running.</li><li><b>Stock vs Registration Reconciliation</b> is the list of loose ends afterwards - above all the pumps that have LEFT the building with no registration behind them, so their warranty never started.</li></ol><p style='margin:10px 0 4px'><b>Watch out for</b></p><ul style='margin:0 0 4px 18px'><li>Give a dealer a login by setting <b>Portal User</b> on the Dealer record. That single field is what row-level access is derived from.</li><li>Always run the check step before importing. A registration is submitted, so a wrong warranty date can only be cancelled and amended afterwards, never quietly deleted.</li></ul></div>\", \"col\": 12}}]",
  "creation": "2026-08-07 17:15:58.064860",
  "custom_blocks": [],
  "docstatus": 0,
@@ -120,9 +120,43 @@
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "icon": "kumar-import",
+   "is_query_report": 0,
+   "label": "Data Migration",
+   "link_count": 2,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "dependencies": "Serial No",
+   "hidden": 0,
+   "icon": "kumar-warehouse",
+   "is_query_report": 1,
+   "label": "Stock vs Registration Reconciliation",
+   "link_count": 0,
+   "link_to": "Stock vs Registration Reconciliation",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "Serial No",
+   "hidden": 0,
+   "icon": "kumar-serial",
+   "is_query_report": 1,
+   "label": "Unregistered Stock",
+   "link_count": 0,
+   "link_to": "Unregistered Stock",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2026-08-08 00:12:23.637660",
+ "modified": "2026-08-08 16:01:07.068788",
  "modified_by": "Administrator",
  "module": "Kumar Service",
  "name": "Masters",
@@ -178,10 +212,10 @@
   {
    "color": "purple",
    "doc_view": "",
-   "icon": "kumar-pump",
-   "label": "Items",
-   "link_to": "Item",
-   "type": "DocType"
+   "icon": "kumar-import",
+   "label": "Historical Import",
+   "link_to": "historical-import",
+   "type": "Page"
   }
  ],
  "title": "Masters",

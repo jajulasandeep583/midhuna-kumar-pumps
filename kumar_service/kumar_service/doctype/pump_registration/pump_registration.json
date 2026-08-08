@@ -302,13 +302,12 @@
    "read_only": 1
   },
   {
-   "default": "Through Dealer - Dealer's Own Invoice",
    "description": "Set automatically from the outlet. Change it only if the paperwork really went the other way.",
    "fieldname": "sale_channel",
    "fieldtype": "Select",
    "in_standard_filter": 1,
    "label": "Sale Channel",
-   "options": "Through Dealer - Dealer's Own Invoice\nDirect - KUMAR Invoice",
+   "options": "\nThrough Dealer - Dealer's Own Invoice\nDirect - KUMAR Invoice",
    "reqd": 1
   },
   {

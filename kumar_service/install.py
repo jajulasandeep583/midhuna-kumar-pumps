@@ -47,6 +47,7 @@ def run_data_setup():
 		custom_fields,
 		desktop_icons,
 		icons,
+		indexes,
 		masters,
 		print_formats,
 		reports,
@@ -60,6 +61,8 @@ def run_data_setup():
 		return
 
 	custom_fields.build_all()
+	# after the custom fields exist, before anything queries across them
+	indexes.build_all()
 	masters.build_all()
 	workflows.build_all()
 	reports.build_all()

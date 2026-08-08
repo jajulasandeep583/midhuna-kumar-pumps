@@ -206,7 +206,8 @@ WORKSPACES = [
 		],
 		"links": [
 			("Claims", ["Kumar Warranty Claim", "Service Request"]),
-			("Reports", ["Warranty Expiring Soon", "Warranty Cost Analysis", "Unregistered Stock"]),
+			("Reports", ["Warranty Expiring Soon", "Warranty Cost Analysis", "Unregistered Stock",
+				"Stock vs Registration Reconciliation"]),
 		],
 	},
 	{
@@ -332,10 +333,19 @@ WORKSPACES = [
 				"dealer login sees its own records and everything below it, nothing sideways.",
 				"<b>Settings</b> holds every assumption - SLA hours, warranty basis, QC enforcement, "
 				"QR base URL. Nothing is hardcoded.",
+				"<b>Historical Serial Import</b> is for go-live: download the CSV template, fill in "
+				"the pumps you built and sold before this system existed, check the file, then "
+				"import. Rows with a sale date come in as submitted registrations with the warranty "
+				"already running.",
+				"<b>Stock vs Registration Reconciliation</b> is the list of loose ends afterwards - "
+				"above all the pumps that have LEFT the building with no registration behind them, "
+				"so their warranty never started.",
 			],
 			[
 				"Give a dealer a login by setting <b>Portal User</b> on the Dealer record. That single "
 				"field is what row-level access is derived from.",
+				"Always run the check step before importing. A registration is submitted, so a wrong "
+				"warranty date can only be cancelled and amended afterwards, never quietly deleted.",
 			],
 		),
 		"shortcuts": [
@@ -343,12 +353,13 @@ WORKSPACES = [
 			("Pump Category", "DocType", "Pump Category", "green"),
 			("Dealer", "DocType", "Dealer Tree", "orange"),
 			("Kumar Service Settings", "DocType", "Settings", "grey"),
-			("Item", "DocType", "Items", "purple"),
+			("historical-import", "Page", "Historical Import", "purple"),
 		],
 		"links": [
 			("Catalogue", ["Pump Model", "Pump Category", "Item"]),
 			("Network", ["Dealer", "Service Technician", "Customer"]),
 			("Configuration", ["Kumar Service Settings"]),
+			("Data Migration", ["Stock vs Registration Reconciliation", "Unregistered Stock"]),
 		],
 	},
 ]

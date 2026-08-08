@@ -91,6 +91,7 @@
    "options": "Part Replacement\nFull Unit Replacement\nRepair Reimbursement"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "workflow_state",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -159,11 +160,13 @@
    "fieldtype": "Column Break"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "approved_amount",
    "fieldtype": "Currency",
    "label": "Approved Amount"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "credit_note",
    "fieldtype": "Link",
    "label": "Credit Note",
@@ -189,11 +192,13 @@
    "fieldtype": "Column Break"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "remarks",
    "fieldtype": "Small Text",
    "label": "Remarks"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "settled_on",
    "fieldtype": "Date",
    "label": "Settled On",

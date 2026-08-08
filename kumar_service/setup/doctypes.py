@@ -47,7 +47,10 @@ FAMILY_CODES = "PP\nPPS\nPPS3PLG\nJM\nSMB\nHMB\nBP\nV3\nV4\nV6\nV8\nHAND\nMOTOR\
 
 # the channel strings live in utils so the runtime controller and the portal
 # can compare against them without importing this dev-time module
-SALE_CHANNELS = f"{CH_DEALER}\n{CH_DIRECT}"
+# Leading blank on purpose. Frappe fills an empty Select with its FIRST option
+# before validate() runs, so without the blank the channel would always arrive
+# pre-set and could never be derived from the outlet.
+SALE_CHANNELS = f"\n{CH_DEALER}\n{CH_DIRECT}"
 # double quotes, deliberately: CH_DEALER contains an apostrophe ("Dealer's Own
 # Invoice") and wrapping it in single quotes ends the JS string early, leaving
 # a depends_on that throws and a field that never shows.
@@ -330,8 +333,14 @@ def pump_registration():
 			# Two different businesses can hand a pump to the same farmer, and the
 			# paperwork behind each is nothing alike. Everything else in this
 			# section keys off this one field.
+			# No default on purpose. A default is filled in before validate()
+			# runs, so the channel would never actually be derived from the
+			# outlet - a KUMAR branch selling over its own counter would be
+			# filed as a dealer sale and then asked for a dealer invoice that
+			# does not exist. Left blank, validate() derives it; anything the
+			# user types is still honoured.
 			f("sale_channel", "Sale Channel", "Select",
-				options=SALE_CHANNELS, default=CH_DEALER, reqd=1, in_standard_filter=1,
+				options=SALE_CHANNELS, reqd=1, in_standard_filter=1,
 				description="Set automatically from the outlet. Change it only if the "
 				"paperwork really went the other way."),
 			f("sale_date", "Sale Date", "Date", reqd=1, in_list_view=1,
@@ -573,8 +582,13 @@ def warranty_claim():
 			f("claim_type", "Claim Type", "Select",
 				options="Part Replacement\nFull Unit Replacement\nRepair Reimbursement",
 				default="Part Replacement", in_standard_filter=1),
+			# allow_on_submit is what makes the workflow usable at all. Every
+			# state past Draft is docstatus 1, so without it the first
+			# transition submits the claim and then nothing can move it again -
+			# "Not allowed to change Status after submission". The approved
+			# amount and credit note are entered at those same later steps.
 			f("workflow_state", "Status", "Link", options="Workflow State", read_only=1,
-				in_list_view=1, in_standard_filter=1, no_copy=1),
+				allow_on_submit=1, in_list_view=1, in_standard_filter=1, no_copy=1),
 			section("sb_trace", "Traceability (pulled from the serial)"),
 			f("pump_model", "Pump Model", "Link", options="Pump Model", read_only=1),
 			f("heat_no", "Heat No", "Link", options="Batch", read_only=1),
@@ -585,14 +599,14 @@ def warranty_claim():
 			f("defective_parts", "Defective Parts", "Table", options="Claim Part Row"),
 			f("claim_amount", "Claim Amount", "Currency", read_only=1, in_list_view=1),
 			column("cb3"),
-			f("approved_amount", "Approved Amount", "Currency"),
-			f("credit_note", "Credit Note", "Link", options="Sales Invoice"),
+			f("approved_amount", "Approved Amount", "Currency", allow_on_submit=1),
+			f("credit_note", "Credit Note", "Link", options="Sales Invoice", allow_on_submit=1),
 			section("sb_evidence", "Evidence"),
 			f("technician_report", "Technician Report", "Text"),
 			f("defect_photo", "Defect Photo", "Attach Image"),
 			column("cb4"),
-			f("remarks", "Remarks", "Small Text"),
-			f("settled_on", "Settled On", "Date", read_only=1),
+			f("remarks", "Remarks", "Small Text", allow_on_submit=1),
+			f("settled_on", "Settled On", "Date", read_only=1, allow_on_submit=1),
 			f("amended_from", "Amended From", "Link", options="Kumar Warranty Claim", read_only=1,
 				no_copy=1, print_hide=1),
 		],

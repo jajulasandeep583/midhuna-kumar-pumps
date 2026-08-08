@@ -1,0 +1,25 @@
+{
+ "content": null,
+ "creation": "2026-08-08 10:00:00.000000",
+ "docstatus": 0,
+ "doctype": "Page",
+ "idx": 0,
+ "modified": "2026-08-08 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Kumar Service",
+ "name": "historical-import",
+ "owner": "Administrator",
+ "page_name": "historical-import",
+ "roles": [
+  {"role": "System Manager"},
+  {"role": "Production Manager"},
+  {"role": "Dealer Manager"},
+  {"role": "Service Manager"},
+  {"role": "Warranty Approver"}
+ ],
+ "script": null,
+ "standard": "Yes",
+ "style": null,
+ "system_page": 0,
+ "title": "Historical Serial Import"
+}

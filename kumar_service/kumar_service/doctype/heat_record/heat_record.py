@@ -16,9 +16,13 @@ class HeatRecord(Document):
 		all_ok = True
 		for row in self.spectro_readings:
 			within = True
-			if row.spec_min is not None and flt(row.value_pct) < flt(row.spec_min):
+			# A blank limit means "not specified for this element". A Float
+			# field is never None - it arrives as 0.0 - so testing for None
+			# left every reading without a stated maximum sitting above a
+			# maximum of zero, i.e. permanently out of spec.
+			if flt(row.spec_min) and flt(row.value_pct) < flt(row.spec_min):
 				within = False
-			if row.spec_max is not None and flt(row.value_pct) > flt(row.spec_max):
+			if flt(row.spec_max) and flt(row.value_pct) > flt(row.spec_max):
 				within = False
 			row.within_spec = 1 if within else 0
 			if not within:

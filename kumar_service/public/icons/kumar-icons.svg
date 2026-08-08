@@ -259,4 +259,12 @@
 		<path d="M4 6h.01M4 12h.01M4 18h.01"/>
 	</symbol>
 
+	<!-- data migration: the old sheet coming down into the system -->
+	<symbol viewBox="0 0 24 24" id="icon-kumar-import" fill="none" stroke="#7C3AED" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+		<path d="M12 3v9"/>
+		<path d="M8.5 8.5 12 12l3.5-3.5"/>
+		<path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>
+		<path d="M4 15h5l1 2h4l1-2h5"/>
+	</symbol>
+
 </svg>

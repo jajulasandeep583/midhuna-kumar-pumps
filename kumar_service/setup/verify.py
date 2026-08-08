@@ -25,6 +25,7 @@ COUNT_DOCTYPES = [
 PAGES = [
 	"management-dashboard", "dealer-network", "my-business", "sales-analytics",
 	"purchase-analytics", "production-daily", "people-payroll", "pump-lookup",
+	"historical-import",
 ]
 
 ENDPOINTS = [
@@ -373,6 +374,30 @@ def run():
 		finally:
 			frappe.set_user(original)
 	check("every dealer login gets a ranked portal", not portal_fail, str(portal_fail))
+
+	print()
+	print("=" * 92)
+	print("INDEXES AND MIGRATION TOOLING")
+	print("=" * 92)
+
+	from kumar_service.setup import indexes
+
+	absent = indexes.missing()
+	check("every hot column is indexed", not absent,
+		str([f"{dt}.{'+'.join(f)}" for dt, f in absent]))
+
+	from kumar_service import migration
+
+	template = migration.template_rows()
+	check("the historical-serial import template is shipped", bool(template),
+		f"{len(template[0]) if template else 0} columns")
+
+	dry = migration.dry_run(rows=template[1:])
+	check("the import template validates against its own sample rows",
+		dry["errors"] == 0, f"{dry['ok']} ok / {dry['errors']} errors")
+
+	recon = frappe.get_all("Report", filters={"name": "Stock vs Registration Reconciliation"})
+	check("the reconciliation report exists", bool(recon))
 
 	print()
 	print("=" * 92)
