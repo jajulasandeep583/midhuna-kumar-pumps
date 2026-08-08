@@ -523,6 +523,64 @@ def run():
 	check("an urgent announcement is never collapsed out of sight", not misordered,
 		str(misordered[:2]))
 
+	# The login page is the first screen anyone sees, and it is the riskiest thing
+	# we override - it extends frappe's own template, so frappe's login sections
+	# must still be reachable through super(). If any of this drifts, nobody can
+	# log in at all, so it is checked hard.
+	login_html = frappe.read_file(
+		frappe.get_app_path("kumar_service", "www", "login.html")
+	) or ""
+	check("the login page extends frappe's, rather than replacing it",
+		'{% extends "frappe/www/login.html" %}' in login_html)
+	check("the login page emits frappe's own login sections", "super()" in login_html)
+	check("the login page does not hand-roll a login form",
+		"api/method/login" not in login_html and "<form" not in login_html)
+	for needed in ("kl-grid", "kl-panel", "Which login do I use?", "kl-pillars"):
+		check(f"the login page carries {needed}", needed in login_html)
+
+	login_py = frappe.read_file(
+		frappe.get_app_path("kumar_service", "www", "login.py")
+	) or ""
+	check("the login controller delegates to frappe's",
+		"frappe.www.login import get_context" in login_py)
+
+	# and it must actually build, for a guest.
+	#
+	# frappe's login controller reads `frappe.local.request.args` for the
+	# redirect-to parameter, and there is no request in a script, so stub one -
+	# without it this check fails on its own harness rather than on the page.
+	original_user = frappe.session.user
+	# Whether the attribute EXISTED matters, not just its value: leaving
+	# `frappe.local.request = None` behind breaks the later print checks, which do
+	# `frappe.request.environ`. Absent and None are different things here.
+	had_request = hasattr(frappe.local, "request")
+	original_request = getattr(frappe.local, "request", None)
+	try:
+		frappe.set_user("Guest")
+		frappe.local.request = frappe._dict(args=frappe._dict(), path="/login", method="GET")
+
+		from kumar_service.www.login import get_context as login_context
+
+		ctx = frappe._dict()
+		login_context(ctx)
+		check("the login page builds for a guest", bool(ctx.get("kumar_pillars")),
+			f"{ctx.get('kumar_models')} models quoted")
+		# frappe's controller has to have run, or the form has no context at all
+		check("frappe's login context came through", "provider_logins" in ctx,
+			f"app_name={ctx.get('app_name')}")
+	except Exception as exc:  # noqa: BLE001
+		check("the login page builds for a guest", False,
+			f"{type(exc).__name__}: {str(exc)[:60]}")
+	finally:
+		if had_request:
+			frappe.local.request = original_request
+		else:
+			try:
+				del frappe.local.request
+			except AttributeError:
+				pass
+		frappe.set_user(original_user)
+
 	# Same treatment on the other two public pages, or the brand falls apart the
 	# moment a visitor moves between them.
 	for page in ("home.html", "warranty_check.html"):

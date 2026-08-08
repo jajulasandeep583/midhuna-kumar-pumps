@@ -28,6 +28,7 @@ A KUMAR branch invoices the customer itself. An authorised distributor buys on o
 A complaint against one physical pump. Enter the serial and everything else fills itself.,"ఒక పంప్ మీద ఫిర్యాదు. సీరియల్ నంబర్ ఇవ్వండి, మిగిలినవన్నీ వాటంతట అవే నిండిపోతాయి."
 A complaint raised here reaches KUMAR immediately and starts the response clock. Ringing the branch does not.,ఇక్కడ పెట్టిన ఫిర్యాదు వెంటనే KUMAR కు చేరి స్పందన సమయం మొదలవుతుంది. బ్రాంచ్‌కు ఫోన్ చేయడం వల్ల అది జరగదు.
 A customer has a problem. We tell you at once if the visit is free.,కస్టమర్‌కు సమస్య ఉంది. సందర్శన ఉచితమా కాదా వెంటనే చెబుతాం.
+"A dealer raises a complaint here and the response clock starts. No ringing round, no waiting to find out whether the visit is free.","డీలర్ ఇక్కడ ఫిర్యాదు పెట్టిన వెంటనే స్పందన సమయం మొదలవుతుంది. ఎవరికీ ఫోన్లు చేయాల్సిన పని లేదు, సందర్శన ఉచితమా కాదా తెలుసుకోవడానికి ఎదురుచూడాల్సిన పని లేదు."
 A first response is already recorded on this request.,ఈ రిక్వెస్ట్‌కు మొదటి స్పందన ఇప్పటికే నమోదైంది.
 A sale date needs a dealer - who sold it?,అమ్మిన తేదీకి డీలర్ కావాలి - ఎవరు అమ్మారు?
 A technician has been assigned and will visit within 24 hours.,"ఒక టెక్నీషియన్‌ను కేటాయించాం, 24 గంటల్లో వస్తారు."
@@ -60,8 +61,10 @@ Aluminium Die Cast,అల్యూమినియం డై కాస్ట్
 Amended From,సవరించిన మూలం
 Amount,మొత్తం
 Analysis,విశ్లేషణ
+"Andhra Pradesh, Telangana, Tamil Nadu, Kerala, Karnataka and beyond","ఆంధ్రప్రదేశ్, తెలంగాణ, తమిళనాడు, కేరళ, కర్ణాటక మరియు ఇతర రాష్ట్రాలు"
 Announcements,ప్రకటనలు
 Answered,బదులిచ్చినవి
+"Answered, not just sold","అమ్మడమే కాదు, బదులు ఇస్తాం"
 Any,ఏదైనా
 Any district,ఏ జిల్లా అయినా
 Any family,ఏ కుటుంబం అయినా
@@ -90,6 +93,7 @@ Authorised distributors,అధీకృత డిస్ట్రిబ్యూ�
 Auto = HP x 0.7457,ఆటో = HP x 0.7457
 Auto from Invoice,ఇన్‌వాయిస్ నుండి ఆటోమేటిక్
 Auto-registration skipped: no Dealer on the invoice or customer.,ఆటో-రిజిస్ట్రేషన్ వదిలేశాం: ఇన్‌వాయిస్ మీద లేదా కస్టమర్ మీద డీలర్ లేరు.
+"Automated DISA foundry &middot; induction furnace with its own metallurgical lab &middot; CNC, VMC and HMC machining","ఆటోమేటెడ్ DISA ఫౌండ్రీ &middot; సొంత మెటలర్జికల్ ల్యాబ్‌తో ఇండక్షన్ ఫర్నేస్ &middot; CNC, VMC మరియు HMC మెషీనింగ్"
 Automated foundry,ఆటోమేటెడ్ ఫౌండ్రీ
 Average Days to Close,పరిష్కారానికి సగటు రోజులు
 Average Gross,సగటు స్థూల జీతం
@@ -129,6 +133,7 @@ Built,తయారైంది
 "Built and Tested, by Day",రోజువారీ తయారీ మరియు టెస్ట్
 Bulk Import,బల్క్ ఇంపోర్ట్
 Buying & Selling,కొనుగోలు & అమ్మకం
+CATALOGUE MODELS,కేటలాగ్ మోడల్‌లు
 "CNC, VMC and HMC machining","CNC, VMC మరియు HMC మెషీనింగ్"
 Cable Fault,కేబుల్ లోపం
 Call these customers,ఈ కస్టమర్లకు ఫోన్ చేయండి
@@ -150,6 +155,7 @@ Chart unavailable,చార్ట్ అందుబాటులో లేదు
 Check Warranty,వారంటీ చూడండి
 Check a Pump,పంప్ వివరాలు చూడండి
 Check a warranty,వారంటీ చూడండి
+Check a warranty without logging in,లాగిన్ లేకుండా వారంటీ చూడండి
 Check the file,ఫైల్‌ను తనిఖీ చేయి
 Checking...,తనిఖీ చేస్తోంది...
 Chemistry Out of Spec,రసాయన కూర్పు స్పెక్ దాటింది
@@ -252,6 +258,8 @@ Dealer's GSTIN,డీలర్ GSTIN
 Dealer's Invoice Date,డీలర్ ఇన్‌వాయిస్ తేదీ
 Dealer's Invoice No,డీలర్ ఇన్‌వాయిస్ నంబర్
 Dealer's Invoice Required,డీలర్ ఇన్‌వాయిస్ తప్పనిసరి
+"Dealer, distributor or KUMAR staff - one login, and you land on the screen built for your job.","డీలర్, డిస్ట్రిబ్యూటర్ లేదా KUMAR సిబ్బంది - ఒకే లాగిన్, మీ పనికి తగిన స్క్రీన్ మీకు కనిపిస్తుంది."
+Dealers and distributors,డీలర్లు మరియు డిస్ట్రిబ్యూటర్లు
 Dealers can only register sales up to {0} days old. Contact the branch office.,డీలర్లు {0} రోజుల లోపు అమ్మకాలను మాత్రమే రిజిస్టర్ చేయగలరు. బ్రాంచ్ ఆఫీసును సంప్రదించండి.
 Deductions,మినహాయింపులు
 Default Service Centre,డిఫాల్ట్ సర్వీస్ సెంటర్
@@ -313,6 +321,7 @@ Every configurable assumption lives here - nothing is hardcoded.,మార్చ
 Every order has been received and billed.,"అన్ని ఆర్డర్‌లు అందాయి, బిల్లులూ వచ్చాయి."
 Every outlet moved stock,ప్రతి అవుట్‌లెట్ స్టాక్ అమ్మింది
 "Every pump component machined on computerised machines, so parts are interchangeable across a production run.","ప్రతి పంప్ భాగాన్ని కంప్యూటరైజ్డ్ మెషీన్ల మీద తయారు చేస్తాం, అందుకే ఒక ఉత్పత్తి బ్యాచ్‌లో భాగాలు ఒకదానికొకటి సరిపోతాయి."
+Every pump has a history,ప్రతి పంప్‌కు ఒక చరిత్ర ఉంది
 Every pump tested on the bench before it leaves the factory,ఫ్యాక్టరీ నుండి బయటకు వెళ్ళే ముందు ప్రతి పంప్‌ను బెంచ్ మీద పరీక్షిస్తాం
 "Every pump we build carries its own history - the melt its casing came from, the winding lot in its stator, the test bench reading before it left, and the warranty that started the day a dealer sold it. One serial number answers all of it.","మేము తయారు చేసే ప్రతి పంప్‌కు దాని సొంత చరిత్ర ఉంటుంది - దాని కేసింగ్ ఏ మెల్ట్ నుండి వచ్చింది, స్టేటర్‌లో ఏ వైండింగ్ లాట్ ఉంది, బయటకు వెళ్ళే ముందు టెస్ట్ బెంచ్ మీద ఏ రీడింగ్ వచ్చింది, డీలర్ అమ్మిన రోజు మొదలైన వారంటీ ఏది. ఒక సీరియల్ నంబర్ ఇవన్నీ చెబుతుంది."
 Everything,అన్నీ
@@ -456,6 +465,7 @@ Job Card Summary,జాబ్ కార్డ్ సారాంశం
 Jobs waiting on you,మీ మీద ఉన్న పనులు
 Joined,చేరిన తేదీ
 Journal Entry,జర్నల్ ఎంట్రీ
+Just checking a warranty?,వారంటీ మాత్రమే చూడాలా?
 KUKA and ABB robots on the machining lines,మెషీనింగ్ లైన్లలో KUKA మరియు ABB రోబోట్లు
 KUMAR Branch,KUMAR బ్రాంచ్
 KUMAR Dealer,KUMAR డీలర్
@@ -468,6 +478,7 @@ KUMAR Pumps - Warranty Check,KUMAR పంపులు - వారంటీ త�
 KUMAR brand since 1973,1973 నుండి KUMAR బ్రాండ్
 KUMAR has replied on {0} of your tickets. Open My Tickets to read them.,మీ {0} టికెట్ల మీద KUMAR బదులిచ్చారు. చదవడానికి నా టికెట్లు తెరవండి.
 KUMAR replied,KUMAR బదులిచ్చారు
+KUMAR staff,KUMAR సిబ్బంది
 KUMAR warranty on this pump,ఈ పంప్ మీద KUMAR వారంటీ
 "Kumar Building, Wahab Road, Tenali - 522 201, Guntur Dist., Andhra Pradesh","కుమార్ బిల్డింగ్, వాహబ్ రోడ్, తెనాలి - 522 201, గుంటూరు జిల్లా, ఆంధ్రప్రదేశ్"
 Kumar Service Settings,కుమార్ సర్వీస్ సెట్టింగ్‌లు
@@ -494,7 +505,9 @@ Look Up,వివరాలు చూడు
 Looking up {0}...,{0} వివరాలు చూస్తున్నాం...
 Low,తక్కువ
 Low Discharge,తక్కువ డిశ్చార్జ్
+MSME National Award 2010,MSME జాతీయ పురస్కారం 2010
 MSME National Award 2010 for Outstanding Entrepreneurship,అత్యుత్తమ వ్యవస్థాపనకు MSME జాతీయ పురస్కారం 2010
+MSME National Quality Award 2010,MSME జాతీయ నాణ్యత పురస్కారం 2010
 Machine,మెషీన్
 Machining,మెషీనింగ్
 Management,మేనేజ్‌మెంట్
@@ -557,6 +570,7 @@ No Conversation Yet,ఇంకా సంభాషణ లేదు
 No Discharge,డిశ్చార్జ్ లేదు
 No KUMAR invoice found for this pump - raise it first.,ఈ పంప్‌కు KUMAR ఇన్‌వాయిస్ కనిపించలేదు - ముందు దాన్ని జారీ చేయండి.
 No Load Current (A),నో లోడ్ కరెంట్ (A)
+No Problem performance,‘నో ప్రాబ్లం’ పనితీరు
 No Reply Yet,ఇంకా బదులు లేదు
 No complaints in this period.,ఈ కాలంలో ఫిర్యాదులు లేవు.
 No dealer could be determined for your login,మీ లాగిన్‌కు డీలర్‌ను నిర్ణయించలేకపోయాం
@@ -596,6 +610,7 @@ Nothing purchased in this period.,ఈ కాలంలో ఏమీ కొనల�
 Nothing said yet.,ఇంకా ఏమీ చెప్పలేదు.
 Nothing said yet. Write below and the dealer sees it in the portal.,"ఇంకా ఏమీ చెప్పలేదు. కింద రాయండి, డీలర్ పోర్టల్‌లో చూస్తారు."
 Nothing was built in this period.,ఈ కాలంలో ఏమీ తయారు కాలేదు.
+Notices,గమనికలు
 OUT OF SPEC: {0},స్పెక్ దాటింది: {0}
 Oldest Still Open,"అత్యంత పాతవి, ఇంకా తెరిచి ఉన్నవి"
 On this list,ఈ జాబితాలో
@@ -650,6 +665,7 @@ Oven Temp (C),ఓవెన్ ఉష్ణోగ్రత (C)
 Over Our Counter,మన కౌంటర్ మీద
 Overall Result,మొత్తం ఫలితం
 "PF, ESI and taxes","PF, ESI మరియు పన్నులు"
+PRODUCT FAMILIES,ఉత్పత్తి కుటుంబాలు
 Packing Slip,ప్యాకింగ్ స్లిప్
 Paid,చెల్లించబడింది
 Painting & Packing,పెయింటింగ్ & ప్యాకింగ్
@@ -740,6 +756,7 @@ QR Base URL,QR బేస్ URL
 QR Code,QR కోడ్
 QR URL,QR URL
 QR for {0},{0} కోసం QR
+QUALITY SYSTEM,నాణ్యత వ్యవస్థ
 Qty,పరిమాణం
 Qty Passed,పాస్ అయిన పరిమాణం
 Qty Produced,తయారైన పరిమాణం
@@ -781,6 +798,7 @@ Register Sale,అమ్మకం నమోదు చేయి
 Register a Pump,పంప్ రిజిస్టర్ చేయండి
 Register a Pump You Have Sold,మీరు అమ్మిన పంప్‌ను రిజిస్టర్ చేయండి
 Register a Sale,అమ్మకాన్ని నమోదు చేయండి
+"Register every pump on the day you sell it - the warranty starts from the registration, and the customer's certificate is generated from it.","అమ్మిన రోజే ప్రతి పంప్‌ను రిజిస్టర్ చేయండి - వారంటీ రిజిస్ట్రేషన్ నుండే మొదలవుతుంది, కస్టమర్ సర్టిఫికెట్ కూడా దాని నుండే తయారవుతుంది."
 "Register every pump you sell on the day you sell it. The warranty only starts when the sale is registered, and the certificate is generated from it.","మీరు అమ్మిన ప్రతి పంప్‌ను అమ్మిన రోజే రిజిస్టర్ చేయండి. అమ్మకం రిజిస్టర్ అయినప్పుడే వారంటీ మొదలవుతుంది, సర్టిఫికెట్ కూడా దాని నుండే తయారవుతుంది."
 Registered By,రిజిస్టర్ చేసినవారు
 Registered {0} pump(s) and started their warranty.,{0} పంప్(లు) రిజిస్టర్ చేసి వారంటీ మొదలుపెట్టాం.
@@ -806,6 +824,7 @@ Reported,ఫిర్యాదు తేదీ
 Reported On,ఫిర్యాదు తేదీ
 Reports,రిపోర్టులు
 Reports & Masters,రిపోర్టులు & మాస్టర్లు
+Reputed since 1971 for pumps that simply run. Every unit is tested on the bench against the BIS specification before it leaves Tenali.,1971 నుండి ఇబ్బంది లేకుండా నడిచే పంపులకు పేరుగాంచాం. తెనాలి నుండి బయటకు వెళ్ళే ముందు ప్రతి యూనిట్‌ను BIS ప్రమాణం ప్రకారం బెంచ్ మీద పరీక్షిస్తాం.
 Request,రిక్వెస్ట్
 Required to approve a heat with any element out of spec,ఏదైనా మూలకం స్పెక్ దాటినప్పుడు హీట్‌ను ఆమోదించాలంటే ఇది తప్పనిసరి
 Resolution,పరిష్కారం
@@ -839,6 +858,7 @@ SLA Met,SLA పాలించినవి
 SLA Met %,SLA పాలన %
 SLA Status,SLA స్థితి
 SMS Enabled,SMS ఆన్
+STATES SERVED,సేవలందిస్తున్న రాష్ట్రాలు
 Salary Slip,జీతం స్లిప్
 Salary Structure,జీతం నిర్మాణం
 Sale Channel,అమ్మకం మార్గం
@@ -928,8 +948,10 @@ Show less,తక్కువ చూపు
 Showing all {0},మొత్తం {0} చూపుతోంది
 Showing {0} of {1},{1} లో {0} చూపుతోంది
 Sign / QC,సంతకం / QC
+Sign in,సైన్ ఇన్
 Signature,సంతకం
 Since 1971,1971 నుండి
+"Since 1971, a pump that leaves Tenali carries its whole history with it","1971 నుండి, తెనాలి నుండి బయటకు వెళ్ళే ప్రతి పంప్ తన పూర్తి చరిత్రను తనతోనే తీసుకెళ్తుంది"
 Single Phase,సింగిల్ ఫేజ్
 Single Stage,సింగిల్ స్టేజ్
 Slips,స్లిప్‌లు
@@ -953,6 +975,7 @@ Spend by Material Type,మెటీరియల్ రకం వారీ ఖర
 Square,చతురస్రం
 Sri Lakshmi Ganapathi Engineering Works,శ్రీ లక్ష్మీ గణపతి ఇంజనీరింగ్ వర్క్స్
 Sri Lakshmi Ganapathi Engineering Works founded at Tenali,తెనాలిలో శ్రీ లక్ష్మీ గణపతి ఇంజనీరింగ్ వర్క్స్ స్థాపన
+"Sri Lakshmi Ganapathi Engineering Works has manufactured pumpsets and electric motors under the KUMAR brand since 1973. This is where our dealers register the pumps they sell, raise a complaint for a customer, claim warranty and follow it through - and where the plant answers them.","శ్రీ లక్ష్మీ గణపతి ఇంజనీరింగ్ వర్క్స్ 1973 నుండి KUMAR బ్రాండ్ కింద పంపుసెట్లు మరియు విద్యుత్ మోటార్లు తయారు చేస్తోంది. మా డీలర్లు తాము అమ్మిన పంపులను రిజిస్టర్ చేసేది, కస్టమర్ తరఫున ఫిర్యాదు పెట్టేది, వారంటీ క్లెయిమ్ చేసి దాన్ని అనుసరించేది ఇక్కడే - ప్లాంట్ వారికి బదులిచ్చేది కూడా ఇక్కడే."
 "Sri Lakshmi Ganapathi Engineering Works, Tenali","శ్రీ లక్ష్మీ గణపతి ఇంజనీరింగ్ వర్క్స్, తెనాలి"
 Stage Type,స్టేజ్ రకం
 Stainless Steel,స్టెయిన్‌లెస్ స్టీల్
@@ -1017,6 +1040,7 @@ The dealer's invoice ({0}) is dated after the sale ({1}).,డీలర్ ఇన
 The last pumps you registered,మీరు చివరగా రిజిస్టర్ చేసిన పంపులు
 The last pumps you registered. The certificate is what you owe the customer.,మీరు చివరగా రిజిస్టర్ చేసిన పంపులు. సర్టిఫికెట్ కస్టమర్‌కు మీరు ఇవ్వాల్సినది.
 The login this dealer uses. Row-level access is derived from this.,ఈ డీలర్ వాడే లాగిన్. ఏ రికార్డులు కనిపిస్తాయో ఇదే నిర్ణయిస్తుంది.
+"The melt its casing came from, the winding lot in its stator, the test reading before dispatch. One serial number answers all of it.","దాని కేసింగ్ ఏ మెల్ట్ నుండి వచ్చింది, స్టేటర్‌లో ఏ వైండింగ్ లాట్ ఉంది, పంపే ముందు టెస్ట్ రీడింగ్ ఏమిటి - ఒక సీరియల్ నంబర్ ఇవన్నీ చెబుతుంది."
 Their warranty ends soon - a good moment to offer a service or a new pump,వారి వారంటీ త్వరలో ముగుస్తుంది - సర్వీస్ లేదా కొత్త పంప్ చెప్పడానికి ఇది మంచి సమయం
 Thermoplastic,థర్మోప్లాస్టిక్
 These elements are out of spec: {0}. A Quality Engineer must record an override reason to approve anyway.,ఈ మూలకాలు స్పెక్ దాటాయి: {0}. అయినా ఆమోదించాలంటే క్వాలిటీ ఇంజనీర్ ఒక కారణాన్ని నమోదు చేయాలి.
@@ -1029,6 +1053,7 @@ This Quarter,ఈ త్రైమాసికం
 This dealer has had no reply yet. Use Dealer &rarr; Reply to Dealer.,ఈ డీలర్‌కు ఇంకా బదులు ఇవ్వలేదు. డీలర్ &rarr; డీలర్‌కు బదులు ఇవ్వండి అనేది వాడండి.
 This entry produced {0} serialised unit(s) but consumed no traceable batches. Genealogy for these units will be incomplete.,ఈ ఎంట్రీ {0} సీరియల్ యూనిట్(ల)ను తయారు చేసింది కానీ ట్రేస్ చేయగల బ్యాచ్‌లు ఏవీ వాడలేదు. ఈ యూనిట్ల వంశవృక్షం అసంపూర్ణంగా ఉంటుంది.
 This is covered by warranty. The visit and the part are free.,ఇది వారంటీ పరిధిలోకి వస్తుంది. సందర్శన మరియు పార్ట్ ఉచితం.
+This portal works in English and తెలుగు. Use the language switch on any page.,ఈ పోర్టల్ ఇంగ్లీష్ మరియు తెలుగులో పనిచేస్తుంది. ఏ పేజీలోనైనా భాష మార్చుకోవచ్చు.
 This pump has not been registered yet. Ask your dealer to register the sale so your warranty starts.,ఈ పంప్ ఇంకా రిజిస్టర్ కాలేదు. వారంటీ మొదలవ్వాలంటే అమ్మకాన్ని రిజిస్టర్ చేయమని మీ డీలర్‌ను అడగండి.
 "This table is not a brochure page - it is the live catalogue the factory raises work orders against. Change a model here and the warranty period, the test limits and the dealer's registration form all follow.","ఇది బ్రోచర్ పేజీ కాదు - ఫ్యాక్టరీ వర్క్ ఆర్డర్‌లు ఇచ్చే సజీవ కేటలాగ్ ఇది. ఇక్కడ ఒక మోడల్ మార్చితే వారంటీ కాలం, టెస్ట్ పరిమితులు, డీలర్ రిజిస్ట్రేషన్ ఫారం - అన్నీ దానితో పాటే మారుతాయి."
 This unit has been tested in accordance with the referenced Bureau of Indian Standards specification before dispatch. Readings are recorded at the test bench under stated supply conditions.,"ఈ యూనిట్‌ను పంపే ముందు, పైన పేర్కొన్న బ్యూరో ఆఫ్ ఇండియన్ స్టాండర్డ్స్ ప్రమాణం ప్రకారం పరీక్షించారు. ఇక్కడి రీడింగ్‌లు తెలిపిన సప్లై పరిస్థితుల్లో టెస్ట్ బెంచ్ మీద నమోదు చేసినవి."
@@ -1068,6 +1093,8 @@ Units delivered in this period,ఈ కాలంలో డెలివరీ అ�
 Unknown model,మోడల్ తెలియదు
 Unknown ticket type,టికెట్ రకం తెలియదు
 Unregistered Stock,రిజిస్టర్ కాని స్టాక్
+Use the login your branch office set up for you. It shows only your own network's pumps and customers.,"మీ బ్రాంచ్ ఆఫీసు ఇచ్చిన లాగిన్ వాడండి. మీ సొంత నెట్‌వర్క్ పంపులు, కస్టమర్లు మాత్రమే కనిపిస్తారు."
+Use your kumarpumps.local email address.,మీ kumarpumps.local ఇమెయిల్ చిరునామా వాడండి.
 Used For,ఎందుకు వాడుతున్నారు
 User,యూజర్
 Valid From,చెల్లుబాటు ప్రారంభం
@@ -1136,9 +1163,11 @@ What should the dealer be told? Plain words - they read this on a phone.,డీ�
 What the plant builds,ప్లాంట్ ఏం తయారు చేస్తుంది
 "What the technician actually did, what parts went in, and what it cost.","టెక్నీషియన్ నిజంగా ఏం చేశారు, ఏ పార్ట్‌లు వేశారు, ఖర్చు ఎంత అయింది."
 "What was dismantled, what was found, and why it is a manufacturing defect","ఏం విప్పి చూశారు, ఏం కనిపించింది, ఇది తయారీ లోపం ఎందుకు అవుతుంది"
+What we build,మేము తయారు చేసేవి
 WhatsApp Enabled,WhatsApp ఆన్
 Where,ఎక్కడ
 Where the Pumps Went,పంపులు ఎక్కడికి వెళ్ళాయి
+Which login do I use?,నేను ఏ లాగిన్ వాడాలి?
 Who Is Waiting,ఎవరు ఎదురుచూస్తున్నారు
 Who Sold Them,ఎవరు అమ్మారు
 Whoever KUMAR owes a reply to comes first. Replying records the first response against the SLA.,KUMAR బదులు ఇవ్వాల్సినవి ముందుగా వస్తాయి. బదులు ఇచ్చినప్పుడు SLA లో మొదటి స్పందనగా నమోదవుతుంది.
@@ -1164,9 +1193,11 @@ Workstation,వర్క్‌స్టేషన్
 Write a message before sending,పంపే ముందు ఒక సందేశం రాయండి
 Write to KUMAR,KUMAR కు రాయండి
 Write to the dealer... they read this on a phone,డీలర్‌కు రాయండి... వారు ఇది ఫోన్‌లో చదువుతారు
+YEARS OF MANUFACTURING,సంవత్సరాల తయారీ అనుభవం
 Yes,అవును
 You,మీరు
 You Owe KUMAR,మీరు KUMAR కు చెల్లించాల్సినది
+You do not need to log in - use the warranty check and type the serial number from the nameplate.,లాగిన్ అవసరం లేదు - వారంటీ తనిఖీలో నేమ్‌ప్లేట్ మీద ఉన్న సీరియల్ నంబర్ టైప్ చేయండి.
 You have not registered a pump yet. Use the blue button above.,మీరు ఇంకా ఏ పంప్‌ను రిజిస్టర్ చేయలేదు. పైన ఉన్న నీలం బటన్ వాడండి.
 Your Invoice Date,మీ ఇన్‌వాయిస్ తేదీ
 Your Invoice No,మీ ఇన్‌వాయిస్ నంబర్
@@ -1178,6 +1209,7 @@ Your own branch office handles you. Head office is for anything they cannot sett
 "Your own sales by product family, all time. Click a family to see only those pumps.",ఉత్పత్తి కుటుంబం వారీగా మీ మొత్తం అమ్మకాలు. ఆ పంపులు మాత్రమే చూడాలంటే కుటుంబం మీద క్లిక్ చేయండి.
 Your recent sales,మీ ఇటీవలి అమ్మకాలు
 against {0} in the 30 days before that,అంతకు ముందు 30 రోజుల్లో {0} తో పోలిస్తే
+and now so does the paperwork.,ఇప్పుడు కాగితాలు కూడా అలాగే.
 catalogue models,కేటలాగ్ మోడల్‌లు
 days,రోజులు
 days left,రోజులు మిగిలాయి
@@ -1185,6 +1217,8 @@ days left,రోజులు మిగిలాయి
 "e.g. No water since two days, motor runs but nothing comes up","ఉదా. రెండు రోజుల నుండి నీరు రావడం లేదు, మోటార్ తిరుగుతోంది కానీ నీరు ఎక్కడం లేదు"
 e.g. bearing seized,ఉదా. బేరింగ్ జామ్ అయింది
 ends {0},{0} న ముగుస్తుంది
+for Outstanding Entrepreneurship,అత్యుత్తమ వ్యవస్థాపనకు
+for submersible pumps,సబ్‌మెర్సిబుల్ పంపులకు
 from the date you sell it,మీరు అమ్మిన తేదీ నుండి
 group,గ్రూప్
 models across {0} product families,{0} ఉత్పత్తి కుటుంబాల్లో మోడల్‌లు

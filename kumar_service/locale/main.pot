@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kumar Service and Traceability VERSION\n"
 "Report-Msgid-Bugs-To: aimidhunatech@gmail.com\n"
-"POT-Creation-Date: 2026-08-08 19:52+0000\n"
-"PO-Revision-Date: 2026-08-08 19:52+0000\n"
+"POT-Creation-Date: 2026-08-08 20:06+0000\n"
+"PO-Revision-Date: 2026-08-08 20:06+0000\n"
 "Last-Translator: aimidhunatech@gmail.com\n"
 "Language-Team: aimidhunatech@gmail.com\n"
 "MIME-Version: 1.0\n"
@@ -376,6 +376,10 @@ msgstr ""
 msgid "Analysis"
 msgstr ""
 
+#: kumar_service/www/login.html:269
+msgid "Andhra Pradesh, Telangana, Tamil Nadu, Kerala, Karnataka and beyond"
+msgstr ""
+
 #: kumar_service/www/dealer_portal.html:466
 msgid "Announcements"
 msgstr ""
@@ -508,6 +512,10 @@ msgstr ""
 
 #: kumar_service/warranty.py:87
 msgid "Auto-registration skipped: no Dealer on the invoice or customer."
+msgstr ""
+
+#: kumar_service/www/login.html:238
+msgid "Automated DISA foundry &middot; induction furnace with its own metallurgical lab &middot; CNC, VMC and HMC machining"
 msgstr ""
 
 #: kumar_service/kumar_service/page/service_command_centre/service_command_centre.js:217
@@ -708,6 +716,10 @@ msgstr ""
 msgid "C"
 msgstr ""
 
+#: kumar_service/www/login.html:200
+msgid "CATALOGUE MODELS"
+msgstr ""
+
 #. Option for the 'Category' (Select) field in DocType 'Service Request'
 #: kumar_service/kumar_service/doctype/service_request/service_request.json
 msgid "Cable Fault"
@@ -796,6 +808,10 @@ msgstr ""
 
 #: kumar_service/www/home.html:139
 msgid "Check a warranty"
+msgstr ""
+
+#: kumar_service/www/login.html:261
+msgid "Check a warranty without logging in"
 msgstr ""
 
 #: kumar_service/kumar_service/page/historical_import/historical_import.js:35
@@ -1357,6 +1373,10 @@ msgstr ""
 
 #: kumar_service/kumar_service/doctype/pump_registration/pump_registration.py:47
 msgid "Dealer's Invoice Required"
+msgstr ""
+
+#: kumar_service/www/login.html:247
+msgid "Dealer, distributor or KUMAR staff - one login, and you land on the screen built for your job."
 msgstr ""
 
 #: kumar_service/kumar_service/doctype/pump_registration/pump_registration.py:92
@@ -2350,6 +2370,7 @@ msgid "KUMAR Invoice Required"
 msgstr ""
 
 #: kumar_service/www/home.html:3 kumar_service/www/home.py:70
+#: kumar_service/www/login.html:16 kumar_service/www/login.py:67
 msgid "KUMAR Pumps & Motors"
 msgstr ""
 
@@ -2361,7 +2382,7 @@ msgstr ""
 msgid "KUMAR Pumps - Warranty Check"
 msgstr ""
 
-#: kumar_service/www/home.html:259
+#: kumar_service/www/home.html:259 kumar_service/www/login.html:269
 msgid "KUMAR brand since 1973"
 msgstr ""
 
@@ -2377,7 +2398,7 @@ msgstr ""
 msgid "KUMAR warranty on this pump"
 msgstr ""
 
-#: kumar_service/www/home.html:258
+#: kumar_service/www/home.html:258 kumar_service/www/login.html:268
 msgid "Kumar Building, Wahab Road, Tenali - 522 201, Guntur Dist., Andhra Pradesh"
 msgstr ""
 
@@ -2530,8 +2551,16 @@ msgstr ""
 msgid "MOTOR"
 msgstr ""
 
+#: kumar_service/www/login.html:236
+msgid "MSME National Award 2010"
+msgstr ""
+
 #: kumar_service/www/home.html:260
 msgid "MSME National Award 2010 for Outstanding Entrepreneurship"
+msgstr ""
+
+#: kumar_service/www/login.html:237
+msgid "MSME National Quality Award 2010"
 msgstr ""
 
 #. Label of the machine (Link) field in DocType 'Winding Batch Record'
@@ -3019,6 +3048,10 @@ msgstr ""
 msgid "Nothing was built in this period."
 msgstr ""
 
+#: kumar_service/www/login.html:171
+msgid "Notices"
+msgstr ""
+
 #: kumar_service/public/js/heat_record.js:9
 msgid "OUT OF SPEC: {0}"
 msgstr ""
@@ -3289,6 +3322,10 @@ msgstr ""
 #. Option for the 'Family Code' (Select) field in DocType 'Pump Model'
 #: kumar_service/kumar_service/doctype/pump_model/pump_model.json
 msgid "PPS3PLG"
+msgstr ""
+
+#: kumar_service/www/login.html:201
+msgid "PRODUCT FAMILIES"
 msgstr ""
 
 #. Label of a Link in the Production Workspace
@@ -3627,6 +3664,10 @@ msgstr ""
 msgid "Pumps & Motors"
 msgstr ""
 
+#: kumar_service/www/login.html:186
+msgid "Pumps &amp; Motors"
+msgstr ""
+
 #: kumar_service/public/js/heat_record.js:22
 msgid "Pumps From This Heat"
 msgstr ""
@@ -3732,6 +3773,10 @@ msgstr ""
 
 #: kumar_service/public/js/serial_no.js:50
 msgid "QR for {0}"
+msgstr ""
+
+#: kumar_service/www/login.html:203
+msgid "QUALITY SYSTEM"
 msgstr ""
 
 #. Label of the qty (Float) field in DocType 'Claim Part Row'
@@ -4242,6 +4287,10 @@ msgstr ""
 msgid "SMS Enabled"
 msgstr ""
 
+#: kumar_service/www/login.html:202
+msgid "STATES SERVED"
+msgstr ""
+
 #. Label of a Link in the Management Workspace
 #: kumar_service/kumar_service/workspace/management/management.json
 msgid "Salary Slip"
@@ -4741,6 +4790,10 @@ msgstr ""
 msgid "Si"
 msgstr ""
 
+#: kumar_service/www/login.html:246
+msgid "Sign in"
+msgstr ""
+
 #. Label of the customer_signature (Signature) field in DocType 'Service Visit'
 #: kumar_service/kumar_service/doctype/service_visit/service_visit.json
 msgid "Signature"
@@ -4748,6 +4801,10 @@ msgstr ""
 
 #: kumar_service/www/dealer_portal.html:517
 msgid "Since 1971"
+msgstr ""
+
+#: kumar_service/www/login.html:191
+msgid "Since 1971, a pump that leaves Tenali carries its whole history with it"
 msgstr ""
 
 #. Option for the 'Phase' (Select) field in DocType 'Pump Model'
@@ -4853,8 +4910,12 @@ msgid "Square"
 msgstr ""
 
 #: kumar_service/www/dealer_portal.html:517 kumar_service/www/home.html:129
-#: kumar_service/www/home.html:257
+#: kumar_service/www/home.html:257 kumar_service/www/login.html:267
 msgid "Sri Lakshmi Ganapathi Engineering Works"
+msgstr ""
+
+#: kumar_service/www/login.html:195
+msgid "Sri Lakshmi Ganapathi Engineering Works has manufactured pumpsets and electric motors under the KUMAR brand since 1973. This is where our dealers register the pumps they sell, raise a complaint for a customer, claim warranty and follow it through - and where the plant answers them."
 msgstr ""
 
 #: kumar_service/www/warranty_check.html:58
@@ -5112,7 +5173,7 @@ msgstr ""
 msgid "Telephonic"
 msgstr ""
 
-#: kumar_service/www/home.html:129
+#: kumar_service/www/home.html:129 kumar_service/www/login.html:186
 msgid "Tenali"
 msgstr ""
 
@@ -5798,6 +5859,10 @@ msgstr ""
 msgid "What was dismantled, what was found, and why it is a manufacturing defect"
 msgstr ""
 
+#: kumar_service/www/login.html:221
+msgid "What we build"
+msgstr ""
+
 #. Label of the whatsapp_notification_enabled (Check) field in DocType 'Kumar
 #. Service Settings'
 #: kumar_service/kumar_service/doctype/kumar_service_settings/kumar_service_settings.json
@@ -5810,6 +5875,10 @@ msgstr ""
 
 #: kumar_service/kumar_service/page/dealer_network/dealer_network.js:78
 msgid "Where the Pumps Went"
+msgstr ""
+
+#: kumar_service/www/login.html:254
+msgid "Which login do I use?"
 msgstr ""
 
 #: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:146
@@ -5947,6 +6016,10 @@ msgstr ""
 msgid "Write to the dealer... they read this on a phone"
 msgstr ""
 
+#: kumar_service/www/login.html:199
+msgid "YEARS OF MANUFACTURING"
+msgstr ""
+
 #: kumar_service/kumar_service/page/service_command_centre/service_command_centre.js:113
 msgid "Yes"
 msgstr ""
@@ -6005,6 +6078,10 @@ msgstr ""
 msgid "against {0} in the 30 days before that"
 msgstr ""
 
+#: kumar_service/www/login.html:192
+msgid "and now so does the paperwork."
+msgstr ""
+
 #: kumar_service/www/home.html:147
 msgid "catalogue models"
 msgstr ""
@@ -6032,6 +6109,14 @@ msgstr ""
 
 #: kumar_service/kumar_service/page/my_business/my_business.js:239
 msgid "ends {0}"
+msgstr ""
+
+#: kumar_service/www/login.html:236
+msgid "for Outstanding Entrepreneurship"
+msgstr ""
+
+#: kumar_service/www/login.html:237
+msgid "for submersible pumps"
 msgstr ""
 
 #: kumar_service/www/dealer_portal.html:1351
