@@ -7,6 +7,8 @@ created and submitted, that the money reconciles, and that all seven dashboard
 endpoints answer with data rather than an exception. Read-only.
 """
 
+import re
+
 import frappe
 from frappe.utils import flt
 
@@ -401,6 +403,81 @@ def run():
 
 	print()
 	print("=" * 92)
+	print("DEALER PORTAL ACTIONS")
+	print("=" * 92)
+
+	from kumar_service import portal_api
+
+	# A dealer must be able to do the whole job here. Anything that only works
+	# in the desk is, for a dealer, broken.
+	original_user = frappe.session.user
+	logins = frappe.get_all(
+		"Dealer",
+		filters={"portal_user": ["!=", ""], "status": "Active"},
+		fields=["name", "portal_user"],
+	)
+	check("there are dealer logins to test", bool(logins), f"{len(logins)} logins")
+
+	read_only_fail, isolation_fail = [], []
+	for login in logins:
+		try:
+			frappe.set_user(login.portal_user)
+			opts = portal_api.portal_options()
+			tickets = portal_api.my_tickets(limit=5)
+			contacts = portal_api.my_contacts()
+			if not opts.get("complaint_categories"):
+				read_only_fail.append(f"{login.name}: no complaint categories")
+			if "tickets" not in tickets:
+				read_only_fail.append(f"{login.name}: no ticket list")
+			if not contacts.get("contacts"):
+				read_only_fail.append(f"{login.name}: nobody to call")
+
+			# A pump this dealer did NOT sell must be refused outright - this is
+			# the check that stops one dealer reading another's customer list.
+			foreign = frappe.db.sql(
+				"""select r.serial_no from `tabPump Registration` r
+				   where r.docstatus = 1 and r.dealer not in (
+				       select d2.name from `tabDealer` d2, `tabDealer` d1
+				       where d1.name = %(me)s and d2.lft >= d1.lft and d2.rgt <= d1.rgt)
+				   limit 1""",
+				{"me": login.name},
+			)
+			if foreign:
+				try:
+					portal_api.pump_snapshot(foreign[0][0])
+					isolation_fail.append(f"{login.name} could read {foreign[0][0]}")
+				except frappe.PermissionError:
+					pass
+				except Exception as exc:  # noqa: BLE001
+					isolation_fail.append(f"{login.name}: {type(exc).__name__}")
+		except Exception as exc:  # noqa: BLE001
+			read_only_fail.append(f"{login.name}: {str(exc)[:50]}")
+		finally:
+			frappe.set_user(original_user)
+
+	check("every dealer login can read its own portal data", not read_only_fail,
+		str(read_only_fail[:2]))
+	check("a dealer cannot read another dealer's pump", not isolation_fail,
+		str(isolation_fail[:2]))
+
+	# The portal must not send a dealer into the desk.
+	portal_html = frappe.read_file(
+		frappe.get_app_path("kumar_service", "www", "dealer_portal.html")
+	) or ""
+	desk_links = re.findall(r'href="(/app/[^"]*)"', portal_html)
+	check("the portal has no desk links", not desk_links, str(desk_links[:3]))
+
+	for needed in ("raise_complaint", "raise_claim", "ticket_detail", "pump_snapshot"):
+		check(f"the portal wires up portal_api.{needed}",
+			f"portal_api.{needed}" in portal_html)
+
+	# The scoped snapshot exists precisely because the desk one ignores
+	# permissions; if the portal ever drifts back to it, say so.
+	check("the portal does not use the permission-ignoring desk snapshot",
+		"api.get_pump_snapshot" not in portal_html)
+
+	print()
+	print("=" * 92)
 	print("BRANDING")
 	print("=" * 92)
 
@@ -484,12 +561,12 @@ def run():
 
 	# A translation whose placeholders do not match its source crashes at
 	# .format() time, in front of whoever triggered the message.
-	import re as _re
+
 
 	bad_placeholders = [
 		src
 		for src, dst in te.items()
-		if sorted(_re.findall(r"\{\d+\}", src)) != sorted(_re.findall(r"\{\d+\}", dst))
+		if sorted(re.findall(r"\{\d+\}", src)) != sorted(re.findall(r"\{\d+\}", dst))
 	]
 	check("no Telugu string drops a {0} placeholder", not bad_placeholders,
 		str(bad_placeholders[:3]))

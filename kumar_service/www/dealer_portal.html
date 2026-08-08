@@ -2,87 +2,236 @@
 
 {% block title %}{{ _("Dealer Portal") }} | KUMAR Pumps{% endblock %}
 
+{#
+  The dealer's whole job, on a phone, without ever opening the desk.
+
+  Six tabs, and everything a dealer can legitimately do lives in one of them:
+  register a sale, raise a complaint, claim warranty, follow a ticket, ring the
+  right person at KUMAR. There are deliberately NO /app/... links: the desk is
+  for KUMAR staff, and a dealer who lands there sees a tool built for somebody
+  else's job.
+
+  Colour is load-bearing, not decoration. Each stat card and each action owns a
+  hue, and ticket status pills are coloured from `portal_api.STATUS_TONE` so
+  "late" looks the same everywhere in the product.
+#}
+
 {% block page_content %}
+{% include "templates/includes/portal_art.svg" %}
+
 <style>
-  .kd { max-width: 900px; margin: 0 auto; padding: 20px 14px 60px; }
-  .kd-top { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;
-            border-bottom:3px solid #0b5394; padding-bottom:12px; margin-bottom:20px; }
-  .kd-brand { font-size:26px; font-weight:800; color:#0b5394; }
-  .kd-who { font-size:13px; color:#555; }
-  .kd-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px;
-              margin-bottom:24px; }
-  .kd-card { border:1px solid #cfd8e3; border-radius:10px; padding:14px; text-align:center; }
-  .kd-num { font-size:26px; font-weight:800; color:#0b5394; }
-  .kd-lbl { font-size:12px; color:#666; margin-top:4px; }
-  .kd-actions { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:26px; }
-  .kd-btn { padding:11px 18px; border-radius:8px; background:#0b5394; color:#fff !important;
-            font-weight:600; font-size:14px; text-decoration:none; display:inline-block; }
-  .kd-btn.sec { background:#fff; color:#0b5394 !important; border:1px solid #0b5394; }
-  .kd-sec { margin-bottom:28px; }
-  .kd-h { font-size:15px; font-weight:700; margin-bottom:10px; color:#33475b; }
-  table.kd-t { width:100%; border-collapse:collapse; font-size:13px; }
-  table.kd-t th { text-align:left; background:#f2f6fb; padding:8px; border:1px solid #cfd8e3;
-                  font-size:12px; color:#33475b; }
-  table.kd-t td { padding:8px; border:1px solid #eef1f5; }
-  .kd-empty { color:#888; font-size:13px; padding:10px 0; }
-  @media (max-width:600px){ table.kd-t th:nth-child(n+4), table.kd-t td:nth-child(n+4){display:none} }
+  .kp { --blue:#0b5394; --blue-d:#08406f; --blue-l:#1a74c4;
+        --ink:#14212e; --mut:#5f7183; --line:#e2eaf3; --bg:#f6f9fc;
+        --ok:#0f8a4a; --ok-bg:#e7f7ee; --warn:#b06000; --warn-bg:#fff5e0;
+        --bad:#c02616; --bad-bg:#fdeceb; --info:#0b62b5; --info-bg:#e8f2fd;
+        --mute:#5f7183; --mute-bg:#eef2f6;
+        --violet:#6b3fa0; --violet-bg:#f3ecfb; --teal:#0d7a72; --teal-bg:#e3f6f4;
+        --amber:#a86a00; --amber-bg:#fff3d9; --rose:#b02a54; --rose-bg:#fdecf2;
+        font-family:"Inter","Segoe UI",Arial,"Noto Sans Telugu","Nirmala UI",sans-serif;
+        color:var(--ink); }
+  .kp-wrap { max-width:1080px; margin:0 auto; padding:0 14px 70px; }
 
-  /* register-a-pump form. A dealer fills this standing in a shop on a phone,
-     so: one column, big targets, and never a field they have to think about. */
-  .kr { border:1px solid #cfd8e3; border-radius:12px; padding:18px; margin-bottom:28px; }
-  .kr-step { font-size:12px; font-weight:700; color:#0b5394; text-transform:uppercase;
-             letter-spacing:.6px; margin:18px 0 8px; }
-  .kr-step:first-child { margin-top:0; }
-  .kr-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px; }
-  .kr label { display:block; font-size:12px; color:#555; margin-bottom:4px; font-weight:600; }
-  .kr input, .kr select, .kr textarea {
-    width:100%; padding:11px 12px; border:1px solid #cfd8e3; border-radius:8px;
-    font-size:15px; background:#fff; }
-  .kr input:focus, .kr select:focus { outline:2px solid #0b5394; border-color:#0b5394; }
-  .kr-find { display:flex; gap:8px; align-items:flex-end; }
-  .kr-find > div { flex:1; }
-  .kr-btn { padding:12px 20px; border-radius:8px; background:#0b5394; color:#fff; border:0;
-            font-weight:700; font-size:15px; cursor:pointer; }
-  .kr-btn[disabled] { opacity:.5; cursor:not-allowed; }
-  .kr-btn.wide { width:100%; padding:15px; font-size:16px; margin-top:18px; }
-  /* the pump we found, and the cover WE are giving - stated, not asked */
-  .kr-found { background:#f2f6fb; border-left:4px solid #0b5394; border-radius:8px;
-              padding:14px; margin-top:14px; font-size:14px; }
-  .kr-found b { color:#0b5394; }
-  .kr-warr { font-size:13px; color:#33475b; margin-top:6px; }
-  .kr-msg { padding:12px 14px; border-radius:8px; font-size:14px; margin-top:14px; }
-  .kr-msg.bad { background:#fdeceb; color:#a32b20; }
-  .kr-msg.good { background:#eaf7ee; color:#1c6b34; }
-  .kr-hide { display:none; }
+  /* ---------- top bar ---------- */
+  .kp-bar { display:flex; align-items:center; justify-content:space-between; gap:12px;
+            flex-wrap:wrap; padding:14px 0 12px; }
+  .kp-brand { display:flex; align-items:center; gap:10px; font-size:22px; font-weight:800;
+              color:var(--blue); letter-spacing:.4px; }
+  .kp-brand small { display:block; font-size:10.5px; font-weight:600; color:var(--mut);
+                    letter-spacing:1.6px; text-transform:uppercase; }
+  .kp-who { text-align:right; font-size:13px; color:var(--mut); line-height:1.5; }
+  .kp-who b { color:var(--ink); display:block; font-size:14px; }
+  .kp-chip { display:inline-block; margin-top:3px; padding:2px 9px; border-radius:20px;
+             font-size:10.5px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; }
+  .kp-chip.ours { background:var(--info-bg); color:var(--info); }
+  .kp-chip.indep { background:var(--violet-bg); color:var(--violet); }
+  .kp-lang a { color:var(--blue); text-decoration:none; padding:3px 8px; border-radius:6px;
+               font-size:13px; }
+  .kp-lang a.on { background:var(--blue); color:#fff; font-weight:700; }
 
-  /* the headline: this month, against last month, and where that puts them */
-  .kp-head { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:16px; }
-  .kp-big { flex:1 1 300px; background:linear-gradient(135deg,#0b5394,#0d6bbd); color:#fff;
-            border-radius:16px; padding:20px 24px; }
-  .kp-big-lbl { font-size:13px; opacity:.85; }
-  .kp-big-val { font-size:46px; font-weight:800; line-height:1.05; }
-  .kp-big-sub { font-size:14px; opacity:.92; margin-top:6px; }
-  .kp-rank { flex:0 1 190px; border:1px solid #cfd8e3; border-radius:16px; padding:20px 22px;
-             display:flex; flex-direction:column; justify-content:center; }
-  .kp-rank-val { font-size:38px; font-weight:800; color:#0b5394; line-height:1; }
-  .kp-rank-lbl { font-size:13px; color:#666; margin-top:6px; }
-  .kd-lang { margin-top:6px; text-align:right; font-size:13px; }
-  .kd-lang a { color:#0b5394; text-decoration:none; padding:3px 7px; border-radius:6px; }
-  .kd-lang a.on { background:#0b5394; color:#fff; font-weight:600; }
+  /* ---------- hero banner ---------- */
+  .kp-hero { position:relative; overflow:hidden; border-radius:20px; color:#fff;
+             background:linear-gradient(118deg,#1a74c4 0%,#0b5394 52%,#062f52 100%);
+             padding:26px 28px; margin-bottom:18px;
+             box-shadow:0 10px 30px rgba(11,83,148,.22); }
+  .kp-hero-art { position:absolute; right:-10px; bottom:-6px; width:340px; height:150px;
+                 opacity:.5; pointer-events:none; }
+  .kp-hero-in { position:relative; z-index:1; max-width:64%; }
+  .kp-eyebrow { font-size:11px; letter-spacing:2.4px; font-weight:700; color:#a8d4f7;
+                text-transform:uppercase; }
+  .kp-big { font-size:52px; font-weight:800; line-height:1; margin:8px 0 2px;
+            font-variant-numeric:tabular-nums; }
+  .kp-big-lbl { font-size:14.5px; color:#d6e9fb; font-weight:600; }
+  .kp-big-sub { margin-top:9px; font-size:13px; color:#a8d4f7; }
+  .kp-rank { display:inline-flex; align-items:baseline; gap:7px; margin-top:14px;
+             background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.32);
+             padding:7px 14px; border-radius:30px; }
+  .kp-rank b { font-size:20px; font-weight:800; }
+  .kp-rank span { font-size:12.5px; color:#d6e9fb; }
+  @media (max-width:700px){ .kp-hero-in{max-width:100%} .kp-hero-art{opacity:.18} .kp-big{font-size:40px} }
+
+  /* ---------- stat strip ---------- */
+  .kp-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(158px,1fr)); gap:11px;
+              margin-bottom:18px; }
+  .kp-stat { border:1px solid var(--line); border-radius:14px; padding:14px 15px; background:#fff;
+             border-top:3px solid var(--blue); }
+  .kp-stat b { display:block; font-size:25px; font-weight:800; line-height:1.15;
+               font-variant-numeric:tabular-nums; }
+  .kp-stat span { font-size:12px; color:var(--mut); font-weight:600; }
+  .kp-stat.c1 { border-top-color:var(--blue);   } .kp-stat.c1 b { color:var(--blue); }
+  .kp-stat.c2 { border-top-color:var(--ok);     } .kp-stat.c2 b { color:var(--ok); }
+  .kp-stat.c3 { border-top-color:var(--teal);   } .kp-stat.c3 b { color:var(--teal); }
+  .kp-stat.c4 { border-top-color:var(--amber);  } .kp-stat.c4 b { color:var(--amber); }
+  .kp-stat.c5 { border-top-color:var(--rose);   } .kp-stat.c5 b { color:var(--rose); }
+  .kp-stat.c6 { border-top-color:var(--violet); } .kp-stat.c6 b { color:var(--violet); }
+
+  /* ---------- tabs ---------- */
+  .kp-tabs { display:flex; gap:7px; overflow-x:auto; padding:3px 0 12px; -webkit-overflow-scrolling:touch; }
+  .kp-tab { flex:0 0 auto; display:inline-flex; align-items:center; gap:7px; cursor:pointer;
+            border:1px solid var(--line); background:#fff; color:var(--mut);
+            padding:10px 15px; border-radius:30px; font-size:13.5px; font-weight:700;
+            white-space:nowrap; }
+  .kp-tab svg { width:17px; height:17px; }
+  .kp-tab:hover { border-color:#c3d6e9; color:var(--ink); }
+  .kp-tab.on { background:var(--blue); border-color:var(--blue); color:#fff; }
+  .kp-tab .n { background:var(--bad); color:#fff; border-radius:20px; padding:0 6px;
+               font-size:11px; min-width:18px; text-align:center; }
+  .kp-tab.on .n { background:rgba(255,255,255,.28); }
+  .kp-panel { display:none; } .kp-panel.on { display:block; }
+
+  /* ---------- action tiles ---------- */
+  .kp-acts { display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr)); gap:12px;
+             margin-bottom:20px; }
+  .kp-act { display:flex; gap:13px; align-items:flex-start; text-align:left; cursor:pointer;
+            border:1px solid var(--line); border-radius:16px; padding:17px; background:#fff;
+            width:100%; transition:transform .12s, box-shadow .12s; }
+  .kp-act:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(11,83,148,.12); }
+  .kp-act .ic { flex:0 0 42px; height:42px; border-radius:12px; display:grid; place-items:center; }
+  .kp-act .ic svg { width:22px; height:22px; }
+  .kp-act h4 { margin:1px 0 3px; font-size:15.5px; font-weight:800; }
+  .kp-act p { margin:0; font-size:12.5px; color:var(--mut); line-height:1.5; }
+  .kp-act.a1 .ic { background:var(--info-bg); color:var(--info); }
+  .kp-act.a2 .ic { background:var(--amber-bg); color:var(--amber); }
+  .kp-act.a3 .ic { background:var(--violet-bg); color:var(--violet); }
+  .kp-act.a4 .ic { background:var(--teal-bg); color:var(--teal); }
+  .kp-act.a5 .ic { background:var(--ok-bg); color:var(--ok); }
+  .kp-act.a6 .ic { background:var(--rose-bg); color:var(--rose); }
+
+  /* ---------- sections, forms, tables ---------- */
+  .kp-sec { background:#fff; border:1px solid var(--line); border-radius:18px; padding:20px;
+            margin-bottom:16px; }
+  .kp-h { display:flex; align-items:center; gap:9px; font-size:17px; font-weight:800;
+          margin-bottom:4px; }
+  .kp-h svg { width:19px; height:19px; color:var(--blue); }
+  .kp-hint { font-size:12.5px; color:var(--mut); margin-bottom:15px; line-height:1.55; }
+  .kp-step { display:flex; align-items:center; gap:8px; font-size:11.5px; font-weight:800;
+             letter-spacing:1.4px; text-transform:uppercase; color:var(--blue);
+             margin:18px 0 9px; }
+  .kp-step::after { content:""; flex:1; height:1px; background:var(--line); }
+  .kp-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; }
+  .kp label { display:block; font-size:12px; font-weight:700; color:var(--mut); margin-bottom:5px; }
+  .kp input, .kp select, .kp textarea {
+      width:100%; padding:11px 12px; font-size:15px; border:1px solid #cfdbe8;
+      border-radius:10px; background:#fff; color:var(--ink); font-family:inherit; }
+  .kp input:focus, .kp select:focus, .kp textarea:focus {
+      outline:none; border-color:var(--blue-l); box-shadow:0 0 0 3px rgba(26,116,196,.14); }
+  .kp textarea { min-height:88px; resize:vertical; }
+  .kp-btn { display:inline-flex; align-items:center; justify-content:center; gap:8px;
+            border:0; cursor:pointer; padding:13px 22px; border-radius:11px;
+            font-size:15px; font-weight:700; background:var(--blue); color:#fff;
+            text-decoration:none; font-family:inherit; }
+  .kp-btn:hover { background:var(--blue-d); color:#fff; text-decoration:none; }
+  .kp-btn[disabled] { opacity:.55; cursor:default; }
+  .kp-btn.wide { width:100%; margin-top:18px; padding:15px; font-size:16px; }
+  .kp-btn.sec { background:#eff5fb; color:var(--blue); border:1px solid #cfdbe8; }
+  .kp-btn.sec:hover { background:#e2edf8; color:var(--blue-d); }
+  .kp-btn.sm { padding:8px 14px; font-size:13px; border-radius:9px; }
+  .kp-find { display:grid; grid-template-columns:1fr auto; gap:10px; align-items:end; }
+  .kp-hide { display:none; }
+
+  .kp-msg { border-radius:11px; padding:13px 15px; font-size:14px; margin-top:12px; line-height:1.55; }
+  .kp-msg.good { background:var(--ok-bg); color:var(--ok); border:1px solid #b6e2c8; }
+  .kp-msg.bad  { background:var(--bad-bg); color:var(--bad); border:1px solid #f2c2bd; }
+  .kp-msg.info { background:var(--info-bg); color:var(--info); border:1px solid #bcd9f5; }
+  .kp-found { background:linear-gradient(120deg,#eef6ff,#e3f0fd); border:1px solid #bcd9f5;
+              border-radius:13px; padding:15px; margin-top:12px; font-size:15px; }
+  .kp-warr { margin-top:8px; font-size:13.5px; color:var(--info); }
+
+  .kp-t { width:100%; border-collapse:collapse; font-size:13.5px; }
+  .kp-t th { text-align:left; font-size:11px; letter-spacing:1.1px; text-transform:uppercase;
+             color:var(--mut); border-bottom:2px solid var(--line); padding:9px 10px; font-weight:800; }
+  .kp-t td { padding:11px 10px; border-bottom:1px solid #f0f4f8; vertical-align:top; }
+  .kp-t tr:hover td { background:#f8fbfe; }
+  .kp-scroll { overflow-x:auto; }
+  .kp-empty { text-align:center; padding:30px 16px; color:var(--mut); font-size:14px;
+              background:var(--bg); border-radius:13px; }
+
+  /* ---------- status pills ---------- */
+  .kp-pill { display:inline-block; padding:4px 11px; border-radius:20px; font-size:11.5px;
+             font-weight:800; letter-spacing:.3px; white-space:nowrap; }
+  .kp-pill.ok   { background:var(--ok-bg);   color:var(--ok); }
+  .kp-pill.warn { background:var(--warn-bg); color:var(--warn); }
+  .kp-pill.bad  { background:var(--bad-bg);  color:var(--bad); }
+  .kp-pill.info { background:var(--info-bg); color:var(--info); }
+  .kp-pill.mute { background:var(--mute-bg); color:var(--mute); }
+  .kp-free { background:var(--ok-bg); color:var(--ok); }
+  .kp-paid { background:var(--warn-bg); color:var(--warn); }
+
+  /* ---------- ticket cards ---------- */
+  .kp-tk { border:1px solid var(--line); border-left:4px solid var(--mute); border-radius:13px;
+           padding:14px 16px; margin-bottom:10px; background:#fff; }
+  .kp-tk.ok{border-left-color:var(--ok)} .kp-tk.warn{border-left-color:var(--warn)}
+  .kp-tk.bad{border-left-color:var(--bad)} .kp-tk.info{border-left-color:var(--info)}
+  .kp-tk-top { display:flex; justify-content:space-between; gap:10px; align-items:flex-start;
+               flex-wrap:wrap; }
+  .kp-tk-id { font-size:12px; color:var(--mut); font-weight:700; }
+  .kp-tk-h { font-size:15.5px; font-weight:800; margin:2px 0 5px; }
+  .kp-tk-m { font-size:12.5px; color:var(--mut); line-height:1.6; }
+  .kp-tk-acts { margin-top:11px; display:flex; gap:8px; flex-wrap:wrap; }
+  .kp-filters { display:flex; gap:7px; margin-bottom:14px; flex-wrap:wrap; }
+  .kp-filters button { border:1px solid var(--line); background:#fff; color:var(--mut);
+                       padding:7px 14px; border-radius:20px; font-size:12.5px; font-weight:700;
+                       cursor:pointer; font-family:inherit; }
+  .kp-filters button.on { background:var(--blue); color:#fff; border-color:var(--blue); }
+
+  /* ---------- contacts ---------- */
+  .kp-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(255px,1fr)); gap:13px; }
+  .kp-ct { border:1px solid var(--line); border-radius:16px; padding:18px; background:#fff;
+           border-top:3px solid var(--teal); }
+  .kp-ct .role { font-size:11px; letter-spacing:1.3px; text-transform:uppercase;
+                 font-weight:800; color:var(--teal); }
+  .kp-ct h4 { margin:7px 0 4px; font-size:16px; font-weight:800; }
+  .kp-ct p { margin:0 0 12px; font-size:12.5px; color:var(--mut); line-height:1.6; }
+  .kp-ct a.tel { display:inline-flex; align-items:center; gap:7px; font-size:15px;
+                 font-weight:800; color:var(--blue); text-decoration:none; }
+  .kp-ct a.tel svg { width:16px; height:16px; }
+
+  /* ---------- family strip ---------- */
+  .kp-fam { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:11px; }
+  .kp-fam div { border:1px solid var(--line); border-radius:14px; padding:15px; background:#fff;
+                text-align:center; }
+  .kp-fam svg { width:38px; height:38px; color:var(--blue); }
+  .kp-fam b { display:block; font-size:21px; font-weight:800; color:var(--blue); margin-top:6px; }
+  .kp-fam span { font-size:12px; color:var(--mut); font-weight:600; }
 </style>
 
-<div class="kd">
-  <div class="kd-top">
-    <div>
-      <div class="kd-brand">
-        <img src="/assets/kumar_service/images/kumar-mark.svg" alt="KUMAR"
-             width="30" height="30" style="vertical-align:-6px;margin-right:7px">KUMAR
-      </div>
-      <div class="kd-who">{{ _("Dealer Portal") }}</div>
+<div class="kp"><div class="kp-wrap">
+
+  <div class="kp-bar">
+    <div class="kp-brand">
+      <img src="/assets/kumar_service/images/kumar-mark.svg" alt="" width="34" height="34">
+      <div>KUMAR<small>{{ _("Dealer Portal") }}</small></div>
     </div>
     <div>
-      <div class="kd-who">{{ dealer or frappe.session.user }}</div>
-      <div class="kd-lang">
+      <div class="kp-who">
+        <b>{{ outlet.dealer_name or dealer or frappe.session.user }}</b>
+        {{ outlet.city or "" }}{% if outlet.state %}, {{ outlet.state }}{% endif %}
+        {% if outlet.is_own_outlet %}
+          <span class="kp-chip ours">{{ _("KUMAR Branch") }}</span>
+        {% else %}
+          <span class="kp-chip indep">{{ _("Authorised Dealer") }}</span>
+        {% endif %}
+      </div>
+      <div class="kp-lang" style="text-align:right;margin-top:5px">
         {%- for code, label, url, active in lang_options %}
           <a href="{{ url }}" class="{{ 'on' if active else '' }}" hreflang="{{ code }}">{{ label }}</a>
         {%- endfor %}
@@ -91,15 +240,18 @@
   </div>
 
   {% if not_a_dealer %}
-    <p>{{ _("Your login is not linked to a dealer record. Ask the branch office to set Portal User on your Dealer.") }}</p>
+    <div class="kp-msg bad">
+      {{ _("Your login is not linked to a dealer record. Ask the branch office to set Portal User on your Dealer.") }}
+    </div>
   {% else %}
 
-  {# This month first, and against last month - a running total since the shop
-     opened tells nobody whether today is going well. #}
-  <div class="kp-head">
-    <div class="kp-big">
-      <div class="kp-big-lbl">{{ _("Pumps sold in the last 30 days") }}</div>
-      <div class="kp-big-val">{{ performance.last_30 }}</div>
+  {# ---------------------------------------------------------------- hero #}
+  <div class="kp-hero">
+    <svg class="kp-hero-art" aria-hidden="true"><use href="#kp-art-banner"></use></svg>
+    <div class="kp-hero-in">
+      <div class="kp-eyebrow">{{ _("Pumps sold in the last 30 days") }}</div>
+      <div class="kp-big">{{ performance.last_30 }}</div>
+      <div class="kp-big-lbl">{{ _("Sri Lakshmi Ganapathi Engineering Works") }} &middot; {{ _("Since 1971") }}</div>
       <div class="kp-big-sub">
         {%- if performance.change_pct is not none -%}
           {%- if performance.change_pct >= 0 %}&#9650;{% else %}&#9660;{% endif %}
@@ -111,314 +263,845 @@
           {{ _("{0} so far in {1}").format(performance.this_month, performance.month_label) }}
         {%- endif -%}
       </div>
+      {% if performance.rank %}
+        <div class="kp-rank">
+          <b>#{{ performance.rank }}</b>
+          <span>{{ _("of {0} selling outlets").format(performance.of) }}</span>
+        </div>
+      {% endif %}
     </div>
-    {% if performance.rank %}
-    <div class="kp-rank">
-      <div class="kp-rank-val">#{{ performance.rank }}</div>
-      <div class="kp-rank-lbl">{{ _("of {0} selling outlets").format(performance.of) }}</div>
+  </div>
+
+  {# ---------------------------------------------------------------- stats #}
+  <div class="kp-stats">
+    <div class="kp-stat c1"><b>{{ counts.registrations }}</b><span>{{ _("Registered, All Time") }}</span></div>
+    <div class="kp-stat c2"><b>{{ performance.in_warranty }}</b><span>{{ _("Pumps Still in Warranty") }}</span></div>
+    <div class="kp-stat c3"><b>{{ frappe.utils.fmt_money(performance.revenue, 0, "INR") }}</b><span>{{ _("Billed to You, 30 Days") }}</span></div>
+    <div class="kp-stat c4"><b>{{ frappe.utils.fmt_money(performance.outstanding, 0, "INR") }}</b><span>{{ _("You Owe KUMAR") }}</span></div>
+    <div class="kp-stat c5"><b>{{ counts.open }}</b><span>{{ _("Open Complaints") }}</span></div>
+    <div class="kp-stat c6"><b>{{ counts.claims }}</b><span>{{ _("Warranty Claims") }}</span></div>
+  </div>
+
+  {# ---------------------------------------------------------------- tabs #}
+  <div class="kp-tabs" id="kp-tabs">
+    <button class="kp-tab on" data-tab="home">
+      <svg><use href="#kp-art-monobloc"></use></svg>{{ _("Home") }}</button>
+    <button class="kp-tab" data-tab="register">
+      <svg><use href="#kp-art-register"></use></svg>{{ _("Register a Sale") }}</button>
+    <button class="kp-tab" data-tab="complaint">
+      <svg><use href="#kp-art-complaint"></use></svg>{{ _("Raise a Complaint") }}</button>
+    <button class="kp-tab" data-tab="claim">
+      <svg><use href="#kp-art-claim"></use></svg>{{ _("Warranty Claim") }}</button>
+    <button class="kp-tab" data-tab="tickets">
+      <svg><use href="#kp-art-ticket"></use></svg>{{ _("My Tickets") }}
+      {% if tickets.open %}<span class="n">{{ tickets.open }}</span>{% endif %}</button>
+    <button class="kp-tab" data-tab="contact">
+      <svg><use href="#kp-art-phone"></use></svg>{{ _("Contact KUMAR") }}</button>
+  </div>
+
+  {# ================================================================ HOME #}
+  <div class="kp-panel on" data-panel="home">
+
+    <div class="kp-acts">
+      <button class="kp-act a1" data-goto="register">
+        <span class="ic"><svg><use href="#kp-art-register"></use></svg></span>
+        <span><h4>{{ _("Register a Sale") }}</h4>
+          <p>{{ _("Start the warranty and print the customer's certificate.") }}</p></span>
+      </button>
+      <button class="kp-act a2" data-goto="complaint">
+        <span class="ic"><svg><use href="#kp-art-complaint"></use></svg></span>
+        <span><h4>{{ _("Raise a Complaint") }}</h4>
+          <p>{{ _("A customer has a problem. We tell you at once if the visit is free.") }}</p></span>
+      </button>
+      <button class="kp-act a3" data-goto="claim">
+        <span class="ic"><svg><use href="#kp-art-claim"></use></svg></span>
+        <span><h4>{{ _("Claim Warranty") }}</h4>
+          <p>{{ _("Ask KUMAR to settle a part, a whole unit or a repair bill.") }}</p></span>
+      </button>
+      <button class="kp-act a4" data-goto="tickets">
+        <span class="ic"><svg><use href="#kp-art-ticket"></use></svg></span>
+        <span><h4>{{ _("My Tickets") }}</h4>
+          <p>{{ _("Every complaint and claim you have with KUMAR, and where it stands.") }}</p></span>
+      </button>
+      <a class="kp-act a5" href="/warranty-check{{ lang_q }}">
+        <span class="ic"><svg><use href="#kp-art-certificate"></use></svg></span>
+        <span><h4>{{ _("Check a Pump") }}</h4>
+          <p>{{ _("Type any serial number and see its warranty status.") }}</p></span>
+      </a>
+      <button class="kp-act a6" data-goto="contact">
+        <span class="ic"><svg><use href="#kp-art-phone"></use></svg></span>
+        <span><h4>{{ _("Contact KUMAR") }}</h4>
+          <p>{{ _("Your branch office, the service centre and head office.") }}</p></span>
+      </button>
+    </div>
+
+    {% if product_families %}
+    <div class="kp-sec">
+      <div class="kp-h"><svg><use href="#kp-art-borewell"></use></svg>{{ _("What You Sell") }}</div>
+      <div class="kp-hint">{{ _("Your own sales by product family, all time.") }}</div>
+      <div class="kp-fam">
+        {% for f in product_families %}
+        <div>
+          <svg><use href="#kp-art-{{ 'borewell' if 'Submersible' in f.category and 'Openwell' not in f.category
+                                    else 'openwell' if 'Openwell' in f.category
+                                    else 'jet' if 'Jet' in f.category else 'monobloc' }}"></use></svg>
+          <b>{{ f.sold }}</b><span>{{ _(f.category) }}</span>
+        </div>
+        {% endfor %}
+      </div>
     </div>
     {% endif %}
-  </div>
 
-  <div class="kd-cards">
-    <div class="kd-card"><div class="kd-num">{{ counts.registrations }}</div>
-      <div class="kd-lbl">{{ _("Registered, All Time") }}</div></div>
-    <div class="kd-card"><div class="kd-num">{{ performance.in_warranty }}</div>
-      <div class="kd-lbl">{{ _("Pumps Still in Warranty") }}</div></div>
-    <div class="kd-card"><div class="kd-num">{{ frappe.utils.fmt_money(performance.revenue, 0, "INR") }}</div>
-      <div class="kd-lbl">{{ _("Billed to You, 30 Days") }}</div></div>
-    <div class="kd-card"><div class="kd-num">{{ frappe.utils.fmt_money(performance.outstanding, 0, "INR") }}</div>
-      <div class="kd-lbl">{{ _("You Owe KUMAR") }}</div></div>
-    <div class="kd-card"><div class="kd-num">{{ counts.open }}</div>
-      <div class="kd-lbl">{{ _("Open Complaints") }}</div></div>
-    <div class="kd-card"><div class="kd-num">{{ counts.claims }}</div>
-      <div class="kd-lbl">{{ _("Warranty Claims") }}</div></div>
-  </div>
-
-  <div class="kd-actions">
-    <a class="kd-btn sec" href="/app/service-request/new">{{ _("Raise a Complaint") }}</a>
-    <a class="kd-btn sec" href="/warranty-check{{ lang_q }}">{{ _("Warranty Check") }}</a>
-    <a class="kd-btn sec" href="/app/dealer-desk">{{ _("Full Dealer Desk") }}</a>
-  </div>
-
-  <div class="kd-sec">
-    <div class="kd-h">{{ _("Register a Pump You Have Sold") }}</div>
-    <form class="kr" id="kr-form" autocomplete="off">
-
-      <div class="kr-step">{{ _("1. Which pump?") }}</div>
-      <div class="kr-find">
-        <div>
-          <label for="kr-serial">{{ _("Serial Number") }}</label>
-          <input id="kr-serial" name="serial_no" placeholder="KP-..." required>
-        </div>
-        <button type="button" class="kr-btn" id="kr-find">{{ _("Find") }}</button>
+    <div class="kp-sec">
+      <div class="kp-h"><svg><use href="#kp-art-certificate"></use></svg>{{ _("Recent Registrations") }}</div>
+      <div class="kp-hint">{{ _("The last pumps you registered. The certificate is what you owe the customer.") }}</div>
+      {% if registrations %}
+      <div class="kp-scroll">
+        <table class="kp-t">
+          <thead><tr>
+            <th>{{ _("Serial") }}</th><th>{{ _("Customer") }}</th><th>{{ _("Sold") }}</th>
+            <th>{{ _("Warranty Upto") }}</th><th>{{ _("Certificate") }}</th>
+          </tr></thead>
+          <tbody>
+          {% for r in registrations %}
+            <tr>
+              <td><b>{{ r.serial_no }}</b><br><small style="color:#5f7183">{{ r.pump_model or "" }}</small></td>
+              <td>{{ r.end_customer_name }}<br>
+                <a href="tel:{{ r.end_customer_mobile }}" style="font-size:12.5px">{{ r.end_customer_mobile }}</a></td>
+              <td>{{ frappe.utils.format_date(r.sale_date) }}</td>
+              <td>{{ frappe.utils.format_date(r.warranty_expiry_date) }}</td>
+              <td><a class="kp-btn sec sm" href="{{ r.certificate_url }}" target="_blank"
+                     rel="noopener">{{ _("Print") }}</a></td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
       </div>
-      <div id="kr-result"></div>
+      {% else %}
+        <div class="kp-empty">{{ _("You have not registered a pump yet. Use the blue button above.") }}</div>
+      {% endif %}
+    </div>
 
-      <div id="kr-rest" class="kr-hide">
-        {% if is_own_outlet %}
-        {# A KUMAR branch. The customer's invoice IS ours, so there is nothing
-           for the clerk to type - we find it from the serial. #}
-        <div class="kr-step">{{ _("2. The KUMAR invoice") }}</div>
-        <div class="kr-row">
-          <div>
-            <label>{{ _("Invoice") }}</label>
-            <div id="kr-kinv" class="kr-found" style="margin-top:0">-</div>
-          </div>
-          <div>
-            <label for="kr-sale">{{ _("Date Sold") }}</label>
-            <input id="kr-sale" name="sale_date" type="date" required>
-          </div>
-        </div>
-        {% else %}
-        <div class="kr-step">{{ _("2. Your bill to the customer") }}</div>
-        <div class="kr-row">
-          <div>
-            <label for="kr-inv">{{ _("Your Invoice No") }}</label>
-            <input id="kr-inv" name="invoice_no" required>
-          </div>
-          <div>
-            <label for="kr-invdate">{{ _("Your Invoice Date") }}</label>
-            <input id="kr-invdate" name="dealer_invoice_date" type="date">
-          </div>
-          <div>
-            <label for="kr-sale">{{ _("Date Sold") }}</label>
-            <input id="kr-sale" name="sale_date" type="date" required>
-          </div>
-        </div>
-        {% endif %}
+    <div class="kp-sec">
+      <div class="kp-h"><svg><use href="#kp-art-phone"></use></svg>{{ _("Warranty Expiring in 30 Days") }}</div>
+      <div class="kp-hint">{{ _("Their warranty ends soon - a good moment to offer a service or a new pump") }}</div>
+      {% if expiring %}
+      <div class="kp-scroll">
+        <table class="kp-t">
+          <thead><tr><th>{{ _("Serial") }}</th><th>{{ _("Customer") }}</th>
+            <th>{{ _("Mobile") }}</th><th>{{ _("Expires") }}</th></tr></thead>
+          <tbody>
+          {% for e in expiring %}
+            <tr>
+              <td><b>{{ e.name }}</b></td>
+              <td>{{ e.custom_end_customer_name }}</td>
+              <td><a class="kp-btn sec sm" href="tel:{{ e.custom_end_customer_mobile }}">
+                  {{ e.custom_end_customer_mobile }}</a></td>
+              <td><span class="kp-pill warn">{{ frappe.utils.format_date(e.custom_warranty_expiry_date) }}</span></td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}<div class="kp-empty">{{ _("Nothing expiring this month.") }}</div>{% endif %}
+    </div>
+  </div>
 
-        <div class="kr-step">{{ _("3. Who bought it") }}</div>
-        <div class="kr-row">
+  {# ============================================================ REGISTER #}
+  <div class="kp-panel" data-panel="register">
+    <div class="kp-sec">
+      <div class="kp-h"><svg><use href="#kp-art-register"></use></svg>{{ _("Register a Pump You Have Sold") }}</div>
+      <div class="kp-hint">
+        {{ _("Registering is what starts the warranty and produces the certificate in KUMAR's name.") }}
+      </div>
+      <form id="kr-form" autocomplete="off">
+        <div class="kp-step">{{ _("1. Which pump?") }}</div>
+        <div class="kp-find">
           <div>
-            <label for="kr-cust">{{ _("Customer Name") }}</label>
-            <input id="kr-cust" name="end_customer_name" required>
+            <label for="kr-serial">{{ _("Serial Number") }}</label>
+            <input id="kr-serial" name="serial_no" placeholder="KP-..." required>
+          </div>
+          <button type="button" class="kp-btn" id="kr-find">{{ _("Find") }}</button>
+        </div>
+        <div id="kr-result"></div>
+
+        <div id="kr-rest" class="kp-hide">
+          {% if is_own_outlet %}
+          {# A KUMAR branch: the customer's invoice IS ours, so nothing to type. #}
+          <div class="kp-step">{{ _("2. The KUMAR invoice") }}</div>
+          <div class="kp-row">
+            <div><label>{{ _("Invoice") }}</label>
+              <div id="kr-kinv" class="kp-found" style="margin-top:0">-</div></div>
+            <div><label for="kr-sale">{{ _("Date Sold") }}</label>
+              <input id="kr-sale" name="sale_date" type="date" required></div>
+          </div>
+          {% else %}
+          <div class="kp-step">{{ _("2. Your bill to the customer") }}</div>
+          <div class="kp-row">
+            <div><label for="kr-inv">{{ _("Your Invoice No") }}</label>
+              <input id="kr-inv" name="invoice_no" required></div>
+            <div><label for="kr-invdate">{{ _("Your Invoice Date") }}</label>
+              <input id="kr-invdate" name="dealer_invoice_date" type="date"></div>
+            <div><label for="kr-sale">{{ _("Date Sold") }}</label>
+              <input id="kr-sale" name="sale_date" type="date" required></div>
+          </div>
+          {% endif %}
+
+          <div class="kp-step">{{ _("3. Who bought it") }}</div>
+          <div class="kp-row">
+            <div><label for="kr-cust">{{ _("Customer Name") }}</label>
+              <input id="kr-cust" name="end_customer_name" required></div>
+            <div><label for="kr-mob">{{ _("Mobile") }}</label>
+              <input id="kr-mob" name="end_customer_mobile" inputmode="numeric"
+                     pattern="[6-9][0-9]{9}" maxlength="10" required></div>
+            <div><label for="kr-app">{{ _("Used For") }}</label>
+              <select id="kr-app" name="application_type">
+                {% for a in options.applications %}<option value="{{ a }}">{{ _(a) }}</option>{% endfor %}
+              </select></div>
+          </div>
+
+          <div class="kp-step">{{ _("4. Where it is installed") }}</div>
+          <div class="kp-row">
+            <div><label for="kr-addr">{{ _("Village / Address") }}</label>
+              <input id="kr-addr" name="installation_address"></div>
+            <div><label for="kr-dist">{{ _("District") }}</label>
+              <input id="kr-dist" name="district"></div>
+            <div><label for="kr-pin">{{ _("Pincode") }}</label>
+              <input id="kr-pin" name="pincode" inputmode="numeric" maxlength="6"></div>
+          </div>
+
+          <button type="submit" class="kp-btn wide" id="kr-submit">
+            {{ _("Register & Get Warranty Certificate") }}
+          </button>
+        </div>
+        <div id="kr-done"></div>
+      </form>
+    </div>
+  </div>
+
+  {# =========================================================== COMPLAINT #}
+  <div class="kp-panel" data-panel="complaint">
+    <div class="kp-sec">
+      <div class="kp-h"><svg><use href="#kp-art-complaint"></use></svg>{{ _("Raise a Complaint") }}</div>
+      <div class="kp-hint">
+        {{ _("Log what the customer is reporting. We answer immediately whether the visit is free, and the response clock starts the moment you submit.") }}
+      </div>
+      <form id="kc-form" autocomplete="off">
+        <div class="kp-step">{{ _("1. Which pump?") }}</div>
+        <div class="kp-row">
+          <div>
+            <label for="kc-serial">{{ _("Serial Number") }}</label>
+            <input id="kc-serial" name="serial_no" list="kp-serials" placeholder="KP-..." required>
           </div>
           <div>
-            <label for="kr-mob">{{ _("Mobile") }}</label>
-            <input id="kr-mob" name="end_customer_mobile" inputmode="numeric"
-                   pattern="[6-9][0-9]{9}" maxlength="10" required>
+            <label for="kc-cat">{{ _("What is the problem") }}</label>
+            <select id="kc-cat" name="complaint_category" required>
+              <option value="">{{ _("Choose one") }}</option>
+              {% for c in options.complaint_categories %}<option value="{{ c }}">{{ _(c) }}</option>{% endfor %}
+            </select>
           </div>
           <div>
-            <label for="kr-app">{{ _("Used For") }}</label>
-            <select id="kr-app" name="application_type">
-              <option>Agriculture</option><option>Domestic</option>
-              <option>Industrial</option><option>Commercial</option>
+            <label for="kc-pri">{{ _("Priority") }}</label>
+            <select id="kc-pri" name="priority">
+              {% for p in options.priorities %}
+                <option value="{{ p }}"{% if p == "Medium" %} selected{% endif %}>{{ _(p) }}</option>
+              {% endfor %}
             </select>
           </div>
         </div>
+        <div id="kc-pump"></div>
 
-        <div class="kr-step">{{ _("4. Where it is installed") }}</div>
-        <div class="kr-row">
-          <div>
-            <label for="kr-addr">{{ _("Village / Address") }}</label>
-            <input id="kr-addr" name="installation_address">
-          </div>
-          <div>
-            <label for="kr-dist">{{ _("District") }}</label>
-            <input id="kr-dist" name="district">
-          </div>
-          <div>
-            <label for="kr-pin">{{ _("Pincode") }}</label>
-            <input id="kr-pin" name="pincode" inputmode="numeric" maxlength="6">
-          </div>
+        <div class="kp-step">{{ _("2. What is happening") }}</div>
+        <div>
+          <label for="kc-desc">{{ _("Describe the problem in the customer's own words") }}</label>
+          <textarea id="kc-desc" name="complaint_description" required
+                    placeholder="{{ _('e.g. No water since two days, motor runs but nothing comes up') }}"></textarea>
         </div>
 
-        <button type="submit" class="kr-btn wide" id="kr-submit">
-          {{ _("Register & Get Warranty Certificate") }}
-        </button>
+        <button type="submit" class="kp-btn wide" id="kc-submit">{{ _("Send to KUMAR") }}</button>
+        <div id="kc-done"></div>
+      </form>
+    </div>
+  </div>
+
+  {# =============================================================== CLAIM #}
+  <div class="kp-panel" data-panel="claim">
+    <div class="kp-sec">
+      <div class="kp-h"><svg><use href="#kp-art-claim"></use></svg>{{ _("Raise a Warranty Claim") }}</div>
+      <div class="kp-hint">
+        {{ _("Ask KUMAR to settle a failure under warranty. Name the parts and say what the technician found - a claim with evidence is settled faster than one without.") }}
+      </div>
+      <form id="kw-form" autocomplete="off">
+        <div class="kp-step">{{ _("1. Which pump?") }}</div>
+        <div class="kp-row">
+          <div>
+            <label for="kw-serial">{{ _("Serial Number") }}</label>
+            <input id="kw-serial" name="serial_no" list="kp-serials" placeholder="KP-..." required>
+          </div>
+          <div>
+            <label for="kw-type">{{ _("Claim Type") }}</label>
+            <select id="kw-type" name="claim_type">
+              {% for t in options.claim_types %}<option value="{{ t }}">{{ _(t) }}</option>{% endfor %}
+            </select>
+          </div>
+          <div>
+            <label for="kw-cause">{{ _("Root Cause") }}</label>
+            <select id="kw-cause" name="root_cause">
+              {% for c in options.root_causes %}
+                <option value="{{ c }}">{{ _(c) if c else _("Not sure") }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div id="kw-pump"></div>
+
+        <div class="kp-step">{{ _("2. Which parts failed") }}</div>
+        <div class="kp-row">
+          <div>
+            <label for="kw-item">{{ _("Part") }}</label>
+            <select id="kw-item">
+              <option value="">{{ _("Choose a part") }}</option>
+              {% for i in claim_items %}
+                <option value="{{ i.name }}">{{ i.item_name or i.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label for="kw-qty">{{ _("Qty") }}</label>
+            <input id="kw-qty" type="number" min="1" step="1" value="1">
+          </div>
+          <div>
+            <label for="kw-def">{{ _("Defect Observed") }}</label>
+            <input id="kw-def" placeholder="{{ _('e.g. bearing seized') }}">
+          </div>
+          <div style="align-self:end">
+            <button type="button" class="kp-btn sec" id="kw-add">{{ _("Add Part") }}</button>
+          </div>
+        </div>
+        <div id="kw-parts"></div>
+
+        <div class="kp-step">{{ _("3. What the technician found") }}</div>
+        <div>
+          <label for="kw-report">{{ _("Technician Report") }}</label>
+          <textarea id="kw-report" name="technician_report"
+                    placeholder="{{ _('What was dismantled, what was found, and why it is a manufacturing defect') }}"></textarea>
+        </div>
+
+        <button type="submit" class="kp-btn wide" id="kw-submit">{{ _("Lodge Claim with KUMAR") }}</button>
+        <div id="kw-done"></div>
+      </form>
+    </div>
+  </div>
+
+  {# ============================================================= TICKETS #}
+  <div class="kp-panel" data-panel="tickets">
+    <div class="kp-sec">
+      <div class="kp-h"><svg><use href="#kp-art-ticket"></use></svg>{{ _("My Tickets") }}</div>
+      <div class="kp-hint">
+        {{ _("Every complaint and warranty claim you have with KUMAR, newest first, and exactly where each one stands.") }}
+      </div>
+      <div class="kp-filters" id="kp-tfilter">
+        <button class="on" data-f="all">{{ _("All") }} ({{ tickets.total }})</button>
+        <button data-f="open">{{ _("Still Open") }} ({{ tickets.open }})</button>
+        <button data-f="complaint">{{ _("Complaints") }}</button>
+        <button data-f="claim">{{ _("Warranty Claims") }}</button>
       </div>
 
-      <div id="kr-done"></div>
-    </form>
+      {% if tickets.tickets %}
+        <div id="kp-tlist">
+        {% for t in tickets.tickets %}
+          <div class="kp-tk {{ t.tone }}" data-kind="{{ t.kind }}"
+               data-open="{{ 0 if t.closed else 1 }}">
+            <div class="kp-tk-top">
+              <div>
+                <div class="kp-tk-id">{{ t.kind_label }} &middot; {{ t.name }}</div>
+                <div class="kp-tk-h">{{ _(t.headline) if t.headline else t.name }}</div>
+                <div class="kp-tk-m">
+                  <b>{{ t.serial_no }}</b>{% if t.pump_model %} &middot; {{ t.pump_model }}{% endif %}
+                  {% if t.customer %}<br>{{ t.customer }}
+                    {%- if t.mobile %} &middot; <a href="tel:{{ t.mobile }}">{{ t.mobile }}</a>{% endif %}
+                  {% endif %}
+                  {% if t.kind == "claim" and t.amount %}
+                    <br>{{ _("Claim Amount") }}: <b>{{ frappe.utils.fmt_money(t.amount, currency="INR") }}</b>
+                    {%- if t.approved %} &middot; {{ _("Approved Amount") }}:
+                      <b>{{ frappe.utils.fmt_money(t.approved, currency="INR") }}</b>{% endif %}
+                  {% endif %}
+                  {% if t.technician %}<br>{{ _("Technician") }}: {{ t.technician }}{% endif %}
+                </div>
+              </div>
+              <div style="text-align:right">
+                <span class="kp-pill {{ t.tone }}">{{ _(t.status) }}</span><br>
+                <small style="color:#5f7183;font-size:11.5px">
+                  {{ frappe.utils.format_date(t.on) }}</small>
+                {% if t.kind == "complaint" %}
+                  <br><span class="kp-pill {{ 'kp-free' if t.free else 'kp-paid' }}"
+                            style="margin-top:5px">
+                    {{ _("Free (in warranty)") if t.free else _("Chargeable") }}</span>
+                {% endif %}
+              </div>
+            </div>
+            <div class="kp-tk-acts">
+              <button class="kp-btn sec sm kp-detail"
+                      data-kind="{{ t.kind }}" data-name="{{ t.name }}">{{ _("Details") }}</button>
+              {% if t.can_claim %}
+                <button class="kp-btn sm kp-mkclaim" data-serial="{{ t.serial_no }}"
+                        data-sr="{{ t.name }}">{{ _("Claim Warranty") }}</button>
+              {% endif %}
+              {% if t.linked_claim %}
+                <span class="kp-pill info">{{ _("Claim") }} {{ t.linked_claim }}</span>
+              {% endif %}
+            </div>
+            <div class="kp-tk-detail"></div>
+          </div>
+        {% endfor %}
+        </div>
+      {% else %}
+        <div class="kp-empty">{{ _("Nothing open. All your customers are looked after.") }}</div>
+      {% endif %}
+    </div>
   </div>
 
-  <div class="kd-sec">
-    <div class="kd-h">{{ _("Recent Registrations") }}</div>
-    {% if registrations %}
-    <table class="kd-t">
-      <tr><th>{{ _("Serial") }}</th><th>{{ _("Customer") }}</th><th>{{ _("Sold") }}</th>
-          <th>{{ _("Warranty Upto") }}</th><th>{{ _("Certificate") }}</th></tr>
-      {% for r in registrations %}
-      <tr>
-        <td><a href="/app/pump-registration/{{ r.name }}">{{ r.serial_no }}</a></td>
-        <td>{{ r.end_customer_name }}<br><small>{{ r.end_customer_mobile }}</small></td>
-        <td>{{ frappe.utils.format_date(r.sale_date) }}</td>
-        <td>{{ frappe.utils.format_date(r.warranty_expiry_date) }}</td>
-        <td><a href="{{ r.certificate_url }}" target="_blank" rel="noopener">{{ _("Print") }}</a></td>
-      </tr>
-      {% endfor %}
-    </table>
-    {% else %}<div class="kd-empty">{{ _("No registrations yet.") }}</div>{% endif %}
+  {# ============================================================= CONTACT #}
+  <div class="kp-panel" data-panel="contact">
+    <div class="kp-sec">
+      <div class="kp-h"><svg><use href="#kp-art-phone"></use></svg>{{ _("Contact KUMAR") }}</div>
+      <div class="kp-hint">{{ _("Your own branch office handles you. Head office is for anything they cannot settle.") }}</div>
+      <div class="kp-cards">
+        {% for c in contacts.contacts %}
+        <div class="kp-ct">
+          <div class="role">{{ c.role }}</div>
+          <h4>{{ c.dealer_name }}</h4>
+          <p>
+            {% if c.contact_person %}{{ c.contact_person }}<br>{% endif %}
+            {{ c.address_line or "" }}{% if c.city %}<br>{{ c.city }}{% endif %}
+            {%- if c.state %}, {{ c.state }}{% endif %}
+            {% if c.email_id %}<br>{{ c.email_id }}{% endif %}
+          </p>
+          {% if c.mobile_no or c.landline %}
+            <a class="tel" href="tel:{{ c.mobile_no or c.landline }}">
+              <svg><use href="#kp-art-phone"></use></svg>{{ c.mobile_no or c.landline }}</a>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="kp-sec">
+      <div class="kp-h"><svg><use href="#kp-art-monobloc"></use></svg>{{ _("Your Outlet") }}</div>
+      <div class="kp-scroll">
+        <table class="kp-t">
+          <tbody>
+            <tr><th>{{ _("Dealer Name") }}</th><td>{{ outlet.dealer_name }}</td></tr>
+            <tr><th>{{ _("Dealer Code") }}</th><td>{{ outlet.code or "-" }}</td></tr>
+            <tr><th>{{ _("City") }}</th><td>{{ outlet.city or "-" }}{% if outlet.state %}, {{ outlet.state }}{% endif %}</td></tr>
+            <tr><th>{{ _("GSTIN") }}</th><td>{{ outlet.gstin or "-" }}</td></tr>
+            <tr><th>{{ _("Whose Invoice") }}</th>
+              <td>{% if outlet.is_own_outlet %}{{ _("Ours") }}{% else %}{{ _("Dealer's") }}{% endif %}</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
-  <div class="kd-sec">
-    <div class="kd-h">{{ _("Open Complaints") }}</div>
-    {% if open_requests %}
-    <table class="kd-t">
-      <tr><th>{{ _("Request") }}</th><th>{{ _("Serial") }}</th><th>{{ _("Complaint") }}</th>
-          <th>{{ _("Status") }}</th><th>{{ _("Reported") }}</th></tr>
-      {% for s in open_requests %}
-      <tr>
-        <td><a href="/app/service-request/{{ s.name }}">{{ s.name }}</a></td>
-        <td>{{ s.serial_no }}</td><td>{{ s.complaint_category }}</td>
-        <td>{{ s.status }}</td><td>{{ frappe.utils.format_datetime(s.reported_on) }}</td>
-      </tr>
-      {% endfor %}
-    </table>
-    {% else %}<div class="kd-empty">{{ _("Nothing open. ") }}</div>{% endif %}
-  </div>
-
-  <div class="kd-sec">
-    <div class="kd-h">{{ _("My Warranty Claims") }}</div>
-    {% if claims %}
-    <table class="kd-t">
-      <tr><th>{{ _("Claim") }}</th><th>{{ _("Serial") }}</th><th>{{ _("Type") }}</th>
-          <th>{{ _("Amount") }}</th><th>{{ _("Status") }}</th></tr>
-      {% for c in claims %}
-      <tr>
-        <td><a href="/app/kumar-warranty-claim/{{ c.name }}">{{ c.name }}</a></td>
-        <td>{{ c.serial_no }}</td><td>{{ c.claim_type }}</td>
-        <td>{{ frappe.utils.fmt_money(c.claim_amount, currency="INR") }}</td>
-        <td>{{ c.workflow_state or "Draft" }}</td>
-      </tr>
-      {% endfor %}
-    </table>
-    {% else %}<div class="kd-empty">{{ _("No claims raised.") }}</div>{% endif %}
-  </div>
-
-  <div class="kd-sec">
-    <div class="kd-h">{{ _("Warranty Expiring in 30 Days") }} <small>{{ _("- call these customers") }}</small></div>
-    {% if expiring %}
-    <table class="kd-t">
-      <tr><th>{{ _("Serial") }}</th><th>{{ _("Customer") }}</th><th>{{ _("Mobile") }}</th>
-          <th>{{ _("Expires") }}</th></tr>
-      {% for e in expiring %}
-      <tr><td>{{ e.name }}</td><td>{{ e.custom_end_customer_name }}</td>
-          <td>{{ e.custom_end_customer_mobile }}</td>
-          <td>{{ frappe.utils.format_date(e.custom_warranty_expiry_date) }}</td></tr>
-      {% endfor %}
-    </table>
-    {% else %}<div class="kd-empty">{{ _("Nothing expiring this month.") }}</div>{% endif %}
-  </div>
+  {# One shared list of this dealer's serials, so complaint and claim can both
+     autocomplete without the dealer remembering a serial number. #}
+  <datalist id="kp-serials">
+    {% for s in my_serials %}
+      <option value="{{ s.serial_no }}">{{ s.pump_model }} &middot; {{ s.end_customer_name }}</option>
+    {% endfor %}
+  </datalist>
 
   {% endif %}
-</div>
+</div></div>
 
 <script>
-// The dealer types a serial; everything about the pump - and above all the
-// warranty we are prepared to honour - is read back from the server. Nothing
-// on this page can change the cover, which is the whole point: the brand sets
-// it, the shop just reports the sale.
 frappe.ready(function () {
   const $ = (id) => document.getElementById(id);
-  const form = $("kr-form");
-  if (!form) return;
-
-  const OWN_OUTLET = {{ "true" if is_own_outlet else "false" }};
-
-  const today = frappe.datetime ? frappe.datetime.get_today() : new Date().toISOString().slice(0, 10);
-  $("kr-sale").value = today;
-  if ($("kr-invdate")) $("kr-invdate").value = today;
-
   const esc = (s) => frappe.utils.escape_html(String(s == null ? "" : s));
-  const say = (into, cls, html) => { $(into).innerHTML = `<div class="kr-msg ${cls}">${html}</div>`; };
+  const money = (v) => format_currency(v, "INR");
+  const say = (into, cls, html) => {
+    const el = $(into);
+    if (el) el.innerHTML = `<div class="kp-msg ${cls}">${html}</div>`;
+  };
 
-  let found = null;
+  /* ------------------------------------------------------------ tabs */
+  const tabs = document.querySelectorAll(".kp-tab");
+  const panels = document.querySelectorAll(".kp-panel");
+  function show(name) {
+    tabs.forEach((t) => t.classList.toggle("on", t.dataset.tab === name));
+    panels.forEach((p) => p.classList.toggle("on", p.dataset.panel === name));
+    // remember the tab across a reload, and make it linkable
+    if (history.replaceState) history.replaceState(null, "", "#" + name);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  tabs.forEach((t) => t.addEventListener("click", () => show(t.dataset.tab)));
+  document.querySelectorAll("[data-goto]").forEach((b) =>
+    b.addEventListener("click", () => show(b.dataset.goto)));
+  if (window.location.hash) {
+    const want = window.location.hash.slice(1);
+    if (document.querySelector(`.kp-panel[data-panel="${want}"]`)) show(want);
+  }
 
-  function lookup() {
-    const serial = $("kr-serial").value.trim();
-    if (!serial) return;
-    found = null;
-    $("kr-rest").classList.add("kr-hide");
-    $("kr-result").innerHTML = `<div class="kr-msg">${__("Checking...")}</div>`;
-
+  /* --------------------------------------------- shared serial lookup
+     Used by both the complaint and the claim form. Shows the customer and the
+     warranty position BEFORE the dealer writes anything, because that is the
+     one fact that changes what they tell the customer on the phone. */
+  function describePump(serial, into) {
+    const box = $(into);
+    if (!serial || !box) { if (box) box.innerHTML = ""; return; }
+    box.innerHTML = `<div class="kp-msg info">${__("Checking...")}</div>`;
     frappe.call({
-      method: "kumar_service.api.portal_serial_lookup",
+      // portal_api, not api: this one refuses a pump the dealer did not sell
+      method: "kumar_service.portal_api.pump_snapshot",
       args: { serial_no: serial },
       callback: function (r) {
         const d = r.message;
-        if (!d) return;
-
-        if (d.already_registered) {
-          const e = d.existing || {};
-          say("kr-result", "bad",
-            __("Already registered to {0} on {1}. Warranty runs to {2}.", [
-              esc(e.end_customer_name), frappe.datetime.str_to_user(e.sale_date),
-              frappe.datetime.str_to_user(e.warranty_expiry_date)]));
+        if (!d || !d.serial_no) {
+          box.innerHTML = `<div class="kp-msg bad">${__("We have no record of that serial. Check the number on the nameplate.")}</div>`;
           return;
         }
-
-        found = d;
-        $("kr-result").innerHTML = `
-          <div class="kr-found">
+        const inW = !!d.in_warranty;
+        box.innerHTML = `
+          <div class="kp-found">
             <b>${esc(d.pump_model || __("Unknown model"))}</b>
             ${d.hp ? " &middot; " + esc(d.hp) + " HP" : ""}
-            ${d.phase ? " &middot; " + esc(d.phase) : ""}
-            <div class="kr-warr">
-              ${__("KUMAR warranty on this pump")}:
-              <b>${esc(d.warranty_months)} ${__("months")}</b>
-              ${__("from the date you sell it")}.
+            ${d.end_customer_name ? "<br>" + esc(d.end_customer_name) : ""}
+            ${d.end_customer_mobile ? " &middot; " + esc(d.end_customer_mobile) : ""}
+            <div class="kp-warr">
+              <span class="kp-pill ${inW ? "ok" : "bad"}">${esc(__(d.warranty_status || ""))}</span>
+              ${d.warranty_expiry_date
+                ? " " + __("Warranty Upto") + " " + frappe.datetime.str_to_user(d.warranty_expiry_date)
+                : ""}
+              ${inW ? "<br>" + __("Warranty job - not chargeable")
+                    : "<br>" + __("Out of warranty - chargeable")}
             </div>
           </div>`;
-
-        // a branch sells on our invoice, so show which one rather than asking
-        if (OWN_OUTLET && $("kr-kinv")) {
-          $("kr-kinv").innerHTML = d.kumar_invoice
-            ? `<b>${esc(d.kumar_invoice)}</b>`
-            : `<span style="color:#a32b20">${__("No KUMAR invoice found for this pump - raise it first.")}</span>`;
-        }
-
-        $("kr-rest").classList.remove("kr-hide");
-        $("kr-cust").focus();
       },
       error: function () {
-        say("kr-result", "bad", __("We have no record of that serial. Check the number on the nameplate."));
+        box.innerHTML = `<div class="kp-msg bad">${__("We have no record of that serial. Check the number on the nameplate.")}</div>`;
       },
     });
   }
 
-  $("kr-find").addEventListener("click", lookup);
-  $("kr-serial").addEventListener("keydown", function (e) {
-    // a barcode scanner ends its scan with Enter, and Enter in a form submits
-    if (e.key === "Enter") { e.preventDefault(); lookup(); }
-  });
+  /* ------------------------------------------------ register a sale */
+  (function register() {
+    const form = $("kr-form");
+    if (!form) return;
+    const OWN_OUTLET = {{ "true" if is_own_outlet else "false" }};
+    const today = frappe.datetime.get_today();
+    $("kr-sale").value = today;
+    if ($("kr-invdate")) $("kr-invdate").value = today;
 
-  form.addEventListener("submit", function (e) {
-    e.preventDefault();
-    if (!found) { lookup(); return; }
+    let found = null;
 
-    const btn = $("kr-submit");
-    btn.disabled = true;
-    btn.textContent = __("Registering...");
+    function lookup() {
+      const serial = $("kr-serial").value.trim();
+      if (!serial) return;
+      found = null;
+      $("kr-rest").classList.add("kp-hide");
+      $("kr-result").innerHTML = `<div class="kp-msg info">${__("Checking...")}</div>`;
 
-    const args = {};
-    new FormData(form).forEach((v, k) => { args[k] = v; });
-    args.serial_no = found.serial_no;
-    args.registration_source = "Dealer Portal";
+      frappe.call({
+        method: "kumar_service.api.portal_serial_lookup",
+        args: { serial_no: serial },
+        callback: function (r) {
+          const d = r.message;
+          if (!d) return;
+          if (d.already_registered) {
+            const e = d.existing || {};
+            say("kr-result", "bad",
+              __("Already registered to {0} on {1}. Warranty runs to {2}.", [
+                esc(e.end_customer_name), frappe.datetime.str_to_user(e.sale_date),
+                frappe.datetime.str_to_user(e.warranty_expiry_date)]));
+            return;
+          }
+          found = d;
+          $("kr-result").innerHTML = `
+            <div class="kp-found">
+              <b>${esc(d.pump_model || __("Unknown model"))}</b>
+              ${d.hp ? " &middot; " + esc(d.hp) + " HP" : ""}
+              ${d.phase ? " &middot; " + esc(__(d.phase)) : ""}
+              <div class="kp-warr">
+                ${__("KUMAR warranty on this pump")}:
+                <b>${esc(d.warranty_months)} ${__("months")}</b>
+                ${__("from the date you sell it")}.
+              </div>
+            </div>`;
+          if (OWN_OUTLET && $("kr-kinv")) {
+            $("kr-kinv").innerHTML = d.kumar_invoice
+              ? `<b>${esc(d.kumar_invoice)}</b>`
+              : `<span style="color:#c02616">${__("No KUMAR invoice found for this pump - raise it first.")}</span>`;
+          }
+          $("kr-rest").classList.remove("kp-hide");
+          $("kr-cust").focus();
+        },
+        error: function () {
+          say("kr-result", "bad", __("We have no record of that serial. Check the number on the nameplate."));
+        },
+      });
+    }
 
-    frappe.call({
-      method: "kumar_service.api.register_pump",
-      args: args,
-      callback: function (r) {
-        const d = r.message || {};
-        form.querySelector("#kr-rest").classList.add("kr-hide");
-        $("kr-result").innerHTML = "";
-        say("kr-done", "good",
-          __("Registered as {0}. Warranty runs to {1}.", [
-            esc(d.name), frappe.datetime.str_to_user(d.warranty_expiry_date)]) +
-          ` <a class="kd-btn" style="margin-left:10px" target="_blank" rel="noopener"
-               href="${esc(d.certificate_url)}">${__("Print Certificate")}</a>`);
-        // the certificate is the deliverable, so leave it on screen; the list
-        // behind it is stale now, so refresh once the dealer has printed
-        setTimeout(() => { window.location.reload(); }, 30000);
-      },
-      error: function () {
-        btn.disabled = false;
-        btn.textContent = __("Register & Get Warranty Certificate");
-      },
+    $("kr-find").addEventListener("click", lookup);
+    $("kr-serial").addEventListener("keydown", function (e) {
+      // a barcode scanner ends its scan with Enter, and Enter would submit
+      if (e.key === "Enter") { e.preventDefault(); lookup(); }
     });
-  });
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (!found) { lookup(); return; }
+      const btn = $("kr-submit");
+      btn.disabled = true;
+      btn.textContent = __("Registering...");
+
+      const args = {};
+      new FormData(form).forEach((v, k) => { args[k] = v; });
+      args.serial_no = found.serial_no;
+      args.registration_source = "Dealer Portal";
+
+      frappe.call({
+        method: "kumar_service.api.register_pump",
+        args: args,
+        callback: function (r) {
+          const d = r.message || {};
+          $("kr-rest").classList.add("kp-hide");
+          $("kr-result").innerHTML = "";
+          say("kr-done", "good",
+            __("Registered as {0}. Warranty runs to {1}.", [
+              esc(d.name), frappe.datetime.str_to_user(d.warranty_expiry_date)]) +
+            ` <a class="kp-btn sm" style="margin-left:10px" target="_blank" rel="noopener"
+                 href="${esc(d.certificate_url)}">${__("Print Certificate")}</a>`);
+          setTimeout(() => { window.location.reload(); }, 30000);
+        },
+        error: function () {
+          btn.disabled = false;
+          btn.textContent = __("Register & Get Warranty Certificate");
+        },
+      });
+    });
+  })();
+
+  /* --------------------------------------------- raise a complaint */
+  (function complaint() {
+    const form = $("kc-form");
+    if (!form) return;
+    $("kc-serial").addEventListener("change", () =>
+      describePump($("kc-serial").value.trim(), "kc-pump"));
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const btn = $("kc-submit");
+      btn.disabled = true;
+      btn.textContent = __("Sending...");
+      frappe.call({
+        method: "kumar_service.portal_api.raise_complaint",
+        args: {
+          serial_no: $("kc-serial").value.trim(),
+          complaint_category: $("kc-cat").value,
+          complaint_description: $("kc-desc").value,
+          priority: $("kc-pri").value,
+        },
+        callback: function (r) {
+          const d = r.message || {};
+          form.reset();
+          $("kc-pump").innerHTML = "";
+          say("kc-done", d.is_under_warranty ? "good" : "info",
+            esc(d.message) +
+            `<div style="margin-top:9px"><button class="kp-btn sm" id="kc-goto">${__("My Tickets")}</button></div>`);
+          const go = $("kc-goto");
+          if (go) go.addEventListener("click", () => window.location.reload());
+          btn.disabled = false;
+          btn.textContent = __("Send to KUMAR");
+        },
+        error: function () {
+          btn.disabled = false;
+          btn.textContent = __("Send to KUMAR");
+        },
+      });
+    });
+  })();
+
+  /* ------------------------------------------------- warranty claim */
+  (function claim() {
+    const form = $("kw-form");
+    if (!form) return;
+    const parts = [];
+
+    $("kw-serial").addEventListener("change", () =>
+      describePump($("kw-serial").value.trim(), "kw-pump"));
+
+    function drawParts() {
+      if (!parts.length) { $("kw-parts").innerHTML = ""; return; }
+      $("kw-parts").innerHTML = `
+        <div class="kp-scroll"><table class="kp-t">
+          <thead><tr><th>${__("Part")}</th><th>${__("Qty")}</th>
+            <th>${__("Defect Observed")}</th><th></th></tr></thead>
+          <tbody>${parts.map((p, i) => `
+            <tr><td><b>${esc(p.label)}</b></td><td>${esc(p.qty)}</td>
+              <td>${esc(p.defect_observed || "")}</td>
+              <td><button type="button" class="kp-btn sec sm" data-drop="${i}">&times;</button></td></tr>`
+          ).join("")}</tbody>
+        </table></div>`;
+      $("kw-parts").querySelectorAll("[data-drop]").forEach((b) =>
+        b.addEventListener("click", () => {
+          parts.splice(parseInt(b.dataset.drop, 10), 1);
+          drawParts();
+        }));
+    }
+
+    $("kw-add").addEventListener("click", function () {
+      const sel = $("kw-item");
+      const code = sel.value;
+      if (!code) return;
+      parts.push({
+        item_code: code,
+        label: sel.options[sel.selectedIndex].text,
+        qty: parseFloat($("kw-qty").value) || 1,
+        defect_observed: $("kw-def").value,
+      });
+      sel.value = ""; $("kw-qty").value = 1; $("kw-def").value = "";
+      drawParts();
+    });
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const btn = $("kw-submit");
+      btn.disabled = true;
+      btn.textContent = __("Sending...");
+      frappe.call({
+        method: "kumar_service.portal_api.raise_claim",
+        args: {
+          serial_no: $("kw-serial").value.trim(),
+          claim_type: $("kw-type").value,
+          root_cause: $("kw-cause").value,
+          technician_report: $("kw-report").value,
+          service_request: form.dataset.sr || null,
+          parts: JSON.stringify(parts.map((p) => ({
+            item_code: p.item_code, qty: p.qty, defect_observed: p.defect_observed,
+          }))),
+        },
+        callback: function (r) {
+          const d = r.message || {};
+          form.reset();
+          parts.length = 0; drawParts();
+          $("kw-pump").innerHTML = "";
+          delete form.dataset.sr;
+          say("kw-done", "good", esc(d.message) +
+            (d.claim_amount ? `<br>${__("Claim Amount")}: <b>${money(d.claim_amount)}</b>` : ""));
+          btn.disabled = false;
+          btn.textContent = __("Lodge Claim with KUMAR");
+        },
+        error: function () {
+          btn.disabled = false;
+          btn.textContent = __("Lodge Claim with KUMAR");
+        },
+      });
+    });
+
+    // "Claim Warranty" on a complaint card jumps here with the pump filled in
+    document.querySelectorAll(".kp-mkclaim").forEach((b) =>
+      b.addEventListener("click", function () {
+        $("kw-serial").value = b.dataset.serial;
+        form.dataset.sr = b.dataset.sr;
+        show("claim");
+        describePump(b.dataset.serial, "kw-pump");
+      }));
+  })();
+
+  /* ------------------------------------------------------- tickets */
+  (function tickets() {
+    const list = $("kp-tlist");
+    if (!list) return;
+
+    document.querySelectorAll("#kp-tfilter button").forEach((b) =>
+      b.addEventListener("click", function () {
+        document.querySelectorAll("#kp-tfilter button").forEach((x) =>
+          x.classList.toggle("on", x === b));
+        const f = b.dataset.f;
+        list.querySelectorAll(".kp-tk").forEach((card) => {
+          const keep =
+            f === "all" ? true :
+            f === "open" ? card.dataset.open === "1" :
+            card.dataset.kind === f;
+          card.style.display = keep ? "" : "none";
+        });
+      }));
+
+    list.querySelectorAll(".kp-detail").forEach((b) =>
+      b.addEventListener("click", function () {
+        const card = b.closest(".kp-tk");
+        const box = card.querySelector(".kp-tk-detail");
+        if (box.dataset.open === "1") {
+          box.innerHTML = ""; box.dataset.open = "0";
+          b.textContent = __("Details");
+          return;
+        }
+        box.innerHTML = `<div class="kp-msg info">${__("Loading...")}</div>`;
+        frappe.call({
+          method: "kumar_service.portal_api.ticket_detail",
+          args: { kind: b.dataset.kind, name: b.dataset.name },
+          callback: function (r) {
+            const d = r.message || {};
+            box.dataset.open = "1";
+            b.textContent = __("Hide");
+            const line = (k, v) => v
+              ? `<tr><th>${esc(k)}</th><td>${v}</td></tr>` : "";
+            let rows = "";
+            if (d.kind === "complaint") {
+              rows =
+                line(__("Complaint Description"), esc(d.description)) +
+                line(__("Priority"), esc(__(d.priority || ""))) +
+                line(__("Reported On"), frappe.datetime.str_to_user(d.reported_on)) +
+                line(__("Response Due"), frappe.datetime.str_to_user(d.response_due_on)) +
+                line(__("First Response"), d.first_response_on
+                  ? frappe.datetime.str_to_user(d.first_response_on) : "") +
+                line(__("Resolution Due"), frappe.datetime.str_to_user(d.resolution_due_on)) +
+                line(__("SLA Status"), esc(__(d.sla_status || ""))) +
+                line(__("Technician"), esc(d.technician)) +
+                line(__("Service Centre"), esc(d.service_centre)) +
+                line(__("Root Cause"), esc(__(d.root_cause || ""))) +
+                line(__("Resolution Summary"), esc(d.resolution_summary));
+              if ((d.visits || []).length) {
+                rows += `<tr><th>${__("Service Visit")}</th><td>` +
+                  d.visits.map((v) =>
+                    `<b>${esc(v.name)}</b> &middot; ${frappe.datetime.str_to_user(v.visit_date)}
+                     &middot; ${esc(__(v.visit_type || ""))}
+                     ${v.findings ? "<br>" + esc(v.findings) : ""}
+                     ${v.action_taken ? "<br><i>" + esc(v.action_taken) + "</i>" : ""}`
+                  ).join("<hr style='border:0;border-top:1px solid #eef2f7;margin:8px 0'>") +
+                  `</td></tr>`;
+              }
+            } else {
+              rows =
+                line(__("Claim Type"), esc(__(d.claim_type || ""))) +
+                line(__("Claim Date"), frappe.datetime.str_to_user(d.claim_date)) +
+                line(__("Claim Amount"), d.claim_amount ? money(d.claim_amount) : "") +
+                line(__("Approved Amount"), d.approved_amount ? money(d.approved_amount) : "") +
+                line(__("Root Cause"), esc(__(d.root_cause || ""))) +
+                line(__("Heat No"), esc(d.heat_no)) +
+                line(__("Winding Batch"), esc(d.winding_batch)) +
+                line(__("Technician Report"), esc(d.technician_report)) +
+                line(__("Remarks"), esc(d.remarks)) +
+                line(__("Settled On"), d.settled_on
+                  ? frappe.datetime.str_to_user(d.settled_on) : "");
+              if ((d.parts || []).length) {
+                rows += `<tr><th>${__("Claimed Parts")}</th><td>` +
+                  d.parts.map((p) =>
+                    `${esc(p.item_name || p.item_code)} &times; ${esc(p.qty)}
+                     ${p.amount ? " &middot; " + money(p.amount) : ""}
+                     ${p.defect_observed ? "<br><small>" + esc(p.defect_observed) + "</small>" : ""}`
+                  ).join("<br>") + `</td></tr>`;
+              }
+            }
+            box.innerHTML = `<div class="kp-scroll" style="margin-top:12px">
+              <table class="kp-t"><tbody>${rows}</tbody></table></div>`;
+          },
+          error: function () {
+            box.innerHTML = `<div class="kp-msg bad">${__("Not permitted")}</div>`;
+          },
+        });
+      }));
+  })();
 });
 </script>
 {% endblock %}

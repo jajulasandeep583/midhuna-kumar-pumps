@@ -1,10 +1,12 @@
-- call these customers,- ఈ కస్టమర్లకు ఫోన్ చేయండి
 1-30 d,1-30 రోజులు
 1. Which pump?,1. ఏ పంప్?
 10 digits starting 6-9,6-9 తో మొదలయ్యే 10 అంకెలు
 2. The KUMAR invoice,2. KUMAR ఇన్‌వాయిస్
+2. What is happening,2. ఏం జరుగుతోంది
+2. Which parts failed,2. ఏ పార్ట్‌లు పోయాయి
 2. Your bill to the customer,2. కస్టమర్‌కు మీ బిల్లు
 3-Plunger Pumps,3-ప్లంజర్ పంపులు
+3. What the technician found,3. టెక్నీషియన్ ఏం కనుగొన్నారు
 3. Who bought it,3. ఎవరు కొన్నారు
 31-60 d,31-60 రోజులు
 4. Where it is installed,4. ఎక్కడ ఇన్‌స్టాల్ చేశారు
@@ -23,6 +25,7 @@
 A CSV with the right columns and two worked examples taken from your own masters. Delete the examples before you upload.,"సరైన కాలమ్‌లతో, మీ సొంత మాస్టర్ల నుండి తీసిన రెండు నమూనా వరుసలతో ఉన్న CSV. అప్‌లోడ్ చేసే ముందు నమూనాలను తొలగించండి."
 A KUMAR branch invoices the customer itself. An authorised distributor buys on our invoice and raises its own to the customer - and the warranty is ours in both cases.,"KUMAR బ్రాంచ్ కస్టమర్‌కు తనే ఇన్‌వాయిస్ ఇస్తుంది. అధీకృత డిస్ట్రిబ్యూటర్ మన ఇన్‌వాయిస్ మీద కొని, కస్టమర్‌కు తన సొంత ఇన్‌వాయిస్ ఇస్తారు - రెండు సందర్భాల్లోనూ వారంటీ మనదే."
 A complaint against one physical pump. Enter the serial and everything else fills itself.,"ఒక పంప్ మీద ఫిర్యాదు. సీరియల్ నంబర్ ఇవ్వండి, మిగిలినవన్నీ వాటంతట అవే నిండిపోతాయి."
+A customer has a problem. We tell you at once if the visit is free.,కస్టమర్‌కు సమస్య ఉంది. సందర్శన ఉచితమా కాదా వెంటనే చెబుతాం.
 A sale date needs a dealer - who sold it?,అమ్మిన తేదీకి డీలర్ కావాలి - ఎవరు అమ్మారు?
 Abbreviation,సంక్షిప్త రూపం
 Absent,గైర్హాజరు
@@ -34,11 +37,13 @@ Across the whole network,మొత్తం నెట్‌వర్క్ అ�
 Across {0} departments,{0} విభాగాల్లో
 Action Taken,తీసుకున్న చర్య
 Active,వాడుకలో
+Add Part,పార్ట్ జోడించు
 Add Standard Duty Points,ప్రామాణిక డ్యూటీ పాయింట్లను జోడించు
 Add Standard Elements,ప్రామాణిక మూలకాలను జోడించు
 Address,చిరునామా
 Agricultural Monobloc,వ్యవసాయ మోనోబ్లాక్
 Agriculture,వ్యవసాయం
+All,అన్నీ
 All Dealers,అన్ని డీలర్లు
 All Elements Within Spec,అన్ని మూలకాలు స్పెక్ లోపలే
 Allow Dealer Backdated Registration (Days),డీలర్ వెనుక తేదీ రిజిస్ట్రేషన్ (రోజులు)
@@ -54,11 +59,14 @@ Approved Amount,ఆమోదించిన మొత్తం
 Approved By,ఆమోదించినవారు
 Approved On,ఆమోదించిన తేదీ
 Approved for Pouring,పోయడానికి ఆమోదం
+Ask KUMAR to settle a failure under warranty. Name the parts and say what the technician found - a claim with evidence is settled faster than one without.,"వారంటీ కింద ఒక లోపాన్ని సెటిల్ చేయమని KUMAR ను అడగండి. ఏ పార్ట్‌లు పోయాయో, టెక్నీషియన్ ఏం కనుగొన్నారో రాయండి - ఆధారాలున్న క్లెయిమ్ త్వరగా సెటిల్ అవుతుంది."
+"Ask KUMAR to settle a part, a whole unit or a repair bill.","ఒక పార్ట్, పూర్తి యూనిట్ లేదా మరమ్మతు బిల్లును సెటిల్ చేయమని KUMAR ను అడగండి."
 Assembly,అసెంబ్లీ
 Assigned,కేటాయించబడింది
 At work,పనిలో ఉన్నారు
 Attendance,హాజరు
 Attendance Mix,హాజరు వివరాలు
+Authorised Dealer,అధీకృత డీలర్
 Authorised Distributor,అధీకృత డిస్ట్రిబ్యూటర్
 Authorised distributors,అధీకృత డిస్ట్రిబ్యూటర్లు
 Auto = HP x 0.7457,ఆటో = HP x 0.7457
@@ -125,14 +133,19 @@ Check the file,ఫైల్‌ను తనిఖీ చేయి
 Checking...,తనిఖీ చేస్తోంది...
 Chemistry Out of Spec,రసాయన కూర్పు స్పెక్ దాటింది
 Chemistry within spec - CE {0},రసాయన కూర్పు స్పెక్ లోపలే ఉంది - CE {0}
+Choose a part,ఒక పార్ట్ ఎంచుకోండి
 Choose file and check,ఫైల్ ఎంచుకుని తనిఖీ చేయి
+Choose one,ఒకటి ఎంచుకోండి
+Choose what is wrong with the pump,పంప్‌కు ఏం సమస్య ఉందో ఎంచుకోండి
 City,పట్టణం
 Claim,క్లెయిమ్
 Claim Amount,క్లెయిమ్ మొత్తం
 Claim Date,క్లెయిమ్ తేదీ
 Claim Part Row,క్లెయిమ్ పార్ట్ వరుస
 Claim Type,క్లెయిమ్ రకం
+Claim Warranty,వారంటీ క్లెయిమ్ చేయండి
 Claim status: {0},క్లెయిమ్ స్థితి: {0}
+Claim {0} has been lodged. KUMAR will review it and you can follow it under My Tickets.,"క్లెయిమ్ {0} నమోదైంది. KUMAR దాన్ని పరిశీలిస్తుంది, మీరు నా టికెట్లలో దాన్ని చూడవచ్చు."
 Claimed Parts,క్లెయిమ్ చేసిన పార్ట్‌లు
 Claims,క్లెయిమ్‌లు
 Claims being checked,పరిశీలనలో ఉన్న క్లెయిమ్‌లు
@@ -142,11 +155,14 @@ Comma separated days before expiry to remind,గడువు ముగియడ�
 Commercial,వాణిజ్య
 Complaint,ఫిర్యాదు
 Complaint Description,ఫిర్యాదు వివరణ
+Complaint {0} is with KUMAR. A free visit is due - this pump is in warranty.,"ఫిర్యాదు {0} KUMAR కు చేరింది. ఈ పంప్ వారంటీలో ఉంది, కాబట్టి ఉచిత సందర్శన వస్తుంది."
+"Complaint {0} is with KUMAR. This pump is out of warranty, so the visit is chargeable.","ఫిర్యాదు {0} KUMAR కు చేరింది. ఈ పంప్ వారంటీ ముగిసింది, కాబట్టి సందర్శనకు ఛార్జీ ఉంటుంది."
 Complaints,ఫిర్యాదులు
 Complaints from your customers that are still open,మీ కస్టమర్ల నుండి ఇంకా తెరిచి ఉన్న ఫిర్యాదులు
 Compliance,ప్రమాణాల పాలన
 Configuration,కాన్ఫిగరేషన్
 Contact,సంప్రదింపు
+Contact KUMAR,KUMAR ను సంప్రదించండి
 Contact Person,సంప్రదించాల్సిన వ్యక్తి
 Continuous R &amp; D,నిరంతర పరిశోధన &amp; అభివృద్ధి
 Copper,రాగి
@@ -209,9 +225,12 @@ Delivered,డెలివరీ అయింది
 Delivery Note,డెలివరీ నోట్
 Delivery Size (inch),డెలివరీ సైజు (అంగుళం)
 Department,విభాగం
+Describe the problem in the customer's own words,కస్టమర్ మాటల్లోనే సమస్యను రాయండి
+Describe what the customer is reporting,కస్టమర్ చెబుతున్నది రాయండి
 Description,వివరణ
 Designation,హోదా
 Desk,డెస్క్
+Details,వివరాలు
 Direct - KUMAR Invoice,నేరుగా - KUMAR ఇన్‌వాయిస్
 Discharge,డిశ్చార్జ్
 Discharge (LPM),డిశ్చార్జ్ (LPM)
@@ -247,6 +266,8 @@ Engine Driven Pumps,ఇంజన్ నడిచే పంపులు
 Enter a serial number,సీరియల్ నంబర్ ఇవ్వండి
 Enter serial number from the nameplate,నేమ్‌ప్లేట్ మీద ఉన్న సీరియల్ నంబర్ ఇవ్వండి
 Enter the spectrometer readings before approving this heat for pouring,ఈ హీట్‌ను పోయడానికి ఆమోదించే ముందు స్పెక్ట్రోమీటర్ రీడింగ్‌లను నమోదు చేయండి
+"Every complaint and claim you have with KUMAR, and where it stands.","KUMAR తో మీకున్న ప్రతి ఫిర్యాదు, క్లెయిమ్ మరియు వాటి స్థితి."
+"Every complaint and warranty claim you have with KUMAR, newest first, and exactly where each one stands.","KUMAR తో మీకున్న ప్రతి ఫిర్యాదు మరియు వారంటీ క్లెయిమ్, కొత్తవి ముందుగా, ప్రతి ఒక్కటి ఏ దశలో ఉందో సహా."
 Every configurable assumption lives here - nothing is hardcoded.,మార్చుకోగల ప్రతి అంశం ఇక్కడే ఉంటుంది - ఏదీ కోడ్‌లో స్థిరంగా రాయలేదు.
 Every order has been received and billed.,"అన్ని ఆర్డర్‌లు అందాయి, బిల్లులూ వచ్చాయి."
 Every outlet moved stock,ప్రతి అవుట్‌లెట్ స్టాక్ అమ్మింది
@@ -285,7 +306,6 @@ Foundry Operator,ఫౌండ్రీ ఆపరేటర్
 Free (in warranty),ఉచితం (వారంటీలో)
 Frequency (Hz),ఫ్రీక్వెన్సీ (Hz)
 Fulfilled,పూర్తయింది
-Full Dealer Desk,పూర్తి డీలర్ డెస్క్
 Full Load Current (A),ఫుల్ లోడ్ కరెంట్ (A)
 Full Unit Replacement,పూర్తి యూనిట్ రిప్లేస్‌మెంట్
 Furnace,ఫర్నేస్
@@ -311,6 +331,7 @@ Hand Pumps,చేతి పంపులు
 Head (m),హెడ్ (మీ)
 Head Max (m),గరిష్ఠ హెడ్ (మీ)
 Head Min (m),కనిష్ఠ హెడ్ (మీ)
+Head office,ప్రధాన కార్యాలయం
 Headcount,సిబ్బంది సంఖ్య
 Headcount by Department,విభాగం వారీ సిబ్బంది
 Headcount by Grade,గ్రేడ్ వారీ సిబ్బంది
@@ -326,10 +347,12 @@ HiPot,HiPot
 HiPot Result,HiPot ఫలితం
 HiPot Test (kV),HiPot టెస్ట్ (kV)
 HiPot Voltage (kV),HiPot వోల్టేజ్ (kV)
+Hide,దాచు
 High,ఎక్కువ
 High Pressure Pumps,హై ప్రెషర్ పంపులు
 Historical Import,పాత రికార్డుల ఇంపోర్ట్
 Historical Serial Import,పాత సీరియల్ నంబర్ల ఇంపోర్ట్
+Home,హోమ్
 How it is made,ఎలా తయారవుతుంది
 How your weeks went,మీ వారాలు ఎలా గడిచాయి
 Hydrostatic,హైడ్రోస్టాటిక్
@@ -386,6 +409,7 @@ Jobs waiting on you,మీ మీద ఉన్న పనులు
 Joined,చేరిన తేదీ
 Journal Entry,జర్నల్ ఎంట్రీ
 KUKA and ABB robots on the machining lines,మెషీనింగ్ లైన్లలో KUKA మరియు ABB రోబోట్లు
+KUMAR Branch,KUMAR బ్రాంచ్
 KUMAR Dealer,KUMAR డీలర్
 KUMAR Dealer Portal,KUMAR డీలర్ పోర్టల్
 KUMAR Invoice,KUMAR ఇన్‌వాయిస్
@@ -413,6 +437,8 @@ Leave Application,సెలవు దరఖాస్తు
 Links,లింక్‌లు
 "Load pumps that were built and sold before this system went live. Every row becomes a Serial No; every row that carries a sale date also becomes a submitted registration, with the warranty already running.",ఈ సిస్టమ్ మొదలవ్వక ముందు తయారై అమ్ముడైన పంపులను ఎక్కించండి. ప్రతి వరుస ఒక సీరియల్ నంబర్ అవుతుంది; అమ్మిన తేదీ ఉన్న ప్రతి వరుస సబ్మిట్ చేసిన రిజిస్ట్రేషన్‌గా మారి వారంటీ కూడా మొదలవుతుంది.
 Loading...,లోడ్ అవుతోంది...
+Lodge Claim with KUMAR,KUMAR తో క్లెయిమ్ నమోదు చేయండి
+"Log what the customer is reporting. We answer immediately whether the visit is free, and the response clock starts the moment you submit.","కస్టమర్ చెబుతున్నది నమోదు చేయండి. సందర్శన ఉచితమా కాదా వెంటనే చెబుతాం, మీరు సబ్మిట్ చేసిన క్షణం నుండే స్పందన సమయం మొదలవుతుంది."
 Look Up,వివరాలు చూడు
 Looking up {0}...,{0} వివరాలు చూస్తున్నాం...
 Low,తక్కువ
@@ -456,7 +482,7 @@ Moulding,మౌల్డింగ్
 My Business,నా వ్యాపారం
 My Claims,నా క్లెయిమ్‌లు
 My Registrations,నా రిజిస్ట్రేషన్లు
-My Warranty Claims,నా వారంటీ క్లెయిమ్‌లు
+My Tickets,నా టికెట్లు
 NOT REGISTERED,రిజిస్టర్ కాలేదు
 NOT REGISTERED - ask the dealer to complete registration first,రిజిస్టర్ కాలేదు - ముందు రిజిస్ట్రేషన్ పూర్తి చేయమని డీలర్‌ను అడగండి
 Name,పేరు
@@ -473,7 +499,6 @@ No - under warranty,కాదు - వారంటీలో ఉంది
 No Discharge,డిశ్చార్జ్ లేదు
 No KUMAR invoice found for this pump - raise it first.,ఈ పంప్‌కు KUMAR ఇన్‌వాయిస్ కనిపించలేదు - ముందు దాన్ని జారీ చేయండి.
 No Load Current (A),నో లోడ్ కరెంట్ (A)
-No claims raised.,ఏ క్లెయిమ్‌లూ లేవు.
 No dealer could be determined for your login,మీ లాగిన్‌కు డీలర్‌ను నిర్ణయించలేకపోయాం
 No dealers match.,సరిపోలే డీలర్లు లేవు.
 No earlier period to compare,పోల్చడానికి గత కాలం లేదు
@@ -483,7 +508,6 @@ No payroll has been run yet.,ఇంకా జీతాలు ప్రాసె�
 No previous service requests for this pump.,ఈ పంప్‌కు ఇంతకుముందు సర్వీస్ రిక్వెస్ట్‌లు లేవు.
 No pump found with serial number {0}. Check the nameplate and try again.,{0} సీరియల్ నంబర్‌తో పంప్ కనిపించలేదు. నేమ్‌ప్లేట్ చూసి మళ్ళీ ప్రయత్నించండి.
 No pump with serial {0}. Check the nameplate.,{0} సీరియల్ ఉన్న పంప్ లేదు. నేమ్‌ప్లేట్ చూసి సరిచూడండి.
-No registrations yet.,ఇంకా రిజిస్ట్రేషన్లు లేవు.
 No sales in this period.,ఈ కాలంలో అమ్మకాలు లేవు.
 No sales yet in this period.,ఈ కాలంలో ఇంకా అమ్మకాలు లేవు.
 No serialised units on this entry.,ఈ ఎంట్రీలో సీరియల్ ఉన్న యూనిట్లు లేవు.
@@ -498,9 +522,9 @@ Not a Defect,లోపం కాదు
 Not due,గడువు రాలేదు
 Not found,కనిపించలేదు
 Not permitted,అనుమతి లేదు
+Not sure,తెలియదు
 Nothing expiring this month.,ఈ నెలలో ఏదీ ముగియడం లేదు.
 Nothing in this period.,ఈ కాలంలో ఏమీ లేదు.
-Nothing open. ,ఏదీ పెండింగ్‌లో లేదు. 
 Nothing open. All your customers are looked after.,ఏదీ పెండింగ్‌లో లేదు. మీ కస్టమర్లందరినీ చూసుకున్నారు.
 Nothing purchased in this period.,ఈ కాలంలో ఏమీ కొనలేదు.
 Nothing was built in this period.,ఈ కాలంలో ఏమీ తయారు కాలేదు.
@@ -649,6 +673,7 @@ Quotation,కొటేషన్
 RPM,RPM
 Raise Complaint,ఫిర్యాదు నమోదు చేయి
 Raise a Complaint,ఫిర్యాదు నమోదు చేయండి
+Raise a Warranty Claim,వారంటీ క్లెయిమ్ నమోదు చేయండి
 Raised this period,ఈ కాలంలో వచ్చినవి
 Range too wide,కాల పరిధి చాలా పెద్దది
 Rate,ధర
@@ -672,6 +697,7 @@ Register a Sale,అమ్మకాన్ని నమోదు చేయండ�
 Registered By,రిజిస్టర్ చేసినవారు
 Registered {0} pump(s) and started their warranty.,{0} పంప్(లు) రిజిస్టర్ చేసి వారంటీ మొదలుపెట్టాం.
 "Registered, All Time",మొత్తం రిజిస్టర్ చేసినవి
+Registering is what starts the warranty and produces the certificate in KUMAR's name.,రిజిస్టర్ చేయడమే వారంటీని మొదలుపెడుతుంది మరియు KUMAR పేరుతో సర్టిఫికెట్ తయారు చేస్తుంది.
 Registering...,రిజిస్టర్ అవుతోంది...
 Registration,రిజిస్ట్రేషన్
 Registrations,రిజిస్ట్రేషన్లు
@@ -745,6 +771,8 @@ Scanned {0},{0} స్కాన్ చేయబడింది
 Seal Failure,సీల్ లోపం
 Self-Priming Monobloc,సెల్ఫ్-ప్రైమింగ్ మోనోబ్లాక్
 Selling / Silent,అమ్ముతున్నవారు / మౌనంగా ఉన్నవారు
+Send to KUMAR,KUMAR కు పంపండి
+Sending...,పంపుతోంది...
 Serial,సీరియల్
 Serial Format (regex),సీరియల్ ఫార్మాట్ (regex)
 Serial Genealogy,సీరియల్ వంశవృక్షం
@@ -773,6 +801,7 @@ Service Request,సర్వీస్ రిక్వెస్ట్
 Service SLA,సర్వీస్ SLA
 Service Technician,సర్వీస్ టెక్నీషియన్
 Service Visit,సర్వీస్ సందర్శన
+Service centre,సర్వీస్ సెంటర్
 Service request assigned: {0},సర్వీస్ రిక్వెస్ట్ కేటాయించబడింది: {0}
 Set automatically from the outlet. Change it only if the paperwork really went the other way.,అవుట్‌లెట్ ఆధారంగా ఆటోమేటిక్‌గా పెట్టబడుతుంది. కాగితాలు నిజంగా వేరే విధంగా ఉన్నప్పుడే మార్చండి.
 Set automatically from warranty status; override if needed,వారంటీ స్థితి ఆధారంగా ఆటోమేటిక్‌గా పెట్టబడుతుంది; అవసరమైతే మార్చవచ్చు
@@ -813,11 +842,13 @@ Stage Type,స్టేజ్ రకం
 Stainless Steel,స్టెయిన్‌లెస్ స్టీల్
 Standard,ప్రమాణం
 Start,ప్రారంభం
+Start the warranty and print the customer's certificate.,వారంటీ మొదలుపెట్టి కస్టమర్ సర్టిఫికెట్ ప్రింట్ చేయండి.
 State,రాష్ట్రం
 Static Water Level (ft),నీటి మట్టం (అడుగులు)
 Stators,స్టేటర్లు
 Stators Wound by Day,రోజువారీ వైండ్ చేసిన స్టేటర్లు
 Status,స్థితి
+Still Open,ఇంకా తెరిచి ఉన్నవి
 Still to pay suppliers,సప్లయర్లకు ఇంకా చెల్లించాల్సినది
 Stock Ageing,స్టాక్ వయస్సు
 Stock Balance,స్టాక్ నిల్వ
@@ -864,6 +895,7 @@ The day the END CUSTOMER got the pump - this starts the warranty.,చివర�
 The dealer's invoice ({0}) is dated after the sale ({1}).,డీలర్ ఇన్‌వాయిస్ తేదీ ({0}) అమ్మకం తేదీ ({1}) తర్వాత ఉంది.
 "The dealer's own invoice to the customer, on the dealer's letterhead and GSTIN. We never raise this - we only record it, because it is the customer's proof of purchase when a claim comes in.",డీలర్ తన లెటర్‌హెడ్ మరియు GSTIN మీద కస్టమర్‌కు ఇచ్చిన సొంత ఇన్‌వాయిస్. దీన్ని మనం జారీ చేయము - క్లెయిమ్ వచ్చినప్పుడు కస్టమర్ కొనుగోలుకు ఇదే రుజువు కాబట్టి నమోదు మాత్రమే చేస్తాం.
 The last pumps you registered,మీరు చివరగా రిజిస్టర్ చేసిన పంపులు
+The last pumps you registered. The certificate is what you owe the customer.,మీరు చివరగా రిజిస్టర్ చేసిన పంపులు. సర్టిఫికెట్ కస్టమర్‌కు మీరు ఇవ్వాల్సినది.
 The login this dealer uses. Row-level access is derived from this.,ఈ డీలర్ వాడే లాగిన్. ఏ రికార్డులు కనిపిస్తాయో ఇదే నిర్ణయిస్తుంది.
 Their warranty ends soon - a good moment to offer a service or a new pump,వారి వారంటీ త్వరలో ముగుస్తుంది - సర్వీస్ లేదా కొత్త పంప్ చెప్పడానికి ఇది మంచి సమయం
 Thermoplastic,థర్మోప్లాస్టిక్
@@ -896,6 +928,7 @@ Traceability Gap,ట్రేసబిలిటీ లోటు
 Tripping,ట్రిప్ అవుతోంది
 Turns per Coil,కాయిల్‌కు చుట్లు
 Type,రకం
+Type any serial number and see its warranty status.,ఏ సీరియల్ నంబర్ అయినా టైప్ చేసి దాని వారంటీ స్థితి చూడండి.
 UOM,కొలమానం
 Under Warranty,వారంటీలో ఉంది
 Units,యూనిట్లు
@@ -907,6 +940,7 @@ Units Sold by Day,రోజువారీ అమ్ముడైన యూని
 Units delivered in this period,ఈ కాలంలో డెలివరీ అయిన యూనిట్లు
 "Units per Day, by Channel",మార్గం వారీ రోజువారీ యూనిట్లు
 Unknown model,మోడల్ తెలియదు
+Unknown ticket type,టికెట్ రకం తెలియదు
 Unregistered Stock,రిజిస్టర్ కాని స్టాక్
 Used For,ఎందుకు వాడుతున్నారు
 User,యూజర్
@@ -962,9 +996,12 @@ Wear & Tear,అరుగుదల
 Welcome back,తిరిగి స్వాగతం
 What They Are Used For,వాటిని ఎందుకు వాడుతున్నారు
 What We Bought,మనం కొన్నవి
+What You Sell,మీరు అమ్మేవి
+What is the problem,ఏం సమస్య
 What is wrong,ఏం తప్పు ఉంది
 What the plant builds,ప్లాంట్ ఏం తయారు చేస్తుంది
 "What the technician actually did, what parts went in, and what it cost.","టెక్నీషియన్ నిజంగా ఏం చేశారు, ఏ పార్ట్‌లు వేశారు, ఖర్చు ఎంత అయింది."
+"What was dismantled, what was found, and why it is a manufacturing defect","ఏం విప్పి చూశారు, ఏం కనిపించింది, ఇది తయారీ లోపం ఎందుకు అవుతుంది"
 WhatsApp Enabled,WhatsApp ఆన్
 Where the Pumps Went,పంపులు ఎక్కడికి వెళ్ళాయి
 Who Sold Them,ఎవరు అమ్మారు
@@ -992,13 +1029,20 @@ You Owe KUMAR,మీరు KUMAR కు చెల్లించాల్సి�
 You have not registered a pump yet. Use the blue button above.,మీరు ఇంకా ఏ పంప్‌ను రిజిస్టర్ చేయలేదు. పైన ఉన్న నీలం బటన్ వాడండి.
 Your Invoice Date,మీ ఇన్‌వాయిస్ తేదీ
 Your Invoice No,మీ ఇన్‌వాయిస్ నంబర్
+Your Outlet,మీ అవుట్‌లెట్
+Your branch office,మీ బ్రాంచ్ ఆఫీసు
+"Your branch office, the service centre and head office.","మీ బ్రాంచ్ ఆఫీసు, సర్వీస్ సెంటర్ మరియు ప్రధాన కార్యాలయం."
 Your login is not linked to a dealer record. Ask the branch office to set Portal User on your Dealer.,మీ లాగిన్ ఏ డీలర్ రికార్డుతోనూ అనుసంధానం కాలేదు. మీ డీలర్ రికార్డులో పోర్టల్ యూజర్ పెట్టమని బ్రాంచ్ ఆఫీసును అడగండి.
+Your own branch office handles you. Head office is for anything they cannot settle.,మీ సొంత బ్రాంచ్ ఆఫీసే మీ పని చూస్తుంది. వారు పరిష్కరించలేని విషయాలకు ప్రధాన కార్యాలయం.
+"Your own sales by product family, all time.",ఉత్పత్తి కుటుంబం వారీగా మీ మొత్తం అమ్మకాలు.
 Your recent sales,మీ ఇటీవలి అమ్మకాలు
 against {0} in the 30 days before that,అంతకు ముందు 30 రోజుల్లో {0} తో పోలిస్తే
 catalogue models,కేటలాగ్ మోడల్‌లు
 days,రోజులు
 days left,రోజులు మిగిలాయి
 "e.g. IS 8034, IS 9079, IS 7538","ఉదా. IS 8034, IS 9079, IS 7538"
+"e.g. No water since two days, motor runs but nothing comes up","ఉదా. రెండు రోజుల నుండి నీరు రావడం లేదు, మోటార్ తిరుగుతోంది కానీ నీరు ఎక్కడం లేదు"
+e.g. bearing seized,ఉదా. బేరింగ్ జామ్ అయింది
 ends {0},{0} న ముగుస్తుంది
 from the date you sell it,మీరు అమ్మిన తేదీ నుండి
 group,గ్రూప్
@@ -1029,6 +1073,7 @@ years of manufacturing,సంవత్సరాల తయారీ అనుభ�
 {0} is already the portal user for dealer {1},{0} ఇప్పటికే {1} డీలర్‌కు పోర్టల్ యూజర్‌గా ఉన్నారు
 "{0} is an independent dealer, so the customer holds the DEALER's invoice, not ours. Enter its number.","{0} స్వతంత్ర డీలర్, కాబట్టి కస్టమర్ దగ్గర డీలర్ ఇన్‌వాయిస్ ఉంటుంది, మనది కాదు. దాని నంబర్ ఇవ్వండి."
 "{0} is independent, so the dealer's own invoice number is required","{0} స్వతంత్రం, కాబట్టి డీలర్ సొంత ఇన్‌వాయిస్ నంబర్ తప్పనిసరి"
+"{0} is not registered yet. Register the sale first, then a complaint can be raised against it.","{0} ఇంకా రిజిస్టర్ కాలేదు. ముందు అమ్మకాన్ని రిజిస్టర్ చేయండి, ఆ తర్వాత దాని మీద ఫిర్యాదు చేయవచ్చు."
 {0} is required,{0} తప్పనిసరి
 {0} kg charged,{0} కేజీలు ఛార్జ్ చేయబడ్డాయి
 {0} more than the period before ({1}),గత కాలం కంటే {0} ఎక్కువ ({1})
@@ -1047,4 +1092,5 @@ years of manufacturing,సంవత్సరాల తయారీ అనుభ�
 {0} stators wound,{0} స్టేటర్లు వైండ్ చేయబడ్డాయి
 "{0} units built, {1} registered, {2} with complaints.","{0} యూనిట్లు తయారయ్యాయి, {1} రిజిస్టర్ అయ్యాయి, {2} మీద ఫిర్యాదులు వచ్చాయి."
 {0} units tested,{0} యూనిట్లు టెస్ట్ చేయబడ్డాయి
+"{0} was not sold by your outlet, so you cannot raise a request against it.","{0} మీ అవుట్‌లెట్ అమ్మలేదు, కాబట్టి దాని మీద మీరు రిక్వెస్ట్ పెట్టలేరు."
 {0}d ago,{0} రోజుల క్రితం

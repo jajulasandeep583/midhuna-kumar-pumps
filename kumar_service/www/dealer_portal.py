@@ -96,6 +96,53 @@ def get_context(context):
 	}
 
 	context.performance = _performance(scope, context.dealer)
+
+	# --- everything the dealer can DO from here, so nobody needs the desk ------
+	from kumar_service import portal_api
+
+	context.options = portal_api.portal_options()
+	context.tickets = portal_api.my_tickets(limit=40)
+	context.contacts = portal_api.my_contacts()
+	context.outlet = context.contacts["outlet"]
+
+	# Serials this dealer sold, for the complaint and claim pickers. A dealer
+	# should never have to remember a serial number to raise a complaint.
+	context.my_serials = frappe.get_all(
+		"Pump Registration",
+		filters={"dealer": ["in", scope], "docstatus": 1},
+		fields=["serial_no", "pump_model", "end_customer_name", "end_customer_mobile",
+		        "warranty_expiry_date"],
+		order_by="sale_date desc",
+		limit=300,
+	)
+
+	# Spare parts a claim can be raised against, priced from the item master.
+	from kumar_service.setup.masters import ITEM_GROUP_COMPONENTS
+
+	context.claim_items = frappe.get_all(
+		"Item",
+		filters={"item_group": ITEM_GROUP_COMPONENTS, "disabled": 0},
+		fields=["name", "item_name", "valuation_rate"],
+		order_by="item_name",
+		limit=60,
+	)
+
+	# Which pumps of theirs KUMAR has flagged as coming off warranty - the
+	# dealer's best reason to ring a customer.
+	context.product_families = frappe.db.sql(
+		"""
+		select   c.name as category, count(*) as sold
+		from     `tabPump Registration` r
+		join     `tabPump Model` m on m.name = r.pump_model
+		join     `tabPump Category` c on c.name = m.pump_category
+		where    r.docstatus = 1 and r.dealer in %(scope)s
+		group by c.name
+		order by count(*) desc
+		limit 6
+		""",
+		{"scope": scope},
+		as_dict=True,
+	)
 	return context
 
 
