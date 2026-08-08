@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kumar Service and Traceability VERSION\n"
 "Report-Msgid-Bugs-To: aimidhunatech@gmail.com\n"
-"POT-Creation-Date: 2026-08-08 17:49+0000\n"
-"PO-Revision-Date: 2026-08-08 17:49+0000\n"
+"POT-Creation-Date: 2026-08-08 18:09+0000\n"
+"PO-Revision-Date: 2026-08-08 18:09+0000\n"
 "Last-Translator: aimidhunatech@gmail.com\n"
 "Language-Team: aimidhunatech@gmail.com\n"
 "MIME-Version: 1.0\n"
@@ -21,9 +21,9 @@ msgstr ""
 msgid "1-30 d"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:472
-#: kumar_service/www/dealer_portal.html:544
-#: kumar_service/www/dealer_portal.html:607
+#: kumar_service/www/dealer_portal.html:490
+#: kumar_service/www/dealer_portal.html:562
+#: kumar_service/www/dealer_portal.html:625
 msgid "1. Which pump?"
 msgstr ""
 
@@ -32,27 +32,27 @@ msgstr ""
 msgid "10 digits starting 6-9"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:485
+#: kumar_service/www/dealer_portal.html:503
 msgid "2. The KUMAR invoice"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:586
+#: kumar_service/www/dealer_portal.html:604
 msgid "2. What is happening"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:644
+#: kumar_service/www/dealer_portal.html:662
 msgid "2. Which parts failed"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:493
+#: kumar_service/www/dealer_portal.html:511
 msgid "2. Your bill to the customer"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:669
+#: kumar_service/www/dealer_portal.html:687
 msgid "3. What the technician found"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:504
+#: kumar_service/www/dealer_portal.html:522
 msgid "3. Who bought it"
 msgstr ""
 
@@ -61,7 +61,7 @@ msgstr ""
 msgid "31-60 d"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:517
+#: kumar_service/www/dealer_portal.html:535
 msgid "4. Where it is installed"
 msgstr ""
 
@@ -209,12 +209,20 @@ msgstr ""
 msgid "A complaint against one physical pump. Enter the serial and everything else fills itself."
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:368
+#: kumar_service/www/dealer_portal.html:386
 msgid "A customer has a problem. We tell you at once if the visit is free."
+msgstr ""
+
+#: kumar_service/public/js/dealer_reply.js:66
+msgid "A first response is already recorded on this request."
 msgstr ""
 
 #: kumar_service/migration.py:224
 msgid "A sale date needs a dealer - who sold it?"
+msgstr ""
+
+#: kumar_service/public/js/dealer_reply.js:21
+msgid "A technician has been assigned and will visit within 24 hours."
 msgstr ""
 
 #. Label of the abbr (Data) field in DocType 'Pump Category'
@@ -263,7 +271,7 @@ msgstr ""
 msgid "Active"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:664
+#: kumar_service/www/dealer_portal.html:682
 msgid "Add Part"
 msgstr ""
 
@@ -288,7 +296,7 @@ msgstr ""
 msgid "Agriculture"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:690
+#: kumar_service/www/dealer_portal.html:708
 msgid "All"
 msgstr ""
 
@@ -299,6 +307,10 @@ msgstr ""
 #. Label of the all_within_spec (Check) field in DocType 'Heat Record'
 #: kumar_service/kumar_service/doctype/heat_record/heat_record.json
 msgid "All Elements Within Spec"
+msgstr ""
+
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:45
+msgid "All Open"
 msgstr ""
 
 #. Label of the allow_dealer_backdated_registration_days (Int) field in DocType
@@ -356,7 +368,13 @@ msgstr ""
 msgid "Analysis"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:708
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:46
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:113
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:180
+msgid "Answered"
+msgstr ""
+
+#: kumar_service/www/dealer_portal.html:726
 msgid "Any status"
 msgstr ""
 
@@ -368,8 +386,8 @@ msgstr ""
 #. Label of the approved_amount (Currency) field in DocType 'Kumar Warranty
 #. Claim'
 #: kumar_service/kumar_service/doctype/kumar_warranty_claim/kumar_warranty_claim.json
-#: kumar_service/www/dealer_portal.html:740
-#: kumar_service/www/dealer_portal.html:1252
+#: kumar_service/www/dealer_portal.html:758
+#: kumar_service/www/dealer_portal.html:1350
 msgid "Approved Amount"
 msgstr ""
 
@@ -388,12 +406,20 @@ msgstr ""
 msgid "Approved for Pouring"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:604
+#: kumar_service/public/js/dealer_reply.js:24
+msgid "Approved. A credit note will follow with your next statement."
+msgstr ""
+
+#: kumar_service/www/dealer_portal.html:622
 msgid "Ask KUMAR to settle a failure under warranty. Name the parts and say what the technician found - a claim with evidence is settled faster than one without."
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:373
+#: kumar_service/www/dealer_portal.html:391
 msgid "Ask KUMAR to settle a part, a whole unit or a repair bill."
+msgstr ""
+
+#: kumar_service/www/dealer_portal.html:1250
+msgid "Ask for an update, or tell KUMAR what the customer is saying"
 msgstr ""
 
 #. Option for the 'Status' (Select) field in DocType 'Service Request'
@@ -415,7 +441,7 @@ msgstr ""
 msgid "Attendance Mix"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:285
+#: kumar_service/www/dealer_portal.html:303
 msgid "Authorised Dealer"
 msgstr ""
 
@@ -569,7 +595,7 @@ msgstr ""
 msgid "Billed"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:333
+#: kumar_service/www/dealer_portal.html:351
 msgid "Billed to You, 30 Days"
 msgstr ""
 
@@ -677,7 +703,7 @@ msgstr ""
 msgid "Category Name"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:417
+#: kumar_service/www/dealer_portal.html:435
 msgid "Certificate"
 msgstr ""
 
@@ -695,7 +721,7 @@ msgstr ""
 #. Label of the is_chargeable (Check) field in DocType 'Service Visit'
 #: kumar_service/kumar_service/doctype/service_visit/service_visit.json
 #: kumar_service/kumar_service/page/my_business/my_business.js:224
-#: kumar_service/www/dealer_portal.html:753
+#: kumar_service/www/dealer_portal.html:774
 msgid "Chargeable"
 msgstr ""
 
@@ -708,7 +734,7 @@ msgid "Check Warranty"
 msgstr ""
 
 #: kumar_service/kumar_service/page/my_business/my_business.js:82
-#: kumar_service/www/dealer_portal.html:382
+#: kumar_service/www/dealer_portal.html:400
 msgid "Check a Pump"
 msgstr ""
 
@@ -721,8 +747,8 @@ msgid "Check the file"
 msgstr ""
 
 #: kumar_service/kumar_service/page/historical_import/historical_import.js:137
-#: kumar_service/www/dealer_portal.html:866
-#: kumar_service/www/dealer_portal.html:943
+#: kumar_service/www/dealer_portal.html:895
+#: kumar_service/www/dealer_portal.html:972
 msgid "Checking..."
 msgstr ""
 
@@ -734,7 +760,7 @@ msgstr ""
 msgid "Chemistry within spec - CE {0}"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:649
+#: kumar_service/www/dealer_portal.html:667
 msgid "Choose a part"
 msgstr ""
 
@@ -742,12 +768,12 @@ msgstr ""
 msgid "Choose file and check"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:553
-#: kumar_service/www/dealer_portal.html:612
+#: kumar_service/www/dealer_portal.html:571
+#: kumar_service/www/dealer_portal.html:630
 msgid "Choose from your pumps"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:571
+#: kumar_service/www/dealer_portal.html:589
 msgid "Choose one"
 msgstr ""
 
@@ -760,25 +786,25 @@ msgstr ""
 #: kumar_service/kumar_service/page/dealer_network/dealer_network.js:37
 #: kumar_service/kumar_service/page/dealer_network/dealer_network.js:229
 #: kumar_service/kumar_service/page/dealer_network/dealer_network.js:280
-#: kumar_service/www/dealer_portal.html:810 kumar_service/www/home.html:205
+#: kumar_service/www/dealer_portal.html:839 kumar_service/www/home.html:205
 msgid "City"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:765
+#: kumar_service/www/dealer_portal.html:793
 msgid "Claim"
 msgstr ""
 
 #. Label of the claim_amount (Currency) field in DocType 'Kumar Warranty Claim'
 #: kumar_service/kumar_service/doctype/kumar_warranty_claim/kumar_warranty_claim.json
-#: kumar_service/www/dealer_portal.html:739
-#: kumar_service/www/dealer_portal.html:1130
-#: kumar_service/www/dealer_portal.html:1251
+#: kumar_service/www/dealer_portal.html:757
+#: kumar_service/www/dealer_portal.html:1159
+#: kumar_service/www/dealer_portal.html:1349
 msgid "Claim Amount"
 msgstr ""
 
 #. Label of the claim_date (Date) field in DocType 'Kumar Warranty Claim'
 #: kumar_service/kumar_service/doctype/kumar_warranty_claim/kumar_warranty_claim.json
-#: kumar_service/www/dealer_portal.html:1250
+#: kumar_service/www/dealer_portal.html:1348
 msgid "Claim Date"
 msgstr ""
 
@@ -789,13 +815,13 @@ msgstr ""
 
 #. Label of the claim_type (Select) field in DocType 'Kumar Warranty Claim'
 #: kumar_service/kumar_service/doctype/kumar_warranty_claim/kumar_warranty_claim.json
-#: kumar_service/www/dealer_portal.html:628
-#: kumar_service/www/dealer_portal.html:1249
+#: kumar_service/www/dealer_portal.html:646
+#: kumar_service/www/dealer_portal.html:1347
 msgid "Claim Type"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:372
-#: kumar_service/www/dealer_portal.html:762
+#: kumar_service/www/dealer_portal.html:390
+#: kumar_service/www/dealer_portal.html:790
 msgid "Claim Warranty"
 msgstr ""
 
@@ -810,7 +836,7 @@ msgstr ""
 #. Label of the sb_parts (Section Break) field in DocType 'Kumar Warranty
 #. Claim'
 #: kumar_service/kumar_service/doctype/kumar_warranty_claim/kumar_warranty_claim.json
-#: kumar_service/www/dealer_portal.html:1261
+#: kumar_service/www/dealer_portal.html:1359
 msgid "Claimed Parts"
 msgstr ""
 
@@ -829,8 +855,12 @@ msgstr ""
 msgid "Clear"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:713
+#: kumar_service/www/dealer_portal.html:731
 msgid "Clear filters"
+msgstr ""
+
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:147
+msgid "Click a dealer to see only their tickets."
 msgstr ""
 
 #. Option for the 'Status' (Select) field in DocType 'Service Request'
@@ -849,8 +879,13 @@ msgstr ""
 msgid "Commercial"
 msgstr ""
 
+#: kumar_service/public/js/dealer_reply.js:42
+msgid "Common replies - click to use one, then edit it."
+msgstr ""
+
 #. Label of the sb_complaint (Section Break) field in DocType 'Service Request'
 #: kumar_service/kumar_service/doctype/service_request/service_request.json
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:188
 #: kumar_service/kumar_service/page/my_business/my_business.js:216
 #: kumar_service/portal_api.py:273 kumar_service/public/js/kumar_common.js:59
 msgid "Complaint"
@@ -858,7 +893,7 @@ msgstr ""
 
 #. Label of the complaint_description (Text) field in DocType 'Service Request'
 #: kumar_service/kumar_service/doctype/service_request/service_request.json
-#: kumar_service/www/dealer_portal.html:1225
+#: kumar_service/www/dealer_portal.html:1323
 msgid "Complaint Description"
 msgstr ""
 
@@ -872,7 +907,7 @@ msgstr ""
 
 #: kumar_service/kumar_service/page/dealer_network/dealer_network.js:47
 #: kumar_service/kumar_service/page/dealer_network/dealer_network.js:355
-#: kumar_service/www/dealer_portal.html:692
+#: kumar_service/www/dealer_portal.html:710
 msgid "Complaints"
 msgstr ""
 
@@ -898,9 +933,9 @@ msgstr ""
 msgid "Contact"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:353
-#: kumar_service/www/dealer_portal.html:387
-#: kumar_service/www/dealer_portal.html:781
+#: kumar_service/www/dealer_portal.html:371
+#: kumar_service/www/dealer_portal.html:405
+#: kumar_service/www/dealer_portal.html:810
 msgid "Contact KUMAR"
 msgstr ""
 
@@ -911,6 +946,10 @@ msgstr ""
 
 #: kumar_service/www/home.html:186
 msgid "Continuous R &amp; D"
+msgstr ""
+
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:223
+msgid "Conversation ({0})"
 msgstr ""
 
 #. Option for the 'Rotor Type' (Select) field in DocType 'Pump Model'
@@ -924,6 +963,7 @@ msgstr ""
 msgid "Copper Wire Batch"
 msgstr ""
 
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:89
 #: kumar_service/public/js/kumar_dashboard.js:361
 msgid "Could not load this screen. You may not have permission for it."
 msgstr ""
@@ -986,8 +1026,8 @@ msgstr ""
 #: kumar_service/kumar_service/workspace/management/management.json
 #: kumar_service/kumar_service/workspace/masters/masters.json
 #: kumar_service/kumar_service/workspace/production/production.json
-#: kumar_service/www/dealer_portal.html:416
-#: kumar_service/www/dealer_portal.html:445
+#: kumar_service/www/dealer_portal.html:434
+#: kumar_service/www/dealer_portal.html:463
 msgid "Customer"
 msgstr ""
 
@@ -998,7 +1038,7 @@ msgstr ""
 
 #. Label of the end_customer_name (Data) field in DocType 'Pump Registration'
 #: kumar_service/kumar_service/doctype/pump_registration/pump_registration.json
-#: kumar_service/www/dealer_portal.html:506
+#: kumar_service/www/dealer_portal.html:524
 msgid "Customer Name"
 msgstr ""
 
@@ -1034,8 +1074,8 @@ msgstr ""
 msgid "Date"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:489
-#: kumar_service/www/dealer_portal.html:499
+#: kumar_service/www/dealer_portal.html:507
+#: kumar_service/www/dealer_portal.html:517
 msgid "Date Sold"
 msgstr ""
 
@@ -1071,6 +1111,10 @@ msgstr ""
 #: kumar_service/kumar_service/doctype/service_request/service_request.json
 #: kumar_service/kumar_service/doctype/service_technician/service_technician.json
 #: kumar_service/kumar_service/doctype/service_visit/service_visit.json
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:29
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:150
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:214
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:336
 #: kumar_service/kumar_service/page/dealer_network/dealer_network.js:34
 #: kumar_service/kumar_service/page/dealer_network/dealer_network.js:228
 #: kumar_service/kumar_service/page/dealer_network/dealer_network.js:261
@@ -1080,13 +1124,20 @@ msgstr ""
 #: kumar_service/kumar_service/page/sales_analytics/sales_analytics.js:240
 #: kumar_service/kumar_service/workspace/management/management.json
 #: kumar_service/kumar_service/workspace/masters/masters.json
+#: kumar_service/portal_api.py:522 kumar_service/public/js/dealer_reply.js:111
 msgid "Dealer"
 msgstr ""
 
 #. Label of the dealer_code (Data) field in DocType 'Dealer'
 #: kumar_service/kumar_service/doctype/dealer/dealer.json
-#: kumar_service/www/dealer_portal.html:809
+#: kumar_service/www/dealer_portal.html:838
 msgid "Dealer Code"
+msgstr ""
+
+#. Label of a shortcut in the Service Desk Workspace
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:15
+#: kumar_service/kumar_service/workspace/service_desk/service_desk.json
+msgid "Dealer Conversations"
 msgstr ""
 
 #. Label of a Desktop Icon
@@ -1104,7 +1155,7 @@ msgstr ""
 
 #. Label of the dealer_name (Data) field in DocType 'Dealer'
 #: kumar_service/kumar_service/doctype/dealer/dealer.json
-#: kumar_service/www/dealer_portal.html:808
+#: kumar_service/www/dealer_portal.html:837
 msgid "Dealer Name"
 msgstr ""
 
@@ -1123,7 +1174,7 @@ msgstr ""
 #. Option for the 'Source' (Select) field in DocType 'Pump Registration'
 #: kumar_service/kumar_service/doctype/pump_registration/pump_registration.json
 #: kumar_service/www/dealer_portal.html:3
-#: kumar_service/www/dealer_portal.html:276
+#: kumar_service/www/dealer_portal.html:294
 msgid "Dealer Portal"
 msgstr ""
 
@@ -1137,6 +1188,10 @@ msgstr ""
 #: kumar_service/kumar_service/workspace/service_desk/service_desk.json
 #: kumar_service/kumar_service/workspace/warranty/warranty.json
 msgid "Dealer Requests & Claims"
+msgstr ""
+
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:70
+msgid "Dealer Requests & Claims report"
 msgstr ""
 
 #. Label of a shortcut in the Masters Workspace
@@ -1168,7 +1223,7 @@ msgid "Dealer {0} does not exist"
 msgstr ""
 
 #: kumar_service/kumar_service/page/dealer_network/dealer_network.js:275
-#: kumar_service/www/dealer_portal.html:813
+#: kumar_service/www/dealer_portal.html:842
 msgid "Dealer's"
 msgstr ""
 
@@ -1215,8 +1270,8 @@ msgstr ""
 
 #. Label of the defect_observed (Small Text) field in DocType 'Claim Part Row'
 #: kumar_service/kumar_service/doctype/claim_part_row/claim_part_row.json
-#: kumar_service/www/dealer_portal.html:660
-#: kumar_service/www/dealer_portal.html:1078
+#: kumar_service/www/dealer_portal.html:678
+#: kumar_service/www/dealer_portal.html:1107
 msgid "Defect Observed"
 msgstr ""
 
@@ -1261,7 +1316,7 @@ msgstr ""
 msgid "Department"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:588
+#: kumar_service/www/dealer_portal.html:606
 msgid "Describe the problem in the customer's own words"
 msgstr ""
 
@@ -1284,8 +1339,8 @@ msgstr ""
 msgid "Desk"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:759
-#: kumar_service/www/dealer_portal.html:1209
+#: kumar_service/www/dealer_portal.html:780
+#: kumar_service/www/dealer_portal.html:1307
 msgid "Details"
 msgstr ""
 
@@ -1325,7 +1380,7 @@ msgstr ""
 
 #. Label of the district (Data) field in DocType 'Pump Registration'
 #: kumar_service/kumar_service/doctype/pump_registration/pump_registration.json
-#: kumar_service/www/dealer_portal.html:521
+#: kumar_service/www/dealer_portal.html:539
 msgid "District"
 msgstr ""
 
@@ -1455,11 +1510,11 @@ msgstr ""
 msgid "Enter the spectrometer readings before approving this heat for pouring"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:378
+#: kumar_service/www/dealer_portal.html:396
 msgid "Every complaint and claim you have with KUMAR, and where it stands."
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:687
+#: kumar_service/www/dealer_portal.html:705
 msgid "Every complaint and warranty claim you have with KUMAR, newest first, and exactly where each one stands."
 msgstr ""
 
@@ -1480,13 +1535,17 @@ msgstr ""
 msgid "Every pump we build carries its own history - the melt its casing came from, the winding lot in its stator, the test bench reading before it left, and the warranty that started the day a dealer sold it. One serial number answers all of it."
 msgstr ""
 
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:48
+msgid "Everything"
+msgstr ""
+
 #. Label of the sb_evidence (Section Break) field in DocType 'Kumar Warranty
 #. Claim'
 #: kumar_service/kumar_service/doctype/kumar_warranty_claim/kumar_warranty_claim.json
 msgid "Evidence"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:446
+#: kumar_service/www/dealer_portal.html:464
 msgid "Expires"
 msgstr ""
 
@@ -1571,7 +1630,7 @@ msgstr ""
 msgid "Fifty years of upgrading the shop floor"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:478
+#: kumar_service/www/dealer_portal.html:496
 msgid "Find"
 msgstr ""
 
@@ -1586,7 +1645,7 @@ msgstr ""
 
 #. Label of the first_response_on (Datetime) field in DocType 'Service Request'
 #: kumar_service/kumar_service/doctype/service_request/service_request.json
-#: kumar_service/www/dealer_portal.html:1229
+#: kumar_service/www/dealer_portal.html:1327
 msgid "First Response"
 msgstr ""
 
@@ -1613,7 +1672,7 @@ msgid "Foundry Operator"
 msgstr ""
 
 #: kumar_service/kumar_service/page/my_business/my_business.js:224
-#: kumar_service/www/dealer_portal.html:753
+#: kumar_service/www/dealer_portal.html:774
 msgid "Free (in warranty)"
 msgstr ""
 
@@ -1649,7 +1708,7 @@ msgstr ""
 
 #. Label of the gstin (Data) field in DocType 'Dealer'
 #: kumar_service/kumar_service/doctype/dealer/dealer.json
-#: kumar_service/www/dealer_portal.html:811
+#: kumar_service/www/dealer_portal.html:840
 msgid "GSTIN"
 msgstr ""
 
@@ -1752,7 +1811,7 @@ msgstr ""
 msgid "Head Min (m)"
 msgstr ""
 
-#: kumar_service/portal_api.py:457
+#: kumar_service/portal_api.py:644
 msgid "Head office"
 msgstr ""
 
@@ -1792,7 +1851,7 @@ msgstr ""
 #. Label of the heat_no (Link) field in DocType 'Kumar Warranty Claim'
 #: kumar_service/kumar_service/doctype/heat_record/heat_record.json
 #: kumar_service/kumar_service/doctype/kumar_warranty_claim/kumar_warranty_claim.json
-#: kumar_service/www/dealer_portal.html:1254
+#: kumar_service/www/dealer_portal.html:1352
 msgid "Heat No"
 msgstr ""
 
@@ -1835,7 +1894,7 @@ msgstr ""
 msgid "HiPot Voltage (kV)"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:1219
+#: kumar_service/www/dealer_portal.html:1317
 msgid "Hide"
 msgstr ""
 
@@ -1853,7 +1912,7 @@ msgstr ""
 msgid "Historical Serial Import"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:342
+#: kumar_service/www/dealer_portal.html:360
 msgid "Home"
 msgstr ""
 
@@ -1949,6 +2008,10 @@ msgstr ""
 msgid "In Progress"
 msgstr ""
 
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:206
+msgid "In warranty"
+msgstr ""
+
 #: kumar_service/kumar_service/doctype/pump_test_certificate/pump_test_certificate.py:30
 msgid "Inconsistent Result"
 msgstr ""
@@ -2003,7 +2066,7 @@ msgstr ""
 #: kumar_service/kumar_service/page/purchase_analytics/purchase_analytics.js:287
 #: kumar_service/kumar_service/page/sales_analytics/sales_analytics.js:23
 #: kumar_service/kumar_service/page/sales_analytics/sales_analytics.js:227
-#: kumar_service/www/dealer_portal.html:487
+#: kumar_service/www/dealer_portal.html:505
 msgid "Invoice"
 msgstr ""
 
@@ -2107,7 +2170,7 @@ msgstr ""
 msgid "Journal Entry"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:283
+#: kumar_service/www/dealer_portal.html:301
 msgid "KUMAR Branch"
 msgstr ""
 
@@ -2144,7 +2207,11 @@ msgstr ""
 msgid "KUMAR brand since 1973"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:966
+#: kumar_service/www/dealer_portal.html:766
+msgid "KUMAR replied"
+msgstr ""
+
+#: kumar_service/www/dealer_portal.html:995
 msgid "KUMAR warranty on this pump"
 msgstr ""
 
@@ -2218,6 +2285,11 @@ msgstr ""
 msgid "Last Sale"
 msgstr ""
 
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:151
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:205
+msgid "Late"
+msgstr ""
+
 #: kumar_service/kumar_service/page/people_payroll/people_payroll.js:113
 msgid "Latest payroll run"
 msgstr ""
@@ -2250,18 +2322,21 @@ msgstr ""
 msgid "Load pumps that were built and sold before this system went live. Every row becomes a Serial No; every row that carries a sale date also becomes a submitted registration, with the warranty already running."
 msgstr ""
 
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:75
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:245
 #: kumar_service/public/js/kumar_dashboard.js:351
-#: kumar_service/www/dealer_portal.html:1212
+#: kumar_service/www/dealer_portal.html:1287
+#: kumar_service/www/dealer_portal.html:1310
 msgid "Loading..."
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:676
-#: kumar_service/www/dealer_portal.html:1132
-#: kumar_service/www/dealer_portal.html:1136
+#: kumar_service/www/dealer_portal.html:694
+#: kumar_service/www/dealer_portal.html:1161
+#: kumar_service/www/dealer_portal.html:1165
 msgid "Lodge Claim with KUMAR"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:541
+#: kumar_service/www/dealer_portal.html:559
 msgid "Log what the customer is reporting. We answer immediately whether the visit is free, and the response clock starts the moment you submit."
 msgstr ""
 
@@ -2383,6 +2458,18 @@ msgstr ""
 msgid "Medium"
 msgstr ""
 
+#: kumar_service/www/dealer_portal.html:785
+msgid "Message KUMAR"
+msgstr ""
+
+#: kumar_service/public/js/dealer_reply.js:55
+msgid "Message to the dealer"
+msgstr ""
+
+#: kumar_service/www/dealer_portal.html:783
+msgid "Messages ({0})"
+msgstr ""
+
 #. Option for the 'Element' (Select) field in DocType 'Heat Spectro Reading'
 #: kumar_service/kumar_service/doctype/heat_spectro_reading/heat_spectro_reading.json
 msgid "Mg"
@@ -2408,8 +2495,8 @@ msgstr ""
 #: kumar_service/kumar_service/page/dealer_network/dealer_network.js:40
 #: kumar_service/kumar_service/page/dealer_network/dealer_network.js:233
 #: kumar_service/kumar_service/page/pump_lookup/pump_lookup.js:132
-#: kumar_service/www/dealer_portal.html:446
-#: kumar_service/www/dealer_portal.html:508
+#: kumar_service/www/dealer_portal.html:464
+#: kumar_service/www/dealer_portal.html:526
 msgid "Mobile"
 msgstr ""
 
@@ -2493,10 +2580,10 @@ msgstr ""
 msgid "My Claims"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:350
-#: kumar_service/www/dealer_portal.html:377
-#: kumar_service/www/dealer_portal.html:685
-#: kumar_service/www/dealer_portal.html:1051
+#: kumar_service/www/dealer_portal.html:368
+#: kumar_service/www/dealer_portal.html:395
+#: kumar_service/www/dealer_portal.html:703
+#: kumar_service/www/dealer_portal.html:1080
 msgid "My Tickets"
 msgstr ""
 
@@ -2548,6 +2635,10 @@ msgstr ""
 msgid "New Service Request"
 msgstr ""
 
+#: kumar_service/portal_api.py:557
+msgid "New message on {0}"
+msgstr ""
+
 #: kumar_service/kumar_service/page/historical_import/historical_import.js:151
 msgid "New registrations"
 msgstr ""
@@ -2561,12 +2652,16 @@ msgstr ""
 msgid "Ni"
 msgstr ""
 
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:47
+msgid "No Conversation Yet"
+msgstr ""
+
 #. Option for the 'Category' (Select) field in DocType 'Service Request'
 #: kumar_service/kumar_service/doctype/service_request/service_request.json
 msgid "No Discharge"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:974
+#: kumar_service/www/dealer_portal.html:1003
 msgid "No KUMAR invoice found for this pump - raise it first."
 msgstr ""
 
@@ -2596,6 +2691,10 @@ msgstr ""
 msgid "No invoices match."
 msgstr ""
 
+#: kumar_service/www/dealer_portal.html:1244
+msgid "No messages yet. Write below and KUMAR will see it."
+msgstr ""
+
 #: kumar_service/kumar_service/page/people_payroll/people_payroll.js:199
 #: kumar_service/kumar_service/page/people_payroll/people_payroll.js:238
 msgid "No payroll has been run yet."
@@ -2611,6 +2710,14 @@ msgstr ""
 
 #: kumar_service/kumar_service/page/pump_lookup/pump_lookup.js:60
 msgid "No pump with serial {0}. Check the nameplate."
+msgstr ""
+
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:114
+msgid "No reply either way"
+msgstr ""
+
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:181
+msgid "No reply yet"
 msgstr ""
 
 #: kumar_service/kumar_service/page/management_dashboard/management_dashboard.js:208
@@ -2668,17 +2775,23 @@ msgid "Not found"
 msgstr ""
 
 #: kumar_service/api.py:349 kumar_service/dashboard.py:54
-#: kumar_service/portal_api.py:207 kumar_service/portal_api.py:348
-#: kumar_service/portal_api.py:386 kumar_service/www/dealer_portal.html:1273
+#: kumar_service/portal_api.py:207 kumar_service/portal_api.py:376
+#: kumar_service/portal_api.py:415 kumar_service/portal_api.py:482
+#: kumar_service/staff_api.py:35 kumar_service/www/dealer_portal.html:1296
+#: kumar_service/www/dealer_portal.html:1371
 msgid "Not permitted"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:637
+#: kumar_service/www/dealer_portal.html:655
 msgid "Not sure"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:460
+#: kumar_service/www/dealer_portal.html:478
 msgid "Nothing expiring this month."
+msgstr ""
+
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:162
+msgid "Nothing here. Every dealer has been answered."
 msgstr ""
 
 #: kumar_service/public/js/kumar_dashboard.js:222
@@ -2686,12 +2799,16 @@ msgid "Nothing in this period."
 msgstr ""
 
 #: kumar_service/kumar_service/page/my_business/my_business.js:214
-#: kumar_service/www/dealer_portal.html:773
+#: kumar_service/www/dealer_portal.html:802
 msgid "Nothing open. All your customers are looked after."
 msgstr ""
 
 #: kumar_service/kumar_service/page/purchase_analytics/purchase_analytics.js:226
 msgid "Nothing purchased in this period."
+msgstr ""
+
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:327
+msgid "Nothing said yet."
 msgstr ""
 
 #: kumar_service/kumar_service/page/production_daily/production_daily.js:194
@@ -2705,6 +2822,10 @@ msgstr ""
 #. Option for the 'Family Code' (Select) field in DocType 'Pump Model'
 #: kumar_service/kumar_service/doctype/pump_model/pump_model.json
 msgid "OW"
+msgstr ""
+
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:115
+msgid "On this list"
 msgstr ""
 
 #. Option for the 'Visit Type' (Select) field in DocType 'Service Visit'
@@ -2756,7 +2877,7 @@ msgstr ""
 
 #: kumar_service/kumar_service/page/management_dashboard/management_dashboard.js:116
 #: kumar_service/kumar_service/page/pump_lookup/pump_lookup.js:134
-#: kumar_service/www/dealer_portal.html:335
+#: kumar_service/www/dealer_portal.html:353
 msgid "Open Complaints"
 msgstr ""
 
@@ -2789,6 +2910,10 @@ msgstr ""
 msgid "Open Serial"
 msgstr ""
 
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:68
+msgid "Open Service Request List"
+msgstr ""
+
 #: kumar_service/kumar_service/page/production_daily/production_daily.js:44
 msgid "Open Work Order List"
 msgstr ""
@@ -2815,8 +2940,8 @@ msgstr ""
 msgid "Operator"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:563
-#: kumar_service/www/dealer_portal.html:622
+#: kumar_service/www/dealer_portal.html:581
+#: kumar_service/www/dealer_portal.html:640
 msgid "Or type / scan the serial"
 msgstr ""
 
@@ -2867,12 +2992,12 @@ msgid "Our invoice. On a direct sale this IS the customer's invoice; through a d
 msgstr ""
 
 #: kumar_service/kumar_service/page/dealer_network/dealer_network.js:274
-#: kumar_service/www/dealer_portal.html:813
+#: kumar_service/www/dealer_portal.html:842
 msgid "Ours"
 msgstr ""
 
 #: kumar_service/public/js/service_request.js:69
-#: kumar_service/www/dealer_portal.html:890
+#: kumar_service/www/dealer_portal.html:919
 msgid "Out of warranty - chargeable"
 msgstr ""
 
@@ -2960,8 +3085,8 @@ msgstr ""
 msgid "Parent Dealer"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:647
-#: kumar_service/www/dealer_portal.html:1077
+#: kumar_service/www/dealer_portal.html:665
+#: kumar_service/www/dealer_portal.html:1106
 msgid "Part"
 msgstr ""
 
@@ -2996,6 +3121,10 @@ msgstr ""
 
 #: kumar_service/kumar_service/doctype/winding_batch_record/winding_batch_record.py:16
 msgid "Passed + rejected ({0}) cannot exceed the quantity produced ({1})"
+msgstr ""
+
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:112
+msgid "Past the promised date"
 msgstr ""
 
 #: kumar_service/kumar_service/page/purchase_analytics/purchase_analytics.js:97
@@ -3091,8 +3220,8 @@ msgstr ""
 msgid "Photo 2"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:551
-#: kumar_service/www/dealer_portal.html:610
+#: kumar_service/www/dealer_portal.html:569
+#: kumar_service/www/dealer_portal.html:628
 msgid "Pick the pump you sold"
 msgstr ""
 
@@ -3101,7 +3230,7 @@ msgstr ""
 #: kumar_service/kumar_service/doctype/dealer/dealer.json
 #: kumar_service/kumar_service/doctype/pump_registration/pump_registration.json
 #: kumar_service/kumar_service/page/pump_lookup/pump_lookup.js:133
-#: kumar_service/www/dealer_portal.html:523
+#: kumar_service/www/dealer_portal.html:541
 msgid "Pincode"
 msgstr ""
 
@@ -3125,12 +3254,12 @@ msgstr ""
 msgid "Portal User"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:428
+#: kumar_service/www/dealer_portal.html:446
 msgid "Print"
 msgstr ""
 
 #: kumar_service/public/js/pump_test_certificate.js:6
-#: kumar_service/www/dealer_portal.html:1014
+#: kumar_service/www/dealer_portal.html:1043
 msgid "Print Certificate"
 msgstr ""
 
@@ -3144,8 +3273,8 @@ msgstr ""
 
 #. Label of the priority (Select) field in DocType 'Service Request'
 #: kumar_service/kumar_service/doctype/service_request/service_request.json
-#: kumar_service/www/dealer_portal.html:576
-#: kumar_service/www/dealer_portal.html:1226
+#: kumar_service/www/dealer_portal.html:594
+#: kumar_service/www/dealer_portal.html:1324
 msgid "Priority"
 msgstr ""
 
@@ -3281,7 +3410,7 @@ msgstr ""
 msgid "Pumps Sold"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:332
+#: kumar_service/www/dealer_portal.html:350
 msgid "Pumps Still in Warranty"
 msgstr ""
 
@@ -3293,7 +3422,7 @@ msgstr ""
 msgid "Pumps sold each week"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:306
+#: kumar_service/www/dealer_portal.html:324
 msgid "Pumps sold in the last 30 days"
 msgstr ""
 
@@ -3378,8 +3507,8 @@ msgstr ""
 #. Label of the qty (Float) field in DocType 'Service Part Used'
 #: kumar_service/kumar_service/doctype/claim_part_row/claim_part_row.json
 #: kumar_service/kumar_service/doctype/service_part_used/service_part_used.json
-#: kumar_service/www/dealer_portal.html:656
-#: kumar_service/www/dealer_portal.html:1077
+#: kumar_service/www/dealer_portal.html:674
+#: kumar_service/www/dealer_portal.html:1106
 msgid "Qty"
 msgstr ""
 
@@ -3439,13 +3568,13 @@ msgid "Raise Complaint"
 msgstr ""
 
 #: kumar_service/kumar_service/page/my_business/my_business.js:79
-#: kumar_service/www/dealer_portal.html:346
-#: kumar_service/www/dealer_portal.html:367
-#: kumar_service/www/dealer_portal.html:539
+#: kumar_service/www/dealer_portal.html:364
+#: kumar_service/www/dealer_portal.html:385
+#: kumar_service/www/dealer_portal.html:557
 msgid "Raise a Complaint"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:602
+#: kumar_service/www/dealer_portal.html:620
 msgid "Raise a Warranty Claim"
 msgstr ""
 
@@ -3494,14 +3623,20 @@ msgstr ""
 msgid "Received, not invoiced"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:410
+#: kumar_service/www/dealer_portal.html:428
 msgid "Recent Registrations"
+msgstr ""
+
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:268
+#: kumar_service/public/js/dealer_reply.js:62
+msgid "Record this as the first response for the SLA"
 msgstr ""
 
 #: kumar_service/kumar_service/doctype/winding_batch_record/winding_batch_record.py:24
 msgid "Record why {0} stators were rejected"
 msgstr ""
 
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:66
 #: kumar_service/kumar_service/page/dealer_network/dealer_network.js:22
 #: kumar_service/kumar_service/page/management_dashboard/management_dashboard.js:20
 #: kumar_service/kumar_service/page/people_payroll/people_payroll.js:17
@@ -3512,8 +3647,8 @@ msgstr ""
 msgid "Refresh"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:528
-#: kumar_service/www/dealer_portal.html:1019
+#: kumar_service/www/dealer_portal.html:546
+#: kumar_service/www/dealer_portal.html:1048
 msgid "Register & Get Warranty Certificate"
 msgstr ""
 
@@ -3531,13 +3666,13 @@ msgstr ""
 msgid "Register a Pump"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:467
+#: kumar_service/www/dealer_portal.html:485
 msgid "Register a Pump You Have Sold"
 msgstr ""
 
 #: kumar_service/kumar_service/page/my_business/my_business.js:76
-#: kumar_service/www/dealer_portal.html:344
 #: kumar_service/www/dealer_portal.html:362
+#: kumar_service/www/dealer_portal.html:380
 msgid "Register a Sale"
 msgstr ""
 
@@ -3550,15 +3685,15 @@ msgstr ""
 msgid "Registered {0} pump(s) and started their warranty."
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:331
+#: kumar_service/www/dealer_portal.html:349
 msgid "Registered, All Time"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:469
+#: kumar_service/www/dealer_portal.html:487
 msgid "Registering is what starts the warranty and produces the certificate in KUMAR's name."
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:996
+#: kumar_service/www/dealer_portal.html:1025
 msgid "Registering..."
 msgstr ""
 
@@ -3583,7 +3718,7 @@ msgstr ""
 #: kumar_service/kumar_service/doctype/heat_record/heat_record.json
 #: kumar_service/kumar_service/doctype/kumar_warranty_claim/kumar_warranty_claim.json
 #: kumar_service/kumar_service/doctype/pump_test_certificate/pump_test_certificate.json
-#: kumar_service/www/dealer_portal.html:1257
+#: kumar_service/www/dealer_portal.html:1355
 msgid "Remarks"
 msgstr ""
 
@@ -3611,13 +3746,30 @@ msgstr ""
 msgid "Repeat failure: this pump has been reported more than once recently."
 msgstr ""
 
+#: kumar_service/staff_api.py:297
+msgid "Reply sent to {0}."
+msgstr ""
+
+#: kumar_service/staff_api.py:295
+msgid "Reply sent to {0}. First response recorded against the SLA."
+msgstr ""
+
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:225
+#: kumar_service/public/js/dealer_reply.js:111
+msgid "Reply to Dealer"
+msgstr ""
+
+#: kumar_service/public/js/dealer_reply.js:35
+msgid "Reply to {0}"
+msgstr ""
+
 #: kumar_service/public/js/kumar_common.js:59
 msgid "Reported"
 msgstr ""
 
 #. Label of the reported_on (Datetime) field in DocType 'Service Request'
 #: kumar_service/kumar_service/doctype/service_request/service_request.json
-#: kumar_service/www/dealer_portal.html:1227
+#: kumar_service/www/dealer_portal.html:1325
 msgid "Reported On"
 msgstr ""
 
@@ -3645,7 +3797,7 @@ msgstr ""
 
 #. Label of the resolution_due_on (Datetime) field in DocType 'Service Request'
 #: kumar_service/kumar_service/doctype/service_request/service_request.json
-#: kumar_service/www/dealer_portal.html:1231
+#: kumar_service/www/dealer_portal.html:1329
 msgid "Resolution Due"
 msgstr ""
 
@@ -3657,7 +3809,7 @@ msgstr ""
 
 #. Label of the resolution_summary (Text) field in DocType 'Service Request'
 #: kumar_service/kumar_service/doctype/service_request/service_request.json
-#: kumar_service/www/dealer_portal.html:1236
+#: kumar_service/www/dealer_portal.html:1334
 msgid "Resolution Summary"
 msgstr ""
 
@@ -3678,7 +3830,7 @@ msgstr ""
 
 #. Label of the response_due_on (Datetime) field in DocType 'Service Request'
 #: kumar_service/kumar_service/doctype/service_request/service_request.json
-#: kumar_service/www/dealer_portal.html:1228
+#: kumar_service/www/dealer_portal.html:1326
 msgid "Response Due"
 msgstr ""
 
@@ -3729,9 +3881,9 @@ msgstr ""
 #: kumar_service/kumar_service/doctype/kumar_warranty_claim/kumar_warranty_claim.json
 #: kumar_service/kumar_service/doctype/service_request/service_request.json
 #: kumar_service/public/js/kumar_common.js:60
-#: kumar_service/www/dealer_portal.html:634
-#: kumar_service/www/dealer_portal.html:1235
-#: kumar_service/www/dealer_portal.html:1253
+#: kumar_service/www/dealer_portal.html:652
+#: kumar_service/www/dealer_portal.html:1333
+#: kumar_service/www/dealer_portal.html:1351
 msgid "Root Cause"
 msgstr ""
 
@@ -3786,7 +3938,7 @@ msgstr ""
 
 #. Label of the sla_status (Select) field in DocType 'Service Request'
 #: kumar_service/kumar_service/doctype/service_request/service_request.json
-#: kumar_service/www/dealer_portal.html:1232
+#: kumar_service/www/dealer_portal.html:1330
 msgid "SLA Status"
 msgstr ""
 
@@ -3930,7 +4082,8 @@ msgstr ""
 msgid "Seal Failure"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:701
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:58
+#: kumar_service/www/dealer_portal.html:719
 msgid "Search"
 msgstr ""
 
@@ -3938,20 +4091,39 @@ msgstr ""
 msgid "Selling / Silent"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:593
-#: kumar_service/www/dealer_portal.html:1055
-#: kumar_service/www/dealer_portal.html:1059
+#: kumar_service/www/dealer_portal.html:1252
+#: kumar_service/www/dealer_portal.html:1272
+msgid "Send"
+msgstr ""
+
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:270
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:317
+#: kumar_service/public/js/dealer_reply.js:70
+#: kumar_service/public/js/dealer_reply.js:92
+msgid "Send to Dealer"
+msgstr ""
+
+#: kumar_service/www/dealer_portal.html:611
+#: kumar_service/www/dealer_portal.html:1084
+#: kumar_service/www/dealer_portal.html:1088
 msgid "Send to KUMAR"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:1036
-#: kumar_service/www/dealer_portal.html:1110
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:299
+#: kumar_service/public/js/dealer_reply.js:72
+#: kumar_service/www/dealer_portal.html:1065
+#: kumar_service/www/dealer_portal.html:1139
+#: kumar_service/www/dealer_portal.html:1261
 msgid "Sending..."
 msgstr ""
 
+#: kumar_service/portal_api.py:605
+msgid "Sent to KUMAR."
+msgstr ""
+
 #: kumar_service/public/js/service_request.js:84
-#: kumar_service/www/dealer_portal.html:416
-#: kumar_service/www/dealer_portal.html:445
+#: kumar_service/www/dealer_portal.html:434
+#: kumar_service/www/dealer_portal.html:463
 msgid "Serial"
 msgstr ""
 
@@ -3992,7 +4164,7 @@ msgstr ""
 msgid "Serial No Ledger"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:475
+#: kumar_service/www/dealer_portal.html:493
 #: kumar_service/www/warranty_check.html:74
 msgid "Serial Number"
 msgstr ""
@@ -4033,7 +4205,7 @@ msgstr ""
 msgid "Serial {0} is not a KUMAR pump we have any record of."
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:703
+#: kumar_service/www/dealer_portal.html:721
 msgid "Serial, customer, mobile or ticket number"
 msgstr ""
 
@@ -4069,7 +4241,7 @@ msgstr ""
 #. Label of the service_centre (Link) field in DocType 'Service Request'
 #: kumar_service/kumar_service/doctype/dealer/dealer.json
 #: kumar_service/kumar_service/doctype/service_request/service_request.json
-#: kumar_service/www/dealer_portal.html:1234
+#: kumar_service/www/dealer_portal.html:1332
 msgid "Service Centre"
 msgstr ""
 
@@ -4157,11 +4329,11 @@ msgstr ""
 #: kumar_service/kumar_service/workspace/dealer_desk/dealer_desk.json
 #: kumar_service/kumar_service/workspace/service_desk/service_desk.json
 #: kumar_service/public/js/service_request.js:9
-#: kumar_service/www/dealer_portal.html:1238
+#: kumar_service/www/dealer_portal.html:1336
 msgid "Service Visit"
 msgstr ""
 
-#: kumar_service/portal_api.py:463
+#: kumar_service/portal_api.py:650
 msgid "Service centre"
 msgstr ""
 
@@ -4191,7 +4363,7 @@ msgstr ""
 
 #. Label of the settled_on (Date) field in DocType 'Kumar Warranty Claim'
 #: kumar_service/kumar_service/doctype/kumar_warranty_claim/kumar_warranty_claim.json
-#: kumar_service/www/dealer_portal.html:1258
+#: kumar_service/www/dealer_portal.html:1356
 msgid "Settled On"
 msgstr ""
 
@@ -4208,15 +4380,19 @@ msgstr ""
 msgid "Shift {0}"
 msgstr ""
 
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:40
+msgid "Show"
+msgstr ""
+
 #: kumar_service/public/js/serial_no.js:43
 msgid "Show QR"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:1179
+#: kumar_service/www/dealer_portal.html:1208
 msgid "Showing all {0}"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:1180
+#: kumar_service/www/dealer_portal.html:1209
 msgid "Showing {0} of {1}"
 msgstr ""
 
@@ -4230,7 +4406,7 @@ msgstr ""
 msgid "Signature"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:308
+#: kumar_service/www/dealer_portal.html:326
 msgid "Since 1971"
 msgstr ""
 
@@ -4250,7 +4426,7 @@ msgstr ""
 
 #: kumar_service/kumar_service/page/dealer_network/dealer_network.js:41
 #: kumar_service/kumar_service/page/dealer_network/dealer_network.js:287
-#: kumar_service/www/dealer_portal.html:416
+#: kumar_service/www/dealer_portal.html:434
 msgid "Sold"
 msgstr ""
 
@@ -4325,7 +4501,7 @@ msgstr ""
 msgid "Square"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:308 kumar_service/www/home.html:110
+#: kumar_service/www/dealer_portal.html:326 kumar_service/www/home.html:110
 #: kumar_service/www/home.html:238
 msgid "Sri Lakshmi Ganapathi Engineering Works"
 msgstr ""
@@ -4352,7 +4528,11 @@ msgstr ""
 msgid "Start"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:363
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:223
+msgid "Start a conversation"
+msgstr ""
+
+#: kumar_service/www/dealer_portal.html:381
 msgid "Start the warranty and print the customer's certificate."
 msgstr ""
 
@@ -4396,11 +4576,11 @@ msgstr ""
 #: kumar_service/kumar_service/page/sales_analytics/sales_analytics.js:29
 #: kumar_service/kumar_service/page/sales_analytics/sales_analytics.js:258
 #: kumar_service/public/js/kumar_common.js:60
-#: kumar_service/www/dealer_portal.html:706
+#: kumar_service/www/dealer_portal.html:724
 msgid "Status"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:691
+#: kumar_service/www/dealer_portal.html:709
 msgid "Still Open"
 msgstr ""
 
@@ -4542,8 +4722,8 @@ msgstr ""
 #. Label of the technician (Link) field in DocType 'Service Visit'
 #: kumar_service/kumar_service/doctype/service_request/service_request.json
 #: kumar_service/kumar_service/doctype/service_visit/service_visit.json
-#: kumar_service/www/dealer_portal.html:743
-#: kumar_service/www/dealer_portal.html:1233
+#: kumar_service/www/dealer_portal.html:761
+#: kumar_service/www/dealer_portal.html:1331
 msgid "Technician"
 msgstr ""
 
@@ -4560,8 +4740,8 @@ msgstr ""
 #. Label of the technician_report (Text) field in DocType 'Kumar Warranty
 #. Claim'
 #: kumar_service/kumar_service/doctype/kumar_warranty_claim/kumar_warranty_claim.json
-#: kumar_service/www/dealer_portal.html:671
-#: kumar_service/www/dealer_portal.html:1256
+#: kumar_service/www/dealer_portal.html:689
+#: kumar_service/www/dealer_portal.html:1354
 msgid "Technician Report"
 msgstr ""
 
@@ -4656,7 +4836,7 @@ msgstr ""
 msgid "The last pumps you registered"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:411
+#: kumar_service/www/dealer_portal.html:429
 msgid "The last pumps you registered. The certificate is what you owe the customer."
 msgstr ""
 
@@ -4666,7 +4846,7 @@ msgid "The login this dealer uses. Row-level access is derived from this."
 msgstr ""
 
 #: kumar_service/kumar_service/page/my_business/my_business.js:105
-#: kumar_service/www/dealer_portal.html:441
+#: kumar_service/www/dealer_portal.html:459
 msgid "Their warranty ends soon - a good moment to offer a service or a new pump"
 msgstr ""
 
@@ -4681,6 +4861,10 @@ msgstr ""
 
 #: kumar_service/traceability.py:163
 msgid "These units cannot be dispatched until their Pump Test Certificate passes:<ul>{0}</ul>"
+msgstr ""
+
+#: kumar_service/public/js/dealer_reply.js:57
+msgid "They read this on a phone. Plain words, no jargon."
 msgstr ""
 
 #: kumar_service/kumar_service/page/my_business/my_business.js:36
@@ -4698,8 +4882,16 @@ msgstr ""
 msgid "This Quarter"
 msgstr ""
 
+#: kumar_service/public/js/dealer_reply.js:118
+msgid "This dealer has had no reply yet. Use Dealer &rarr; Reply to Dealer."
+msgstr ""
+
 #: kumar_service/traceability.py:118
 msgid "This entry produced {0} serialised unit(s) but consumed no traceable batches. Genealogy for these units will be incomplete."
+msgstr ""
+
+#: kumar_service/public/js/dealer_reply.js:22
+msgid "This is covered by warranty. The visit and the part are free."
 msgstr ""
 
 #: kumar_service/www/warranty_check.html:91
@@ -4731,6 +4923,11 @@ msgstr ""
 #. Description of the 'Is KUMAR's Own Outlet' (Check) field in DocType 'Dealer'
 #: kumar_service/kumar_service/doctype/dealer/dealer.json
 msgid "Tick for a branch or showroom KUMAR owns: its sale to the end customer is a KUMAR invoice in our own books. Leave clear for an independent firm - it buys from us on our invoice, then raises its own invoice to the customer, which never enters our books."
+msgstr ""
+
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:150
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:160
+msgid "Tickets"
 msgstr ""
 
 #. Label of a shortcut in the Service Desk Workspace
@@ -4811,7 +5008,7 @@ msgstr ""
 msgid "Type"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:383
+#: kumar_service/www/dealer_portal.html:401
 msgid "Type any serial number and see its warranty status."
 msgstr ""
 
@@ -4869,12 +5066,13 @@ msgstr ""
 msgid "Units per Day, by Channel"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:880
-#: kumar_service/www/dealer_portal.html:962
+#: kumar_service/www/dealer_portal.html:909
+#: kumar_service/www/dealer_portal.html:991
 msgid "Unknown model"
 msgstr ""
 
-#: kumar_service/portal_api.py:418
+#: kumar_service/portal_api.py:448 kumar_service/portal_api.py:471
+#: kumar_service/staff_api.py:226 kumar_service/staff_api.py:242
 msgid "Unknown ticket type"
 msgstr ""
 
@@ -4887,7 +5085,7 @@ msgstr ""
 msgid "Unregistered Stock"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:511
+#: kumar_service/www/dealer_portal.html:529
 msgid "Used For"
 msgstr ""
 
@@ -4942,7 +5140,7 @@ msgstr ""
 msgid "Vibration (mm/s)"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:519
+#: kumar_service/www/dealer_portal.html:537
 msgid "Village / Address"
 msgstr ""
 
@@ -4978,6 +5176,16 @@ msgstr ""
 
 #: kumar_service/kumar_service/page/management_dashboard/management_dashboard.js:131
 msgid "Wage bill {0}"
+msgstr ""
+
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:151
+msgid "Waiting"
+msgstr ""
+
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:44
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:111
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:178
+msgid "Waiting on KUMAR"
 msgstr ""
 
 #. Label of a Link in the Production Workspace
@@ -5034,15 +5242,16 @@ msgstr ""
 
 #. Label of the linked_claim (Link) field in DocType 'Service Request'
 #: kumar_service/kumar_service/doctype/service_request/service_request.json
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:188
 #: kumar_service/portal_api.py:306
 #: kumar_service/public/js/service_request.js:19
-#: kumar_service/www/dealer_portal.html:348
+#: kumar_service/www/dealer_portal.html:366
 msgid "Warranty Claim"
 msgstr ""
 
 #: kumar_service/kumar_service/page/management_dashboard/management_dashboard.js:123
-#: kumar_service/www/dealer_portal.html:336
-#: kumar_service/www/dealer_portal.html:693
+#: kumar_service/www/dealer_portal.html:354
+#: kumar_service/www/dealer_portal.html:711
 msgid "Warranty Claims"
 msgstr ""
 
@@ -5070,7 +5279,7 @@ msgstr ""
 msgid "Warranty Expiring Soon"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:440
+#: kumar_service/www/dealer_portal.html:458
 msgid "Warranty Expiring in 30 Days"
 msgstr ""
 
@@ -5111,8 +5320,8 @@ msgid "Warranty Starts From"
 msgstr ""
 
 #: kumar_service/kumar_service/page/pump_lookup/pump_lookup.js:129
-#: kumar_service/www/dealer_portal.html:417
-#: kumar_service/www/dealer_portal.html:887
+#: kumar_service/www/dealer_portal.html:435
+#: kumar_service/www/dealer_portal.html:916
 msgid "Warranty Upto"
 msgstr ""
 
@@ -5121,7 +5330,7 @@ msgid "Warranty Valid Upto"
 msgstr ""
 
 #: kumar_service/public/js/service_request.js:68
-#: kumar_service/www/dealer_portal.html:889
+#: kumar_service/www/dealer_portal.html:918
 msgid "Warranty job - not chargeable"
 msgstr ""
 
@@ -5140,10 +5349,14 @@ msgstr ""
 msgid "Water Quality"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:874
-#: kumar_service/www/dealer_portal.html:895
-#: kumar_service/www/dealer_portal.html:980
+#: kumar_service/www/dealer_portal.html:903
+#: kumar_service/www/dealer_portal.html:924
+#: kumar_service/www/dealer_portal.html:1009
 msgid "We have no record of that serial. Check the number on the nameplate."
+msgstr ""
+
+#: kumar_service/public/js/dealer_reply.js:23
+msgid "We need the pump brought to the service centre. Please arrange it."
 msgstr ""
 
 #. Option for the 'Root Cause' (Select) field in DocType 'Kumar Warranty Claim'
@@ -5165,16 +5378,20 @@ msgstr ""
 msgid "What We Bought"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:394
+#: kumar_service/www/dealer_portal.html:412
 msgid "What You Sell"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:569
+#: kumar_service/www/dealer_portal.html:587
 msgid "What is the problem"
 msgstr ""
 
 #: kumar_service/kumar_service/page/historical_import/historical_import.js:111
 msgid "What is wrong"
+msgstr ""
+
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:264
+msgid "What should the dealer be told? Plain words - they read this on a phone."
 msgstr ""
 
 #: kumar_service/www/home.html:136
@@ -5186,7 +5403,7 @@ msgstr ""
 msgid "What the technician actually did, what parts went in, and what it cost."
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:673
+#: kumar_service/www/dealer_portal.html:691
 msgid "What was dismantled, what was found, and why it is a manufacturing defect"
 msgstr ""
 
@@ -5200,13 +5417,21 @@ msgstr ""
 msgid "Where the Pumps Went"
 msgstr ""
 
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:146
+msgid "Who Is Waiting"
+msgstr ""
+
 #: kumar_service/kumar_service/page/dealer_network/dealer_network.js:74
 msgid "Who Sold Them"
 msgstr ""
 
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:161
+msgid "Whoever KUMAR owes a reply to comes first. Replying records the first response against the SLA."
+msgstr ""
+
 #: kumar_service/kumar_service/page/dealer_network/dealer_network.js:35
 #: kumar_service/kumar_service/page/dealer_network/dealer_network.js:270
-#: kumar_service/www/dealer_portal.html:812
+#: kumar_service/www/dealer_portal.html:841
 msgid "Whose Invoice"
 msgstr ""
 
@@ -5221,7 +5446,7 @@ msgstr ""
 #: kumar_service/kumar_service/page/pump_lookup/pump_lookup.js:152
 #: kumar_service/kumar_service/workspace/traceability/traceability.json
 #: kumar_service/public/js/service_request.js:92
-#: kumar_service/www/dealer_portal.html:1255
+#: kumar_service/www/dealer_portal.html:1353
 msgid "Winding Batch"
 msgstr ""
 
@@ -5314,44 +5539,57 @@ msgstr ""
 msgid "Workstation"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:334
+#: kumar_service/kumar_service/page/dealer_conversations/dealer_conversations.js:296
+#: kumar_service/portal_api.py:537
+msgid "Write a message before sending"
+msgstr ""
+
+#: kumar_service/www/dealer_portal.html:1248
+msgid "Write to KUMAR"
+msgstr ""
+
+#: kumar_service/www/dealer_portal.html:1240
+msgid "You"
+msgstr ""
+
+#: kumar_service/www/dealer_portal.html:352
 msgid "You Owe KUMAR"
 msgstr ""
 
 #: kumar_service/kumar_service/page/my_business/my_business.js:254
-#: kumar_service/www/dealer_portal.html:435
+#: kumar_service/www/dealer_portal.html:453
 msgid "You have not registered a pump yet. Use the blue button above."
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:497
+#: kumar_service/www/dealer_portal.html:515
 msgid "Your Invoice Date"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:495
+#: kumar_service/www/dealer_portal.html:513
 msgid "Your Invoice No"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:804
+#: kumar_service/www/dealer_portal.html:833
 msgid "Your Outlet"
 msgstr ""
 
-#: kumar_service/portal_api.py:454
+#: kumar_service/portal_api.py:641
 msgid "Your branch office"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:388
+#: kumar_service/www/dealer_portal.html:406
 msgid "Your branch office, the service centre and head office."
 msgstr ""
 
-#: kumar_service/portal_api.py:48 kumar_service/www/dealer_portal.html:298
+#: kumar_service/portal_api.py:48 kumar_service/www/dealer_portal.html:316
 msgid "Your login is not linked to a dealer record. Ask the branch office to set Portal User on your Dealer."
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:782
+#: kumar_service/www/dealer_portal.html:811
 msgid "Your own branch office handles you. Head office is for anything they cannot settle."
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:395
+#: kumar_service/www/dealer_portal.html:413
 msgid "Your own sales by product family, all time."
 msgstr ""
 
@@ -5359,7 +5597,7 @@ msgstr ""
 msgid "Your recent sales"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:315
+#: kumar_service/www/dealer_portal.html:333
 msgid "against {0} in the 30 days before that"
 msgstr ""
 
@@ -5380,11 +5618,11 @@ msgstr ""
 msgid "e.g. IS 8034, IS 9079, IS 7538"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:590
+#: kumar_service/www/dealer_portal.html:608
 msgid "e.g. No water since two days, motor runs but nothing comes up"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:661
+#: kumar_service/www/dealer_portal.html:679
 msgid "e.g. bearing seized"
 msgstr ""
 
@@ -5392,7 +5630,7 @@ msgstr ""
 msgid "ends {0}"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:968
+#: kumar_service/www/dealer_portal.html:997
 msgid "from the date you sell it"
 msgstr ""
 
@@ -5410,7 +5648,7 @@ msgstr ""
 msgid "lft"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:967
+#: kumar_service/www/dealer_portal.html:996
 msgid "months"
 msgstr ""
 
@@ -5426,7 +5664,7 @@ msgstr ""
 msgid "new"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:323
+#: kumar_service/www/dealer_portal.html:341
 msgid "of {0} selling outlets"
 msgstr ""
 
@@ -5435,7 +5673,7 @@ msgstr ""
 msgid "old_parent"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:313
+#: kumar_service/www/dealer_portal.html:331
 msgid "on the 30 days before that"
 msgstr ""
 
@@ -5495,6 +5733,10 @@ msgstr ""
 
 #: kumar_service/kumar_service/page/people_payroll/people_payroll.js:98
 msgid "{0} days marked"
+msgstr ""
+
+#: kumar_service/portal_api.py:480 kumar_service/staff_api.py:244
+msgid "{0} does not exist"
 msgstr ""
 
 #: kumar_service/kumar_service/page/my_business/my_business.js:130
@@ -5583,7 +5825,7 @@ msgstr ""
 msgid "{0} salary slips"
 msgstr ""
 
-#: kumar_service/www/dealer_portal.html:317
+#: kumar_service/www/dealer_portal.html:335
 msgid "{0} so far in {1}"
 msgstr ""
 

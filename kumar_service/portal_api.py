@@ -321,6 +321,34 @@ def my_tickets(kind="all", limit=60):
 
 	tickets.sort(key=lambda t: str(t.get("on") or ""), reverse=True)
 
+	# Whether KUMAR has come back on each ticket. One grouped query rather than a
+	# thread read per card, because a dealer with sixty tickets should not cost
+	# sixty round trips.
+	portal_users = _portal_users()
+	refs = [(TICKET_DOCTYPES[t["kind"]], t["name"]) for t in tickets]
+	replies = {}
+	if refs:
+		for row in frappe.get_all(
+			"Comment",
+			filters={
+				"comment_type": "Comment",
+				"reference_doctype": ["in", list({r[0] for r in refs})],
+				"reference_name": ["in", list({r[1] for r in refs})],
+			},
+			fields=["reference_doctype", "reference_name", "owner", "creation"],
+			order_by="creation asc",
+		):
+			replies.setdefault((row.reference_doctype, row.reference_name), []).append(row)
+
+	for t in tickets:
+		msgs = replies.get((TICKET_DOCTYPES[t["kind"]], t["name"]), [])
+		t["replies"] = len(msgs)
+		last = msgs[-1] if msgs else None
+		t["last_reply_on"] = last.creation if last else None
+		# "KUMAR replied" only when the LAST word was theirs - otherwise the
+		# dealer is the one who is waiting on nobody.
+		t["kumar_replied"] = 1 if last and last.owner not in portal_users else 0
+
 	open_count = sum(
 		1
 		for t in tickets
@@ -378,6 +406,7 @@ def ticket_detail(kind, name):
 			"mobile": doc.end_customer_mobile,
 			"visits": visits,
 			"linked_claim": doc.linked_claim,
+			"thread": thread_for("Service Request", name),
 		}
 
 	if kind == "claim":
@@ -413,9 +442,167 @@ def ticket_detail(kind, name):
 				}
 				for p in doc.defective_parts
 			],
+			"thread": thread_for("Kumar Warranty Claim", name),
 		}
 
 	frappe.throw(_("Unknown ticket type"))
+
+
+# ---------------------------------------------------------------------------
+# The conversation
+#
+# A portal that only takes messages in is half a system: the dealer needs to see
+# KUMAR come back to them. Built on frappe's own `Comment` timeline rather than a
+# bespoke DocType, for one decisive reason - KUMAR staff can then reply from the
+# Service Request form they already work in, using the comment box that is
+# already there, and it shows up in the dealer's portal. No new screen for staff
+# to learn, and nothing to keep in sync.
+#
+# Who said it is derived from the comment's owner against the Dealer.portal_user
+# list, the same way the Dealer Requests report tells Portal from Desk.
+# ---------------------------------------------------------------------------
+
+TICKET_DOCTYPES = {"complaint": "Service Request", "claim": "Kumar Warranty Claim"}
+
+
+def _ticket_doctype(kind):
+	doctype = TICKET_DOCTYPES.get(kind)
+	if not doctype:
+		frappe.throw(_("Unknown ticket type"))
+	return doctype
+
+
+def _my_ticket(kind, name):
+	"""Assert this ticket belongs to the calling dealer's network."""
+	doctype = _ticket_doctype(kind)
+	dealer = frappe.db.get_value(doctype, name, "dealer")
+	if not dealer:
+		frappe.throw(_("{0} does not exist").format(name), frappe.DoesNotExistError)
+	if dealer not in _my_scope():
+		frappe.throw(_("Not permitted"), frappe.PermissionError)
+	return doctype, dealer
+
+
+def _portal_users():
+	return set(
+		frappe.get_all("Dealer", filters={"portal_user": ["!=", ""]}, pluck="portal_user")
+	)
+
+
+def thread_for(doctype, name, portal_users=None):
+	"""The conversation on one ticket, oldest first.
+
+	Shared by the portal and the management screen so both sides read exactly the
+	same thread - if they could diverge, one of them would be lying.
+	"""
+	portal_users = portal_users if portal_users is not None else _portal_users()
+	rows = frappe.get_all(
+		"Comment",
+		filters={
+			"reference_doctype": doctype,
+			"reference_name": name,
+			# only real replies: frappe also files Info/Workflow/Edit comments
+			# against the same document and they are audit noise, not conversation
+			"comment_type": "Comment",
+		},
+		fields=["name", "content", "owner", "creation", "comment_by"],
+		order_by="creation asc",
+	)
+	thread = []
+	for r in rows:
+		from_dealer = r.owner in portal_users
+		thread.append(
+			{
+				"name": r.name,
+				"message": frappe.utils.strip_html(r.content or "").strip(),
+				"html": r.content,
+				"by": r.comment_by or r.owner,
+				"from_dealer": 1 if from_dealer else 0,
+				"side": "dealer" if from_dealer else "kumar",
+				"who": _("Dealer") if from_dealer else "KUMAR",
+				"on": r.creation,
+			}
+		)
+	return thread
+
+
+def add_reply(doctype, name, message, notify_users=None):
+	"""Append to a ticket's conversation and tell the other side.
+
+	`notify_users` is who to alert. Without the notification this is a noticeboard
+	nobody reads - the whole point is that neither side has to keep checking.
+	"""
+	message = (message or "").strip()
+	if not message:
+		frappe.throw(_("Write a message before sending"))
+
+	comment = frappe.get_doc(
+		{
+			"doctype": "Comment",
+			"comment_type": "Comment",
+			"reference_doctype": doctype,
+			"reference_name": name,
+			"content": frappe.utils.escape_html(message),
+			"comment_by": frappe.session.user,
+		}
+	)
+	comment.flags.ignore_permissions = True
+	comment.insert(ignore_permissions=True)
+
+	for user in {u for u in (notify_users or []) if u and u != frappe.session.user}:
+		try:
+			frappe.get_doc(
+				{
+					"doctype": "Notification Log",
+					"subject": _("New message on {0}").format(name),
+					"email_content": message[:500],
+					"for_user": user,
+					"type": "Alert",
+					"document_type": doctype,
+					"document_name": name,
+					"from_user": frappe.session.user,
+				}
+			).insert(ignore_permissions=True)
+		except Exception:  # noqa: BLE001 - a failed alert must not lose the reply
+			frappe.clear_last_message()
+
+	return comment.name
+
+
+@frappe.whitelist()
+def ticket_thread(kind, name):
+	"""The dealer reading the conversation on their own ticket."""
+	doctype, _dealer = _my_ticket(kind, name)
+	return {"kind": kind, "name": name, "thread": thread_for(doctype, name)}
+
+
+@frappe.whitelist()
+def post_reply(kind, name, message):
+	"""The dealer writing back to KUMAR."""
+	doctype, dealer = _my_ticket(kind, name)
+
+	# Tell the people who actually own the ticket: whoever it is assigned to, the
+	# technician on it, and the Service Managers.
+	notify = set()
+	if doctype == "Service Request":
+		tech_user = frappe.db.get_value(
+			"Service Technician",
+			frappe.db.get_value(doctype, name, "assigned_technician"),
+			"user",
+		)
+		if tech_user:
+			notify.add(tech_user)
+	notify.update(
+		frappe.get_all(
+			"Has Role",
+			filters={"role": "Service Manager", "parenttype": "User"},
+			pluck="parent",
+		)
+	)
+	notify.add(frappe.db.get_value(doctype, name, "owner"))
+
+	add_reply(doctype, name, message, notify_users=notify)
+	return {"thread": thread_for(doctype, name), "message": _("Sent to KUMAR.")}
 
 
 @frappe.whitelist()

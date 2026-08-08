@@ -98,6 +98,7 @@ EXTRA_ICONS = {
 	# the company side of the dealer portal; the shortcut carries a shorter label
 	"Dealer Requests & Claims": "kumar-portal",
 	"Dealer Requests": "kumar-portal",
+	"Dealer Conversations": "kumar-portal",
 	"Data Migration": "kumar-import",
 	# desk pages
 	"Historical Serial Import": "kumar-import",

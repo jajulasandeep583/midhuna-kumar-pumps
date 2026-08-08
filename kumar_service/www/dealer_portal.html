@@ -247,6 +247,24 @@
                        cursor:pointer; font-family:inherit; }
   .kp-filters button.on { background:var(--blue); color:#fff; border-color:var(--blue); }
 
+  /* ---------- the conversation with KUMAR ----------
+     KUMAR on the left in brand blue, the dealer's own words on the right in
+     grey: the dealer should be able to tell at a glance who said what without
+     reading a single name. */
+  .kp-chat { margin-top:14px; display:flex; flex-direction:column; gap:9px; }
+  .kp-bub { max-width:82%; padding:10px 13px; border-radius:14px; font-size:13.5px;
+            line-height:1.6; }
+  .kp-bub.kumar { align-self:flex-start; background:var(--blue); color:#fff;
+                  border-bottom-left-radius:4px; }
+  .kp-bub.dealer { align-self:flex-end; background:#eef2f6; color:var(--ink);
+                   border-bottom-right-radius:4px; }
+  .kp-bub-who { font-size:10.5px; font-weight:800; opacity:.8; margin-bottom:3px;
+                letter-spacing:.4px; }
+  .kp-replybox { margin-top:14px; padding:14px; border-radius:13px; background:var(--bg);
+                 border:1px solid var(--line); }
+  .kp-replybox textarea { min-height:70px; }
+  .kp-replied { background:var(--ok-bg); color:var(--ok); }
+
   /* ---------- contacts ---------- */
   .kp-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(255px,1fr)); gap:13px; }
   .kp-ct { border:1px solid var(--line); border-radius:16px; padding:18px; background:#fff;
@@ -744,6 +762,9 @@
                 </div>
               </div>
               <div style="text-align:right">
+                {% if t.kumar_replied %}
+                  <span class="kp-pill kp-replied">{{ _("KUMAR replied") }}</span><br>
+                {% endif %}
                 <span class="kp-pill {{ t.tone }}">{{ _(t.status) }}</span><br>
                 <small style="color:#5f7183;font-size:11.5px">
                   {{ frappe.utils.format_date(t.on) }}</small>
@@ -757,6 +778,13 @@
             <div class="kp-tk-acts">
               <button class="kp-btn sec sm kp-detail"
                       data-kind="{{ t.kind }}" data-name="{{ t.name }}">{{ _("Details") }}</button>
+              <button class="kp-btn sm kp-chatbtn" data-kind="{{ t.kind }}" data-name="{{ t.name }}">
+                {%- if t.replies -%}
+                  {{ _("Messages ({0})").format(t.replies) }}
+                {%- else -%}
+                  {{ _("Message KUMAR") }}
+                {%- endif -%}
+              </button>
               {% if t.can_claim %}
                 <button class="kp-btn sm kp-mkclaim" data-serial="{{ t.serial_no }}"
                         data-sr="{{ t.name }}">{{ _("Claim Warranty") }}</button>
@@ -766,6 +794,7 @@
               {% endif %}
             </div>
             <div class="kp-tk-detail"></div>
+            <div class="kp-tk-chat"></div>
           </div>
         {% endfor %}
         </div>
@@ -1199,6 +1228,75 @@ frappe.ready(function () {
       apply();
     });
     apply();
+
+    /* --- the conversation with KUMAR ---
+       The dealer can read what KUMAR said and write back. Same Comment thread the
+       staff screen and the Service Request form use, so there is exactly one
+       version of the conversation. */
+    function drawChat(box, thread, kind, name) {
+      const bubbles = thread.length
+        ? `<div class="kp-chat">` + thread.map((m) => `
+            <div class="kp-bub ${m.from_dealer ? "dealer" : "kumar"}">
+              <div class="kp-bub-who">${esc(m.from_dealer ? __("You") : "KUMAR")}
+                &middot; ${esc(frappe.datetime.str_to_user(m.on))}</div>
+              <div>${esc(m.message)}</div>
+            </div>`).join("") + `</div>`
+        : `<div class="kp-msg info">${__("No messages yet. Write below and KUMAR will see it.")}</div>`;
+
+      box.innerHTML = bubbles + `
+        <div class="kp-replybox">
+          <label>${__("Write to KUMAR")}</label>
+          <textarea class="kp-chat-msg"
+            placeholder="${__("Ask for an update, or tell KUMAR what the customer is saying")}"></textarea>
+          <button type="button" class="kp-btn sm kp-chat-send"
+                  style="margin-top:10px">${__("Send")}</button>
+        </div>`;
+
+      const send = box.querySelector(".kp-chat-send");
+      send.addEventListener("click", function () {
+        const ta = box.querySelector(".kp-chat-msg");
+        const message = (ta.value || "").trim();
+        if (!message) return;
+        send.disabled = true;
+        send.textContent = __("Sending...");
+        frappe.call({
+          method: "kumar_service.portal_api.post_reply",
+          args: { kind: kind, name: name, message: message },
+          callback: function (r) {
+            const d = r.message || {};
+            drawChat(box, d.thread || [], kind, name);
+            frappe.show_alert({ message: d.message, indicator: "green" });
+          },
+          error: function () {
+            send.disabled = false;
+            send.textContent = __("Send");
+          },
+        });
+      });
+    }
+
+    list.querySelectorAll(".kp-chatbtn").forEach((b) =>
+      b.addEventListener("click", function () {
+        const card = b.closest(".kp-tk");
+        const box = card.querySelector(".kp-tk-chat");
+        if (box.dataset.open === "1") {
+          box.innerHTML = ""; box.dataset.open = "0";
+          return;
+        }
+        box.dataset.open = "1";
+        box.innerHTML = `<div class="kp-msg info">${__("Loading...")}</div>`;
+        frappe.call({
+          method: "kumar_service.portal_api.ticket_thread",
+          args: { kind: b.dataset.kind, name: b.dataset.name },
+          callback: function (r) {
+            const d = r.message || {};
+            drawChat(box, d.thread || [], b.dataset.kind, b.dataset.name);
+          },
+          error: function () {
+            box.innerHTML = `<div class="kp-msg bad">${__("Not permitted")}</div>`;
+          },
+        });
+      }));
 
     list.querySelectorAll(".kp-detail").forEach((b) =>
       b.addEventListener("click", function () {

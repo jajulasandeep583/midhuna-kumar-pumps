@@ -25,7 +25,8 @@ COUNT_DOCTYPES = [
 ]
 
 PAGES = [
-	"management-dashboard", "dealer-network", "my-business", "sales-analytics",
+	"management-dashboard", "dealer-network", "dealer-conversations", "my-business",
+	"sales-analytics",
 	"purchase-analytics", "production-daily", "people-payroll", "pump-lookup",
 	"historical-import",
 ]
@@ -513,6 +514,107 @@ def run():
 				f"{len(only_portal)} portal rows")
 		except Exception as exc:  # noqa: BLE001
 			check("the dealer-requests report runs", False, str(exc)[:70])
+
+	print()
+	print("=" * 92)
+	print("THE DEALER CONVERSATION, BOTH WAYS")
+	print("=" * 92)
+
+	from kumar_service import portal_api, staff_api
+
+	# A portal that only takes messages in is half a system. These checks are
+	# about the return leg: KUMAR answering, and the dealer seeing it.
+	logins = frappe.get_all(
+		"Dealer", filters={"portal_user": ["!=", ""], "status": "Active"},
+		fields=["name", "portal_user"],
+	)
+	check("enough dealers have a portal login to demo the network", len(logins) >= 5,
+		f"{len(logins)} logins")
+
+	threads = frappe.db.count(
+		"Comment",
+		{"comment_type": "Comment",
+		 "reference_doctype": ["in", ["Service Request", "Kumar Warranty Claim"]]},
+	)
+	check("there are real conversations on the demo tickets", threads > 20,
+		f"{threads} messages")
+
+	staff_user = (
+		frappe.db.get_value("User", {"name": ["like", "service.manager@%"]}, "name")
+		or "Administrator"
+	)
+	original_user = frappe.session.user
+	try:
+		frappe.set_user(staff_user)
+		queue = staff_api.dealer_conversations(state="all")
+		summary = queue["summary"]
+		check("the staff queue answers", summary.get("total", 0) > 0, str(summary))
+		check("the queue separates who owes whom a reply",
+			summary.get("waiting", 0) > 0 and summary.get("answered", 0) > 0,
+			f"{summary.get('waiting')} waiting / {summary.get('answered')} answered")
+		check("the queue rolls up per dealer", bool(queue.get("dealers")),
+			f"{len(queue.get('dealers') or [])} dealers")
+		# whoever KUMAR owes a reply to must sort first, or the screen is a list
+		# rather than a queue
+		waiting_first = staff_api.dealer_conversations(state="all")["tickets"][:1]
+		check("the ticket KUMAR owes a reply to sorts first",
+			bool(waiting_first) and waiting_first[0]["conversation"] == "waiting",
+			waiting_first[0]["conversation"] if waiting_first else "-")
+	except Exception as exc:  # noqa: BLE001
+		check("the staff queue answers", False, str(exc)[:70])
+	finally:
+		frappe.set_user(original_user)
+
+	# A dealer must be able to read its own thread, and must be refused both the
+	# staff endpoint and another dealer's thread.
+	leaks = []
+	for login in logins:
+		try:
+			frappe.set_user(login.portal_user)
+			mine = frappe.get_all(
+				"Service Request",
+				filters={"dealer": ["in", frappe.get_all(
+					"Dealer",
+					filters={"lft": [">=", frappe.db.get_value("Dealer", login.name, "lft")],
+					         "rgt": ["<=", frappe.db.get_value("Dealer", login.name, "rgt")]},
+					pluck="name")], "docstatus": ["<", 2]},
+				pluck="name", limit=1,
+			)
+			if mine:
+				portal_api.ticket_thread("complaint", mine[0])
+			try:
+				staff_api.dealer_conversations()
+				leaks.append(f"{login.name} reached the staff queue")
+			except frappe.PermissionError:
+				pass
+		except frappe.PermissionError as exc:
+			leaks.append(f"{login.name} refused its own thread: {exc}")
+		except Exception as exc:  # noqa: BLE001
+			leaks.append(f"{login.name}: {type(exc).__name__}")
+		finally:
+			frappe.set_user(original_user)
+	check("dealers read their own thread and cannot reach KUMAR's queue", not leaks,
+		str(leaks[:2]))
+
+	conv_js = frappe.read_file(
+		frappe.get_app_path("kumar_service", "kumar_service", "page", "dealer_conversations",
+			"dealer_conversations.js")
+	) or ""
+	check("the conversations page calls the staff reply endpoint",
+		"staff_api.reply_to_dealer" in conv_js)
+	check("the conversations page can record the SLA first response",
+		"mark_responded" in conv_js)
+	check("the portal lets the dealer write back", "portal_api.post_reply" in portal_html)
+	check("the portal shows the thread", "portal_api.ticket_thread" in portal_html)
+
+	reply_js = frappe.read_file(
+		frappe.get_app_path("kumar_service", "public", "js", "dealer_reply.js")
+	) or ""
+	check("the Service Request form has a Reply to Dealer button",
+		"Reply to Dealer" in reply_js and "Service Request" in reply_js)
+	check("the reply button is loaded by the desk bundle",
+		"dealer_reply.js" in (frappe.read_file(
+			frappe.get_app_path("kumar_service", "public", "js", "kumar.bundle.js")) or ""))
 
 	print()
 	print("=" * 92)

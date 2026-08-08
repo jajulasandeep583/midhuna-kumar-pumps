@@ -1400,6 +1400,120 @@ def attribute_portal_requests(portal_share=0.55):
 	return changed
 
 
+#: Conversations that read like a service desk rather than lorem ipsum. Each is
+#: (who said it, what they said); "dealer" is posted as the dealer's portal login
+#: and "kumar" as the service manager, which is what makes the thread render on
+#: the correct side in both the portal and the Dealer Conversations screen.
+DEMO_THREADS = (
+	(
+		("kumar", "Technician assigned. He will reach the village tomorrow before noon. "
+			"This pump is in warranty so there is nothing to pay."),
+		("dealer", "Customer is in the field till Thursday. Please tell him to come after 4pm."),
+		("kumar", "Noted. Visit moved to Thursday evening."),
+	),
+	(
+		("kumar", "Please bring the pump to the Vijayawada service centre - the winding has "
+			"to be tested on the bench, it cannot be done at site."),
+		("dealer", "Sending it by lorry tomorrow."),
+	),
+	(
+		("dealer", "Customer is asking for an update. It has been four days now."),
+	),
+	(
+		("kumar", "Claim approved. A credit note will come with your next statement."),
+	),
+	(
+		("dealer", "Third pump from the same lot with the same noise. Please check the batch."),
+		("kumar", "Quality has pulled the heat record and is checking the other units built "
+			"from it. We will come back to you on Monday."),
+	),
+	(
+		("kumar", "Inspected. The cable was cut during installation, so this is not a "
+			"manufacturing defect - the visit is chargeable."),
+		("dealer", "Understood, customer has agreed to pay."),
+	),
+	# Weighting matters: three of the threads above end with the DEALER speaking,
+	# which puts the ticket in KUMAR's "waiting on us" queue. Left unbalanced the
+	# demo showed 34 of 60 tickets waiting, which reads as a company that does not
+	# answer its dealers. These two end with KUMAR.
+	(
+		("dealer", "Pump replaced and installed. Customer is happy."),
+		("kumar", "Thank you. Closing this one - the replacement carries the balance "
+			"of the original warranty."),
+	),
+	(
+		("dealer", "Can you send two spare seals with the next despatch?"),
+		("kumar", "Added to your next despatch, no charge - both are warranty items."),
+	),
+)
+
+
+def seed_dealer_conversations(limit=22):
+	"""Put real conversations on some dealer tickets.
+
+	Without these, the portal's Messages button and the whole Dealer
+	Conversations screen are empty on the demo site - which makes the one feature
+	that shows KUMAR answering its dealers look unbuilt.
+
+	Deliberately leaves a mix behind: some threads where the dealer spoke last
+	(so KUMAR's queue has real work in it), some answered, and plenty with no
+	conversation at all.
+	"""
+	from kumar_service.portal_api import add_reply
+
+	rng = random.Random(20260808)
+	service_manager = (
+		frappe.db.get_value("User", {"name": ["like", "service.manager@%"]}, "name")
+		or "Administrator"
+	)
+
+	def portal_login(dealer):
+		hops = 0
+		while dealer and hops < 8:
+			user = frappe.db.get_value("Dealer", dealer, "portal_user")
+			if user:
+				return user
+			dealer = frappe.db.get_value("Dealer", dealer, "parent_dealer")
+			hops += 1
+		return None
+
+	candidates = []
+	for doctype in ("Service Request", "Kumar Warranty Claim"):
+		for row in frappe.get_all(
+			doctype, filters={"docstatus": ["<", 2]}, fields=["name", "dealer"], limit=120
+		):
+			candidates.append((doctype, row.name, row.dealer))
+	rng.shuffle(candidates)
+
+	original = frappe.session.user
+	made = 0
+	try:
+		for doctype, name, dealer in candidates:
+			if made >= limit:
+				break
+			if frappe.db.exists(
+				"Comment",
+				{"reference_doctype": doctype, "reference_name": name, "comment_type": "Comment"},
+			):
+				continue
+			dealer_user = portal_login(dealer)
+			if not dealer_user:
+				continue
+
+			for side, text in rng.choice(DEMO_THREADS):
+				# post as the right person: `owner` is what decides which side of
+				# the conversation a message lands on
+				frappe.set_user(dealer_user if side == "dealer" else service_manager)
+				add_reply(doctype, name, text)
+			made += 1
+	finally:
+		frappe.set_user(original)
+
+	frappe.db.commit()
+	print(f"  {made} tickets given a conversation")
+	return made
+
+
 def build_all():
 	frappe.flags.mute_emails = True
 
@@ -1447,6 +1561,9 @@ def build_all():
 
 	print("attributing dealer requests to the portal...")
 	attribute_portal_requests()
+
+	print("conversations between KUMAR and the dealers...")
+	seed_dealer_conversations()
 
 	frappe.db.commit()
 	print("DEMO OPS DONE")

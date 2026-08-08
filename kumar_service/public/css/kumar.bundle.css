@@ -26,6 +26,91 @@
 }
 
 /* ==================================================================
+   Dealer Conversations (.kv-*) — KUMAR answering the dealers
+
+   A queue, not a dashboard. Colour carries one meaning only: red = a dealer is
+   waiting on us. That is the whole point of the screen, so nothing else is
+   allowed to be red.
+   ================================================================== */
+
+.kv-wrap { padding: 4px 0 40px; }
+
+.kv-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px; margin-bottom: 16px; }
+.kv-tile { background: var(--fg-color); border: 1px solid var(--border-color);
+           border-radius: 12px; padding: 13px 15px; border-top: 3px solid var(--kumar-blue); }
+.kv-tile b { display: block; font-size: 25px; font-weight: 700; line-height: 1.15;
+             font-variant-numeric: tabular-nums; }
+.kv-tile span { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+.kv-tile.kv-red    { border-top-color: #c02616; } .kv-tile.kv-red b    { color: #c02616; }
+.kv-tile.kv-amber  { border-top-color: #a86a00; } .kv-tile.kv-amber b  { color: #a86a00; }
+.kv-tile.kv-green  { border-top-color: #0f8a4a; } .kv-tile.kv-green b  { color: #0f8a4a; }
+.kv-tile.kv-grey   { border-top-color: #8a9099; } .kv-tile.kv-grey b   { color: #5f7183; }
+.kv-tile.kv-blue   { border-top-color: var(--kumar-blue); }
+.kv-tile.kv-blue b { color: var(--kumar-blue); }
+
+.kv-panel { background: var(--fg-color); border: 1px solid var(--border-color);
+            border-radius: 14px; padding: 18px; margin-bottom: 16px; }
+.kv-h { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+.kv-hint { font-size: 12.5px; color: var(--text-muted); margin-bottom: 14px; line-height: 1.55; }
+.kv-empty { text-align: center; padding: 26px 14px; color: var(--text-muted); font-size: 14px; }
+.kv-empty.small { padding: 12px; font-size: 13px; }
+.kv-load { padding: 22px; color: var(--text-muted); font-size: 13.5px; }
+
+table.kv-t { width: 100%; border-collapse: collapse; font-size: 13px; }
+table.kv-t th { text-align: left; font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+                color: var(--text-muted); border-bottom: 2px solid var(--border-color);
+                padding: 8px 9px; font-weight: 700; }
+table.kv-t td { padding: 9px; border-bottom: 1px solid var(--border-color); }
+table.kv-t tbody tr { cursor: pointer; }
+table.kv-t tbody tr:hover td { background: var(--bg-light-gray, #f7fafd); }
+.kv-num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* a ticket, with its reply box */
+.kv-card { border: 1px solid var(--border-color); border-left: 4px solid #8a9099;
+           border-radius: 12px; padding: 14px 16px; margin-bottom: 11px; }
+.kv-card.kv-red   { border-left-color: #c02616; }
+.kv-card.kv-green { border-left-color: #0f8a4a; }
+.kv-card.kv-grey  { border-left-color: #8a9099; }
+.kv-card-top { display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+.kv-meta { font-size: 11.5px; color: var(--text-muted); font-weight: 600; }
+.kv-title { font-size: 15px; font-weight: 700; margin: 2px 0 4px; }
+.kv-sub { font-size: 12.5px; color: var(--text-muted); line-height: 1.6; }
+.kv-said { margin-top: 8px; font-size: 13px; padding: 9px 11px; border-radius: 9px;
+           background: var(--bg-light-gray, #f7fafd); color: var(--text-color); }
+.kv-right { text-align: right; flex: 0 0 auto; }
+.kv-when { font-size: 11.5px; color: var(--text-muted); margin-top: 4px; }
+.kv-last { margin-top: 10px; font-size: 13px; padding: 9px 11px; border-radius: 9px;
+           background: #eef6ff; border: 1px solid #cfe3f7; }
+.kv-actions { margin-top: 11px; display: flex; gap: 8px; flex-wrap: wrap; }
+
+.kv-pill { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px;
+           font-weight: 700; margin-left: 5px; white-space: nowrap; }
+.kv-pill.red   { background: #fdeceb; color: #c02616; }
+.kv-pill.amber { background: #fff3d9; color: #a86a00; }
+.kv-pill.green { background: #e7f7ee; color: #0f8a4a; }
+.kv-pill.grey  { background: #eef2f6; color: #5f7183; }
+
+.kv-reply { margin-top: 11px; padding: 13px; border-radius: 11px;
+            background: var(--bg-light-gray, #f7fafd); border: 1px solid var(--border-color); }
+.kv-reply-foot { display: flex; justify-content: space-between; align-items: center;
+                 gap: 12px; margin-top: 10px; flex-wrap: wrap; }
+.kv-check { font-size: 12.5px; color: var(--text-muted); font-weight: 500; margin: 0;
+            display: flex; align-items: center; gap: 7px; }
+.kv-canned { margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
+.kv-canned .kv-can { font-size: 11.5px; text-align: left; white-space: normal; max-width: 100%; }
+
+/* the conversation itself: dealer on the left, KUMAR on the right */
+.kv-msgs { margin-top: 11px; display: flex; flex-direction: column; gap: 8px; }
+.kv-bubble { max-width: 78%; padding: 9px 12px; border-radius: 12px; font-size: 13px;
+             line-height: 1.55; }
+.kv-bubble.dealer { align-self: flex-start; background: #eef2f6; color: var(--text-color);
+                    border-bottom-left-radius: 4px; }
+.kv-bubble.kumar  { align-self: flex-end; background: var(--kumar-blue); color: #fff;
+                    border-bottom-right-radius: 4px; }
+.kv-bubble-who { font-size: 10.5px; font-weight: 700; opacity: .78; margin-bottom: 3px; }
+
+/* ==================================================================
    Desk chrome (2026-08-08)
 
    Enough KUMAR to stop the desk reading as a stock ERPNext install, and no

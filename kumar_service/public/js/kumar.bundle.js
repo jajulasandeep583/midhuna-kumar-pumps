@@ -8,3 +8,8 @@
 // fresh hashed filename, so a deploy invalidates the cache by construction.
 import "./kumar_common.js";
 import "./kumar_dashboard.js";
+// Registers form handlers for Service Request and Kumar Warranty Claim. It lives
+// in the shared bundle rather than doctype_js because it covers two doctypes that
+// already have a script of their own, and its handlers simply never fire
+// anywhere else.
+import "./dealer_reply.js";

@@ -610,11 +610,23 @@ def _ensure_customer(dealer):
 
 
 def dealer_logins():
-	"""Give three dealers a real login so row-level isolation can be demonstrated."""
+	"""Give the network real logins, so the portal is not a demo of one shop.
+
+	The first three cover the three shapes the portal has to handle - a KUMAR
+	branch, an independent dealer, and a group dealer with a sub-dealer under it.
+	The four below them are the real authorised distributors named in the 2025
+	brochure; they get logins too, because a distributor in Kerala or Bihar is
+	exactly who this portal is for, and without a login they can hold no
+	conversation with KUMAR at all.
+	"""
 	people = [
 		("dealer.vijayawada@kumarpumps.local", "Aruna Jyothi Distributors - Vijayawada", "Vijayawada Branch"),
 		("dealer.venkateswara@kumarpumps.local", "Sri Venkateswara Pump Center", "Venkateswara Pumps"),
 		("dealer.deccan@kumarpumps.local", "Deccan Pumps & Motors", "Deccan Pumps"),
+		("dealer.kappens@kumarpumps.local", "Kappens Sani Wares", "Kappens Sani Wares"),
+		("dealer.spmachinary@kumarpumps.local", "SP Machinary Stores", "SP Machinary Stores"),
+		("dealer.jain@kumarpumps.local", "Jain Enterprises", "Jain Enterprises"),
+		("dealer.sudhakar@kumarpumps.local", "Sudhakar Stores", "Sudhakar Stores"),
 	]
 	made = []
 	for email, dealer, full_name in people:

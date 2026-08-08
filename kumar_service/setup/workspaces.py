@@ -162,6 +162,8 @@ WORKSPACES = [
 			],
 		),
 		"shortcuts": [
+			# first, because answering the dealers is the job
+			("dealer-conversations", "Page", "Dealer Conversations", "green"),
 			("pump-lookup", "Page", "Pump Lookup", "blue"),
 			("Service Request", "DocType", "Open Requests", "red"),
 			("Service Visit", "DocType", "Today's Visits", "orange"),
