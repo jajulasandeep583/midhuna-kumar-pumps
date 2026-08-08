@@ -259,6 +259,14 @@
 		<path d="M4 6h.01M4 12h.01M4 18h.01"/>
 	</symbol>
 
+	<!-- dealer portal: a phone raising a ticket into the company -->
+	<symbol viewBox="0 0 24 24" id="icon-kumar-portal" fill="none" stroke="#0D9488" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+		<rect x="6" y="2.5" width="12" height="19" rx="2.6"/>
+		<path d="M10.5 5h3"/>
+		<path d="M9 11.5h6M9 15h4"/>
+		<circle cx="12" cy="19" r=".9"/>
+	</symbol>
+
 	<!-- data migration: the old sheet coming down into the system -->
 	<symbol viewBox="0 0 24 24" id="icon-kumar-import" fill="none" stroke="#7C3AED" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
 		<path d="M12 3v9"/>

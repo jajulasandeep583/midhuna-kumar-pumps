@@ -326,10 +326,14 @@ def my_tickets(kind="all", limit=60):
 		for t in tickets
 		if not t["closed"] and t["status"] not in CLOSED_REQUEST_STATES + ("Settled", "Rejected")
 	)
+	shown = tickets[:limit]
 	return {
-		"tickets": tickets[:limit],
+		"tickets": shown,
 		"open": open_count,
 		"total": len(tickets),
+		# only the statuses actually present, so the filter never offers an
+		# option that would return nothing
+		"statuses": sorted({t["status"] for t in shown if t.get("status")}),
 	}
 
 

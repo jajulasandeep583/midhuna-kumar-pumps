@@ -20,6 +20,23 @@
 {% include "templates/includes/portal_art.svg" %}
 
 <style>
+  /* ---------- the canvas ----------
+     The single biggest reason this screen used to read as "white": frappe's web
+     shell paints body, main.container and .page_content white, and every card
+     here is also white, so there was nothing for the cards to sit ON. Tint the
+     page and the white cards become cards. */
+  body { background:#eaf1f8 !important; }
+  main.container, .page_content, .page-content-wrapper { background:transparent !important; }
+  main.container { max-width:1180px !important; }
+
+  /* frappe's generic web page header repeats the page name above our own
+     branded bar and breaks the illusion that this is a product rather than a
+     website page. The portal supplies its own header. */
+  #page-dealer_portal .page-header-wrapper,
+  #page-dealer_portal .page-breadcrumbs,
+  #page-dealer_portal .page-header { display:none !important; }
+  .web-footer, footer.web-footer { background:transparent; }
+
   .kp { --blue:#0b5394; --blue-d:#08406f; --blue-l:#1a74c4;
         --ink:#14212e; --mut:#5f7183; --line:#e2eaf3; --bg:#f6f9fc;
         --ok:#0f8a4a; --ok-bg:#e7f7ee; --warn:#b06000; --warn-bg:#fff5e0;
@@ -33,7 +50,9 @@
 
   /* ---------- top bar ---------- */
   .kp-bar { display:flex; align-items:center; justify-content:space-between; gap:12px;
-            flex-wrap:wrap; padding:14px 0 12px; }
+            flex-wrap:wrap; padding:14px 18px; margin-bottom:14px;
+            background:#fff; border:1px solid var(--line); border-radius:16px;
+            box-shadow:0 2px 8px rgba(11,83,148,.06); }
   .kp-brand { display:flex; align-items:center; gap:10px; font-size:22px; font-weight:800;
               color:var(--blue); letter-spacing:.4px; }
   .kp-brand small { display:block; font-size:10.5px; font-weight:600; color:var(--mut);
@@ -73,7 +92,7 @@
   .kp-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(158px,1fr)); gap:11px;
               margin-bottom:18px; }
   .kp-stat { border:1px solid var(--line); border-radius:14px; padding:14px 15px; background:#fff;
-             border-top:3px solid var(--blue); }
+             border-top:3px solid var(--blue); box-shadow:0 2px 10px rgba(11,83,148,.07); }
   .kp-stat b { display:block; font-size:25px; font-weight:800; line-height:1.15;
                font-variant-numeric:tabular-nums; }
   .kp-stat span { font-size:12px; color:var(--mut); font-weight:600; }
@@ -84,12 +103,19 @@
   .kp-stat.c5 { border-top-color:var(--rose);   } .kp-stat.c5 b { color:var(--rose); }
   .kp-stat.c6 { border-top-color:var(--violet); } .kp-stat.c6 b { color:var(--violet); }
 
-  /* ---------- tabs ---------- */
-  .kp-tabs { display:flex; gap:7px; overflow-x:auto; padding:3px 0 12px; -webkit-overflow-scrolling:touch; }
+  /* ---------- tabs ----------
+     Sticky, because the tab bar IS the portal's navigation: scrolling a long
+     ticket list must never leave the dealer with no way back. */
+  .kp-tabs { display:flex; gap:7px; overflow-x:auto; padding:10px 12px; margin-bottom:16px;
+             -webkit-overflow-scrolling:touch; position:sticky; top:0; z-index:20;
+             background:rgba(234,241,248,.94); backdrop-filter:blur(6px);
+             border:1px solid var(--line); border-radius:32px;
+             box-shadow:0 3px 12px rgba(11,83,148,.09); scrollbar-width:none; }
+  .kp-tabs::-webkit-scrollbar { display:none; }
   .kp-tab { flex:0 0 auto; display:inline-flex; align-items:center; gap:7px; cursor:pointer;
             border:1px solid var(--line); background:#fff; color:var(--mut);
             padding:10px 15px; border-radius:30px; font-size:13.5px; font-weight:700;
-            white-space:nowrap; }
+            white-space:nowrap; transition:background .12s, color .12s, border-color .12s; }
   .kp-tab svg { width:17px; height:17px; }
   .kp-tab:hover { border-color:#c3d6e9; color:var(--ink); }
   .kp-tab.on { background:var(--blue); border-color:var(--blue); color:#fff; }
@@ -117,11 +143,20 @@
   .kp-act.a6 .ic { background:var(--rose-bg); color:var(--rose); }
 
   /* ---------- sections, forms, tables ---------- */
-  .kp-sec { background:#fff; border:1px solid var(--line); border-radius:18px; padding:20px;
-            margin-bottom:16px; }
-  .kp-h { display:flex; align-items:center; gap:9px; font-size:17px; font-weight:800;
-          margin-bottom:4px; }
-  .kp-h svg { width:19px; height:19px; color:var(--blue); }
+  .kp-sec { background:#fff; border:1px solid var(--line); border-radius:18px;
+            margin-bottom:16px; overflow:hidden;
+            box-shadow:0 3px 14px rgba(11,83,148,.08); }
+  /* a tinted header strip per section, so a long page reads as a stack of
+     panels rather than one undifferentiated white sheet */
+  .kp-sec > .kp-h { margin:0; padding:16px 20px 14px;
+                    background:linear-gradient(180deg,#f4f9ff,#ffffff);
+                    border-bottom:1px solid var(--line); }
+  .kp-sec > .kp-hint, .kp-sec > :not(.kp-h) { margin-left:20px; margin-right:20px; }
+  .kp-sec > .kp-hint { margin-top:14px; }
+  .kp-sec > *:last-child { margin-bottom:20px; }
+  .kp-h { display:flex; align-items:center; gap:10px; font-size:17px; font-weight:800; }
+  .kp-h svg { width:22px; height:22px; color:var(--blue); flex:0 0 22px;
+              padding:4px; background:var(--info-bg); border-radius:8px; box-sizing:content-box; }
   .kp-hint { font-size:12.5px; color:var(--mut); margin-bottom:15px; line-height:1.55; }
   .kp-step { display:flex; align-items:center; gap:8px; font-size:11.5px; font-weight:800;
              letter-spacing:1.4px; text-transform:uppercase; color:var(--blue);
@@ -131,10 +166,29 @@
   .kp label { display:block; font-size:12px; font-weight:700; color:var(--mut); margin-bottom:5px; }
   .kp input, .kp select, .kp textarea {
       width:100%; padding:11px 12px; font-size:15px; border:1px solid #cfdbe8;
-      border-radius:10px; background:#fff; color:var(--ink); font-family:inherit; }
+      border-radius:10px; background:#fbfdff; color:var(--ink); font-family:inherit; }
   .kp input:focus, .kp select:focus, .kp textarea:focus {
-      outline:none; border-color:var(--blue-l); box-shadow:0 0 0 3px rgba(26,116,196,.14); }
+      outline:none; border-color:var(--blue-l); background:#fff;
+      box-shadow:0 0 0 3px rgba(26,116,196,.16); }
   .kp textarea { min-height:88px; resize:vertical; }
+  /* A native select renders as unstyled grey chrome and was the main reason the
+     dropdowns "did not look proper". Suppress the native arrow and draw our own
+     so a select reads like the rest of the form. `padding-right` leaves room for
+     it, and background-image is the only way to place it without a wrapper. */
+  .kp select {
+      appearance:none; -webkit-appearance:none; -moz-appearance:none;
+      padding-right:38px; cursor:pointer;
+      background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath d='M1 1.5L7 7.5L13 1.5' fill='none' stroke='%230b5394' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat:no-repeat;
+      background-position:right 13px center;
+      background-size:13px 9px; }
+  .kp select:disabled { opacity:.6; cursor:default; }
+  /* an input wired to a datalist gets the same affordance, or nobody knows the
+     suggestions are there */
+  .kp input[list] {
+      background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath d='M1 1.5L7 7.5L13 1.5' fill='none' stroke='%230b5394' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat:no-repeat; background-position:right 13px center;
+      background-size:13px 9px; padding-right:38px; }
   .kp-btn { display:inline-flex; align-items:center; justify-content:center; gap:8px;
             border:0; cursor:pointer; padding:13px 22px; border-radius:11px;
             font-size:15px; font-weight:700; background:var(--blue); color:#fff;
@@ -488,11 +542,29 @@
       </div>
       <form id="kc-form" autocomplete="off">
         <div class="kp-step">{{ _("1. Which pump?") }}</div>
+        {# A real dropdown of the dealer's own pumps is the primary control: for a
+           complaint the pump is always one they sold, so making them remember a
+           serial number was the wrong question. The text box stays for a barcode
+           scanner and for a serial that is not in the visible list. #}
         <div class="kp-row">
           <div>
-            <label for="kc-serial">{{ _("Serial Number") }}</label>
+            <label for="kc-pick">{{ _("Pick the pump you sold") }}</label>
+            <select id="kc-pick">
+              <option value="">{{ _("Choose from your pumps") }}</option>
+              {% for s in my_serials %}
+                <option value="{{ s.serial_no }}">
+                  {{ s.serial_no }} &middot; {{ s.end_customer_name or "" }}
+                  {%- if s.pump_model %} ({{ s.pump_model }}){% endif %}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label for="kc-serial">{{ _("Or type / scan the serial") }}</label>
             <input id="kc-serial" name="serial_no" list="kp-serials" placeholder="KP-..." required>
           </div>
+        </div>
+        <div class="kp-row" style="margin-top:12px">
           <div>
             <label for="kc-cat">{{ _("What is the problem") }}</label>
             <select id="kc-cat" name="complaint_category" required>
@@ -535,9 +607,23 @@
         <div class="kp-step">{{ _("1. Which pump?") }}</div>
         <div class="kp-row">
           <div>
-            <label for="kw-serial">{{ _("Serial Number") }}</label>
+            <label for="kw-pick">{{ _("Pick the pump you sold") }}</label>
+            <select id="kw-pick">
+              <option value="">{{ _("Choose from your pumps") }}</option>
+              {% for s in my_serials %}
+                <option value="{{ s.serial_no }}">
+                  {{ s.serial_no }} &middot; {{ s.end_customer_name or "" }}
+                  {%- if s.pump_model %} ({{ s.pump_model }}){% endif %}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label for="kw-serial">{{ _("Or type / scan the serial") }}</label>
             <input id="kw-serial" name="serial_no" list="kp-serials" placeholder="KP-..." required>
           </div>
+        </div>
+        <div class="kp-row" style="margin-top:12px">
           <div>
             <label for="kw-type">{{ _("Claim Type") }}</label>
             <select id="kw-type" name="claim_type">
@@ -601,17 +687,45 @@
         {{ _("Every complaint and warranty claim you have with KUMAR, newest first, and exactly where each one stands.") }}
       </div>
       <div class="kp-filters" id="kp-tfilter">
-        <button class="on" data-f="all">{{ _("All") }} ({{ tickets.total }})</button>
-        <button data-f="open">{{ _("Still Open") }} ({{ tickets.open }})</button>
-        <button data-f="complaint">{{ _("Complaints") }}</button>
-        <button data-f="claim">{{ _("Warranty Claims") }}</button>
+        <button type="button" class="on" data-f="all">{{ _("All") }} ({{ tickets.total }})</button>
+        <button type="button" data-f="open">{{ _("Still Open") }} ({{ tickets.open }})</button>
+        <button type="button" data-f="complaint">{{ _("Complaints") }}</button>
+        <button type="button" data-f="claim">{{ _("Warranty Claims") }}</button>
       </div>
+
+      {# Search and a status dropdown, because the pills alone cannot answer
+         "where is the ticket for that customer who rang this morning". All three
+         filters combine. #}
+      <div class="kp-row" style="margin-bottom:16px">
+        <div>
+          <label for="kp-tsearch">{{ _("Search") }}</label>
+          <input id="kp-tsearch" type="search" autocomplete="off"
+                 placeholder="{{ _('Serial, customer, mobile or ticket number') }}">
+        </div>
+        <div>
+          <label for="kp-tstatus">{{ _("Status") }}</label>
+          <select id="kp-tstatus">
+            <option value="">{{ _("Any status") }}</option>
+            {% for s in tickets.statuses %}<option value="{{ s }}">{{ _(s) }}</option>{% endfor %}
+          </select>
+        </div>
+        <div style="align-self:end">
+          <button type="button" class="kp-btn sec" id="kp-tclear">{{ _("Clear filters") }}</button>
+        </div>
+      </div>
+      <div id="kp-tcount" class="kp-hint" style="margin-bottom:10px"></div>
 
       {% if tickets.tickets %}
         <div id="kp-tlist">
         {% for t in tickets.tickets %}
+          {# data-search is what the search box matches on: everything a dealer
+             might remember about the ticket, lowercased server-side. #}
           <div class="kp-tk {{ t.tone }}" data-kind="{{ t.kind }}"
-               data-open="{{ 0 if t.closed else 1 }}">
+               data-open="{{ 0 if t.closed else 1 }}"
+               data-status="{{ t.status }}"
+               data-search="{{ (t.name ~ ' ' ~ (t.serial_no or '') ~ ' ' ~ (t.pump_model or '')
+                                ~ ' ' ~ (t.customer or '') ~ ' ' ~ (t.mobile or '')
+                                ~ ' ' ~ (t.headline or ''))|lower }}">
             <div class="kp-tk-top">
               <div>
                 <div class="kp-tk-id">{{ t.kind_label }} &middot; {{ t.name }}</div>
@@ -783,6 +897,33 @@ frappe.ready(function () {
     });
   }
 
+  /* Wire a "pick from your pumps" dropdown to the serial text box next to it.
+     Either control can drive the lookup: the dropdown for the common case, the
+     text box for a barcode scanner or a serial not in the list. Keeping them in
+     sync matters because the FORM posts the text box, not the dropdown. */
+  function bindPicker(selectId, inputId, intoId) {
+    const sel = $(selectId);
+    const input = $(inputId);
+    if (!input) return;
+    if (sel) {
+      sel.addEventListener("change", function () {
+        if (!sel.value) return;
+        input.value = sel.value;
+        describePump(sel.value, intoId);
+      });
+    }
+    const fromInput = () => {
+      const v = input.value.trim();
+      // if it was typed rather than picked, drop the dropdown's stale selection
+      if (sel && sel.value !== v) sel.value = "";
+      describePump(v, intoId);
+    };
+    input.addEventListener("change", fromInput);
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") { e.preventDefault(); fromInput(); }
+    });
+  }
+
   /* ------------------------------------------------ register a sale */
   (function register() {
     const form = $("kr-form");
@@ -885,8 +1026,8 @@ frappe.ready(function () {
   (function complaint() {
     const form = $("kc-form");
     if (!form) return;
-    $("kc-serial").addEventListener("change", () =>
-      describePump($("kc-serial").value.trim(), "kc-pump"));
+    // the dropdown and the text box are two ways into the same field
+    bindPicker("kc-pick", "kc-serial", "kc-pump");
 
     form.addEventListener("submit", function (e) {
       e.preventDefault();
@@ -927,8 +1068,7 @@ frappe.ready(function () {
     if (!form) return;
     const parts = [];
 
-    $("kw-serial").addEventListener("change", () =>
-      describePump($("kw-serial").value.trim(), "kw-pump"));
+    bindPicker("kw-pick", "kw-serial", "kw-pump");
 
     function drawParts() {
       if (!parts.length) { $("kw-parts").innerHTML = ""; return; }
@@ -1013,19 +1153,52 @@ frappe.ready(function () {
     const list = $("kp-tlist");
     if (!list) return;
 
+    /* Three filters that COMBINE - pills, free-text search and status. Filtering
+       on the client is deliberate: the whole list is already on the page, so a
+       dealer on a weak connection gets instant results and no round trip. */
+    const cards = Array.from(list.querySelectorAll(".kp-tk"));
+    let pill = "all";
+
+    function apply() {
+      const q = ($("kp-tsearch").value || "").trim().toLowerCase();
+      const status = $("kp-tstatus").value;
+      let shown = 0;
+      cards.forEach((card) => {
+        const byPill =
+          pill === "all" ? true :
+          pill === "open" ? card.dataset.open === "1" :
+          card.dataset.kind === pill;
+        const byText = !q || (card.dataset.search || "").indexOf(q) !== -1;
+        const byStatus = !status || card.dataset.status === status;
+        const keep = byPill && byText && byStatus;
+        card.style.display = keep ? "" : "none";
+        if (keep) shown += 1;
+      });
+      $("kp-tcount").textContent =
+        shown === cards.length
+          ? __("Showing all {0}", [cards.length])
+          : __("Showing {0} of {1}", [shown, cards.length]);
+    }
+
     document.querySelectorAll("#kp-tfilter button").forEach((b) =>
       b.addEventListener("click", function () {
         document.querySelectorAll("#kp-tfilter button").forEach((x) =>
           x.classList.toggle("on", x === b));
-        const f = b.dataset.f;
-        list.querySelectorAll(".kp-tk").forEach((card) => {
-          const keep =
-            f === "all" ? true :
-            f === "open" ? card.dataset.open === "1" :
-            card.dataset.kind === f;
-          card.style.display = keep ? "" : "none";
-        });
+        pill = b.dataset.f;
+        apply();
       }));
+
+    $("kp-tsearch").addEventListener("input", apply);
+    $("kp-tstatus").addEventListener("change", apply);
+    $("kp-tclear").addEventListener("click", function () {
+      $("kp-tsearch").value = "";
+      $("kp-tstatus").value = "";
+      pill = "all";
+      document.querySelectorAll("#kp-tfilter button").forEach((x) =>
+        x.classList.toggle("on", x.dataset.f === "all"));
+      apply();
+    });
+    apply();
 
     list.querySelectorAll(".kp-detail").forEach((b) =>
       b.addEventListener("click", function () {

@@ -95,6 +95,9 @@ EXTRA_ICONS = {
 	"Model Reliability": "kumar-model",
 	"Warranty Cost Analysis": "kumar-claim",
 	"Stock vs Registration Reconciliation": "kumar-warehouse",
+	# the company side of the dealer portal; the shortcut carries a shorter label
+	"Dealer Requests & Claims": "kumar-portal",
+	"Dealer Requests": "kumar-portal",
 	"Data Migration": "kumar-import",
 	# desk pages
 	"Historical Serial Import": "kumar-import",

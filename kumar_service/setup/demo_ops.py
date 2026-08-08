@@ -1343,6 +1343,63 @@ def sales_cycle(orders=110):
 # -------------------------------------------------------------------- run
 
 
+def attribute_portal_requests(portal_share=0.55):
+	"""Mark a realistic share of dealer complaints and claims as portal-raised.
+
+	The demo builder creates everything as Administrator, so every row in the
+	"Dealer Requests & Claims" report read "Desk" - which is not what the company
+	would actually see, because a dealer with a portal login raises complaints
+	from the portal, not by ringing the branch to type it in for them.
+
+	`owner` is what identifies the channel (the report checks it against the
+	Dealer.portal_user list), so that is what gets set. Deterministic seed, so a
+	rebuild produces the same split.
+
+	Only touches documents whose dealer HAS a portal login - a dealer without one
+	genuinely cannot have raised it themselves.
+	"""
+	rng = random.Random(20260807)
+
+	logins = {
+		row.name: row.portal_user
+		for row in frappe.get_all(
+			"Dealer", filters={"portal_user": ["!=", ""]}, fields=["name", "portal_user"]
+		)
+	}
+	if not logins:
+		return 0
+
+	# A group dealer's own sub-dealers work through the parent's login here: the
+	# sub-dealer has no login of its own in this demo.
+	def login_for(dealer):
+		seen = 0
+		while dealer and seen < 8:
+			if dealer in logins:
+				return logins[dealer]
+			dealer = frappe.db.get_value("Dealer", dealer, "parent_dealer")
+			seen += 1
+		return None
+
+	changed = 0
+	for doctype in ("Service Request", "Kumar Warranty Claim"):
+		for row in frappe.get_all(
+			doctype, filters={"docstatus": ["<", 2]}, fields=["name", "dealer", "owner"]
+		):
+			if rng.random() > portal_share:
+				continue
+			user = login_for(row.dealer)
+			if not user or row.owner == user:
+				continue
+			# set_value, not a save: touching `owner` through the document API on a
+			# submitted doc is refused, and nothing else about the record changes.
+			frappe.db.set_value(doctype, row.name, "owner", user, update_modified=False)
+			changed += 1
+
+	frappe.db.commit()
+	print(f"  {changed} requests/claims attributed to the dealer portal")
+	return changed
+
+
 def build_all():
 	frappe.flags.mute_emails = True
 
@@ -1387,6 +1444,9 @@ def build_all():
 
 	print("direct (branch-counter) registrations...")
 	direct_registrations()
+
+	print("attributing dealer requests to the portal...")
+	attribute_portal_requests()
 
 	frappe.db.commit()
 	print("DEMO OPS DONE")

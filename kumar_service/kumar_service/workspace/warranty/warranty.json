@@ -1,7 +1,7 @@
 {
  "app": "kumar_service",
  "charts": [],
- "content": "[{\"id\": \"75c5003140\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Warranty &amp; Claims</b></span>\", \"col\": 12}}, {\"id\": \"683a09c470\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Shortcuts</b></span>\", \"col\": 12}}, {\"id\": \"972a2c3290\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Pending Claims\", \"col\": 3}}, {\"id\": \"3fc00d810e\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Warranty Expiring (30d)\", \"col\": 3}}, {\"id\": \"9c2b539271\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Batch Defect Analysis\", \"col\": 3}}, {\"id\": \"8ad87f4e61\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Warranty Cost\", \"col\": 3}}, {\"id\": \"485b601698\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"c547049b55\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Reports & Masters</b></span>\", \"col\": 12}}, {\"id\": \"71a7026e46\", \"type\": \"card\", \"data\": {\"card_name\": \"Claims\", \"col\": 4}}, {\"id\": \"3746572cae\", \"type\": \"card\", \"data\": {\"card_name\": \"Reports\", \"col\": 4}}, {\"id\": \"cbddd1e838\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"10a9dc4a99\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>How to use this screen</b></span>\", \"col\": 12}}, {\"id\": \"954a4065f9\", \"type\": \"paragraph\", \"data\": {\"text\": \"<div style='border:1px solid var(--border-color);border-radius:8px;padding:14px 16px;background:var(--fg-color)'><p style='margin:0 0 6px'><b>How to use Warranty & Claims</b></p><p style='margin:0 0 8px;color:var(--text-muted)'>Where a dealer's claim is checked and settled, and where warranty exposure is watched. Each claim carries the pump's heat number and winding batch, which is what makes it possible to spot a bad batch instead of arguing about one pump.</p><p style='margin:10px 0 4px'><b>Do this, in order</b></p><ol style='margin:0 0 4px 18px'><li>A dealer submits a claim; it lands in <b>Pending Claims</b>.</li><li>Service Manager reviews it into Under Investigation. Quality Engineer approves or rejects on the evidence - photos, technician report, root cause.</li><li>Approved claims go to Accounts to <b>Settle</b>, optionally against a credit note.</li><li>Check <b>Batch Defect Analysis</b> whenever two claims share a heat or winding batch.</li></ol><p style='margin:10px 0 4px'><b>Watch out for</b></p><ul style='margin:0 0 4px 18px'><li>Rejecting without a root cause loses the only information the factory would get.</li><li><b>Warranty Expiring (30d)</b> is a sales list, not a problem list - it is the AMC and replacement opportunity.</li></ul></div>\", \"col\": 12}}]",
+ "content": "[{\"id\": \"3fa8340b09\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Warranty &amp; Claims</b></span>\", \"col\": 12}}, {\"id\": \"6dfb8eaa54\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Shortcuts</b></span>\", \"col\": 12}}, {\"id\": \"f4b7f80ac4\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Pending Claims\", \"col\": 3}}, {\"id\": \"d3dbf1bc1f\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Warranty Expiring (30d)\", \"col\": 3}}, {\"id\": \"2368e62a90\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Batch Defect Analysis\", \"col\": 3}}, {\"id\": \"b20c4425f1\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Warranty Cost\", \"col\": 3}}, {\"id\": \"3847fefdbc\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"32af65600a\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Reports & Masters</b></span>\", \"col\": 12}}, {\"id\": \"7da2a03c86\", \"type\": \"card\", \"data\": {\"card_name\": \"Claims\", \"col\": 4}}, {\"id\": \"58c1abc30d\", \"type\": \"card\", \"data\": {\"card_name\": \"Reports\", \"col\": 4}}, {\"id\": \"4b0fbea4b1\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"71eac14a92\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>How to use this screen</b></span>\", \"col\": 12}}, {\"id\": \"45cd08e2d1\", \"type\": \"paragraph\", \"data\": {\"text\": \"<div style='border:1px solid var(--border-color);border-radius:8px;padding:14px 16px;background:var(--fg-color)'><p style='margin:0 0 6px'><b>How to use Warranty & Claims</b></p><p style='margin:0 0 8px;color:var(--text-muted)'>Where a dealer's claim is checked and settled, and where warranty exposure is watched. Each claim carries the pump's heat number and winding batch, which is what makes it possible to spot a bad batch instead of arguing about one pump.</p><p style='margin:10px 0 4px'><b>Do this, in order</b></p><ol style='margin:0 0 4px 18px'><li>A dealer submits a claim; it lands in <b>Pending Claims</b>.</li><li>Service Manager reviews it into Under Investigation. Quality Engineer approves or rejects on the evidence - photos, technician report, root cause.</li><li>Approved claims go to Accounts to <b>Settle</b>, optionally against a credit note.</li><li>Check <b>Batch Defect Analysis</b> whenever two claims share a heat or winding batch.</li></ol><p style='margin:10px 0 4px'><b>Watch out for</b></p><ul style='margin:0 0 4px 18px'><li>Rejecting without a root cause loses the only information the factory would get.</li><li><b>Warranty Expiring (30d)</b> is a sales list, not a problem list - it is the AMC and replacement opportunity.</li></ul></div>\", \"col\": 12}}]",
  "creation": "2026-08-07 17:15:57.054853",
  "custom_blocks": [],
  "docstatus": 0,
@@ -51,7 +51,7 @@
    "icon": "kumar-report",
    "is_query_report": 0,
    "label": "Reports",
-   "link_count": 4,
+   "link_count": 5,
    "link_type": "DocType",
    "onboard": 0,
    "type": "Card Break"
@@ -103,9 +103,21 @@
    "link_type": "Report",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "dependencies": "Service Request",
+   "hidden": 0,
+   "icon": "kumar-portal",
+   "is_query_report": 1,
+   "label": "Dealer Requests & Claims",
+   "link_count": 0,
+   "link_to": "Dealer Requests & Claims",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2026-08-08 16:01:06.909721",
+ "modified": "2026-08-08 23:16:19.140167",
  "modified_by": "Administrator",
  "module": "Kumar Service",
  "name": "Warranty",

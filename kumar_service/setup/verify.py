@@ -476,6 +476,44 @@ def run():
 	check("the portal does not use the permission-ignoring desk snapshot",
 		"api.get_pump_snapshot" not in portal_html)
 
+	# The canvas fix. Without a tinted page, white cards on frappe's white web
+	# shell read as one blank sheet - which is exactly how this screen looked
+	# before, and the sort of thing no unit test would ever notice.
+	check("the portal tints the page behind its cards", "background:#eaf1f8" in portal_html)
+	check("the portal hides frappe's duplicate page header",
+		"page-header-wrapper" in portal_html)
+	check("the tab bar sticks while scrolling", "position:sticky" in portal_html)
+	check("dropdowns are styled rather than native", "appearance:none" in portal_html)
+	for control in ("kc-pick", "kw-pick", "kp-tsearch", "kp-tstatus", "kp-tclear"):
+		check(f"the portal has the {control} control", f'id="{control}"' in portal_html)
+
+	# The company side of the portal: staff must be able to see what dealers
+	# raised, and tell portal from desk.
+	requests_report = "Dealer Requests & Claims"
+	check("the dealer-requests report exists", frappe.db.exists("Report", requests_report))
+	if frappe.db.exists("Report", requests_report):
+		try:
+			report = frappe.get_doc("Report", requests_report)
+			cols, rows = report.execute_script_report(filters={})[:2]
+			check("the dealer-requests report returns columns and rows",
+				len(cols) > 10 and len(rows) > 0, f"{len(cols)} cols / {len(rows)} rows")
+			sources = {r.get("raised_from") for r in rows}
+			check("it distinguishes portal-raised from desk-raised",
+				"Portal" in sources and "Desk" in sources, str(sorted(sources)))
+			kinds = {r.get("kind") for r in rows}
+			check("it covers both complaints and claims",
+				kinds == {"Complaint", "Warranty Claim"}, str(sorted(kinds)))
+			# a filter that does not filter is worse than no filter
+			_c, only_claims = report.execute_script_report(filters={"kind": "Warranty Claim"})[:2]
+			leaked = [r for r in only_claims if r.get("kind") != "Warranty Claim"]
+			check("its Type filter actually filters", not leaked, f"{len(only_claims)} rows")
+			_c, only_portal = report.execute_script_report(filters={"source": "Portal"})[:2]
+			leaked = [r for r in only_portal if r.get("raised_from") != "Portal"]
+			check("its Raised From filter actually filters", not leaked,
+				f"{len(only_portal)} portal rows")
+		except Exception as exc:  # noqa: BLE001
+			check("the dealer-requests report runs", False, str(exc)[:70])
+
 	print()
 	print("=" * 92)
 	print("BRANDING")

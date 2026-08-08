@@ -54,6 +54,7 @@ Aluminium Die Cast,అల్యూమినియం డై కాస్ట్
 Amended From,సవరించిన మూలం
 Amount,మొత్తం
 Analysis,విశ్లేషణ
+Any status,ఏ స్థితి అయినా
 Application,ఉపయోగం
 Approved Amount,ఆమోదించిన మొత్తం
 Approved By,ఆమోదించినవారు
@@ -135,6 +136,7 @@ Chemistry Out of Spec,రసాయన కూర్పు స్పెక్ ద�
 Chemistry within spec - CE {0},రసాయన కూర్పు స్పెక్ లోపలే ఉంది - CE {0}
 Choose a part,ఒక పార్ట్ ఎంచుకోండి
 Choose file and check,ఫైల్ ఎంచుకుని తనిఖీ చేయి
+Choose from your pumps,మీ పంపుల నుండి ఎంచుకోండి
 Choose one,ఒకటి ఎంచుకోండి
 Choose what is wrong with the pump,పంప్‌కు ఏం సమస్య ఉందో ఎంచుకోండి
 City,పట్టణం
@@ -150,6 +152,7 @@ Claimed Parts,క్లెయిమ్ చేసిన పార్ట్‌ల�
 Claims,క్లెయిమ్‌లు
 Claims being checked,పరిశీలనలో ఉన్న క్లెయిమ్‌లు
 Clear,తుడిచేయి
+Clear filters,ఫిల్టర్లు తొలగించు
 Closed,ముగిసింది
 Comma separated days before expiry to remind,గడువు ముగియడానికి ఎన్ని రోజుల ముందు గుర్తు చేయాలి - కామాతో వేరు చేయండి
 Commercial,వాణిజ్య
@@ -201,6 +204,8 @@ Dealer Name,డీలర్ పేరు
 Dealer Network,డీలర్ నెట్‌వర్క్
 Dealer Performance,డీలర్ పనితీరు
 Dealer Portal,డీలర్ పోర్టల్
+Dealer Requests,డీలర్ రిక్వెస్ట్‌లు
+Dealer Requests & Claims,డీలర్ రిక్వెస్ట్‌లు & క్లెయిమ్‌లు
 Dealer Stamp &amp; Signature,డీలర్ స్టాంప్ &amp; సంతకం
 Dealer Tree,డీలర్ వృక్షం
 Dealer Type,డీలర్ రకం
@@ -554,6 +559,7 @@ Open the reconciliation report to see what is still unaccounted for,ఇంకా
 Openwell Submersible Pumps,ఓపెన్‌వెల్ సబ్‌మెర్సిబుల్ పంపులు
 Operation,ఆపరేషన్
 Operator,ఆపరేటర్
+Or type / scan the serial,లేదా సీరియల్ టైప్ చేయండి / స్కాన్ చేయండి
 Order,ఆర్డర్
 Order to Invoice,ఆర్డర్ నుండి ఇన్‌వాయిస్ వరకు
 Ordered,ఆర్డర్ చేయబడింది
@@ -606,6 +612,7 @@ Performance Testing,పనితీరు పరీక్ష
 Phase,ఫేజ్
 Photo 1,ఫోటో 1
 Photo 2,ఫోటో 2
+Pick the pump you sold,మీరు అమ్మిన పంప్‌ను ఎంచుకోండి
 Pincode,పిన్‌కోడ్
 Piston Pumps,పిస్టన్ పంపులు
 Planned,ప్లాన్ చేయబడింది
@@ -769,6 +776,7 @@ Scan Serial / Batch,సీరియల్ / బ్యాచ్ స్కాన�
 Scan to verify warranty status,వారంటీ స్థితి చూడటానికి స్కాన్ చేయండి
 Scanned {0},{0} స్కాన్ చేయబడింది
 Seal Failure,సీల్ లోపం
+Search,వెతకండి
 Self-Priming Monobloc,సెల్ఫ్-ప్రైమింగ్ మోనోబ్లాక్
 Selling / Silent,అమ్ముతున్నవారు / మౌనంగా ఉన్నవారు
 Send to KUMAR,KUMAR కు పంపండి
@@ -787,6 +795,7 @@ Serial {0} appears twice in this file,{0} సీరియల్ ఈ ఫైల్
 Serial {0} is already registered ({1}).,{0} సీరియల్ ఇప్పటికే రిజిస్టర్ అయింది ({1}).
 Serial {0} is already registered under {1}. Amend that registration instead.,{0} సీరియల్ ఇప్పటికే {1} కింద రిజిస్టర్ అయింది. దాన్నే సవరించండి.
 Serial {0} is not a KUMAR pump we have any record of.,{0} సీరియల్ మా రికార్డులో ఉన్న KUMAR పంప్ కాదు.
+"Serial, customer, mobile or ticket number","సీరియల్, కస్టమర్, మొబైల్ లేదా టికెట్ నంబర్"
 Serials created,సృష్టించిన సీరియల్‌లు
 Series,సిరీస్
 Service,సర్వీస్
@@ -813,6 +822,8 @@ Shift,షిఫ్ట్
 Shift {0},షిఫ్ట్ {0}
 Shortcuts,షార్ట్‌కట్‌లు
 Show QR,QR చూపు
+Showing all {0},మొత్తం {0} చూపుతోంది
+Showing {0} of {1},{1} లో {0} చూపుతోంది
 Sign / QC,సంతకం / QC
 Signature,సంతకం
 Since 1971,1971 నుండి

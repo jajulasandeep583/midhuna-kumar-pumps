@@ -1,7 +1,7 @@
 {
  "app": "kumar_service",
  "charts": [],
- "content": "[{\"id\": \"0a9915df8f\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Service Desk</b></span>\", \"col\": 12}}, {\"id\": \"26326b37e3\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Shortcuts</b></span>\", \"col\": 12}}, {\"id\": \"0de4f17899\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Pump Lookup\", \"col\": 3}}, {\"id\": \"805150cdb2\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Open Requests\", \"col\": 3}}, {\"id\": \"78143dc764\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Today's Visits\", \"col\": 3}}, {\"id\": \"599a2b47c5\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Technicians\", \"col\": 3}}, {\"id\": \"c99291be06\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"SLA Compliance\", \"col\": 3}}, {\"id\": \"b90f8eafdb\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"0eb83a6d16\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Reports & Masters</b></span>\", \"col\": 12}}, {\"id\": \"25cec4fea5\", \"type\": \"card\", \"data\": {\"card_name\": \"Service\", \"col\": 4}}, {\"id\": \"d89e34702d\", \"type\": \"card\", \"data\": {\"card_name\": \"Analysis\", \"col\": 4}}, {\"id\": \"9bfd1c279b\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"6385f31d64\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>How to use this screen</b></span>\", \"col\": 12}}, {\"id\": \"9d8c630fe2\", \"type\": \"paragraph\", \"data\": {\"text\": \"<div style='border:1px solid var(--border-color);border-radius:8px;padding:14px 16px;background:var(--fg-color)'><p style='margin:0 0 6px'><b>How to use the Service Desk</b></p><p style='margin:0 0 8px;color:var(--text-muted)'>Everything after a customer complains: triage it, put a technician on it, and close it inside the SLA the company promises (24 hours to respond).</p><p style='margin:10px 0 4px'><b>Do this, in order</b></p><ol style='margin:0 0 4px 18px'><li>Open the complaint from <b>Open Requests</b>. The pump's full history is already on the form - check <b>Repeat Failure</b> before assuming it is a fresh fault.</li><li>Set <b>Technician</b> and <b>Service Centre</b>, then set status to Assigned. The response clock stops when you fill <b>First Response</b>.</li><li>The technician records what happened in a <b>Service Visit</b>: findings, parts used, labour. Warranty jobs default to non-chargeable.</li><li>Close the request with a <b>Root Cause</b>. That field is what feeds the Pareto chart and tells the factory what to fix.</li></ol><p style='margin:10px 0 4px'><b>Watch out for</b></p><ul style='margin:0 0 4px 18px'><li><b>SLA Breaches</b> is the list to clear first thing every morning.</li><li>If the root cause is a Manufacturing Defect, raise a Warranty Claim so the batch gets analysed - otherwise the plant never learns.</li></ul></div>\", \"col\": 12}}]",
+ "content": "[{\"id\": \"f838c8f0da\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Service Desk</b></span>\", \"col\": 12}}, {\"id\": \"ce5d9c141a\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Shortcuts</b></span>\", \"col\": 12}}, {\"id\": \"03108302ef\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Pump Lookup\", \"col\": 3}}, {\"id\": \"750f6b3533\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Open Requests\", \"col\": 3}}, {\"id\": \"40a729a479\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Today's Visits\", \"col\": 3}}, {\"id\": \"0b050b2319\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Technicians\", \"col\": 3}}, {\"id\": \"ec1480b6b5\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"SLA Compliance\", \"col\": 3}}, {\"id\": \"feb93f2813\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Dealer Requests\", \"col\": 3}}, {\"id\": \"62206729ab\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"69e4caed54\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>Reports & Masters</b></span>\", \"col\": 12}}, {\"id\": \"d2f8136ade\", \"type\": \"card\", \"data\": {\"card_name\": \"Service\", \"col\": 4}}, {\"id\": \"0ca0197a7b\", \"type\": \"card\", \"data\": {\"card_name\": \"Analysis\", \"col\": 4}}, {\"id\": \"8ac27e24fb\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"038322b946\", \"type\": \"header\", \"data\": {\"text\": \"<span class='h4'><b>How to use this screen</b></span>\", \"col\": 12}}, {\"id\": \"90648219b8\", \"type\": \"paragraph\", \"data\": {\"text\": \"<div style='border:1px solid var(--border-color);border-radius:8px;padding:14px 16px;background:var(--fg-color)'><p style='margin:0 0 6px'><b>How to use the Service Desk</b></p><p style='margin:0 0 8px;color:var(--text-muted)'>Everything after a customer complains: triage it, put a technician on it, and close it inside the SLA the company promises (24 hours to respond).</p><p style='margin:10px 0 4px'><b>Do this, in order</b></p><ol style='margin:0 0 4px 18px'><li>Open the complaint from <b>Open Requests</b>. The pump's full history is already on the form - check <b>Repeat Failure</b> before assuming it is a fresh fault.</li><li>Set <b>Technician</b> and <b>Service Centre</b>, then set status to Assigned. The response clock stops when you fill <b>First Response</b>.</li><li>The technician records what happened in a <b>Service Visit</b>: findings, parts used, labour. Warranty jobs default to non-chargeable.</li><li>Close the request with a <b>Root Cause</b>. That field is what feeds the Pareto chart and tells the factory what to fix.</li></ol><p style='margin:10px 0 4px'><b>Watch out for</b></p><ul style='margin:0 0 4px 18px'><li><b>SLA Breaches</b> is the list to clear first thing every morning.</li><li>If the root cause is a Manufacturing Defect, raise a Warranty Claim so the batch gets analysed - otherwise the plant never learns.</li></ul></div>\", \"col\": 12}}]",
  "creation": "2026-08-07 17:00:47.784711",
  "custom_blocks": [],
  "docstatus": 0,
@@ -62,7 +62,7 @@
    "icon": "kumar-report",
    "is_query_report": 0,
    "label": "Analysis",
-   "link_count": 3,
+   "link_count": 4,
    "link_type": "DocType",
    "onboard": 0,
    "type": "Card Break"
@@ -102,9 +102,21 @@
    "link_type": "Report",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "dependencies": "Service Request",
+   "hidden": 0,
+   "icon": "kumar-portal",
+   "is_query_report": 1,
+   "label": "Dealer Requests & Claims",
+   "link_count": 0,
+   "link_to": "Dealer Requests & Claims",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2026-08-08 16:01:06.851986",
+ "modified": "2026-08-08 23:16:18.940510",
  "modified_by": "Administrator",
  "module": "Kumar Service",
  "name": "Service Desk",
@@ -163,6 +175,15 @@
    "icon": "kumar-report",
    "label": "SLA Compliance",
    "link_to": "SLA Compliance",
+   "report_ref_doctype": "Service Request",
+   "type": "Report"
+  },
+  {
+   "color": "green",
+   "doc_view": "",
+   "icon": "kumar-portal",
+   "label": "Dealer Requests",
+   "link_to": "Dealer Requests & Claims",
    "report_ref_doctype": "Service Request",
    "type": "Report"
   }
