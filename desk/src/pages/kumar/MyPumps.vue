@@ -5,7 +5,12 @@
         <div class="text-lg font-semibold text-ink-gray-9">{{ __("What I Sold") }}</div>
       </template>
       <template #right-header>
-        <Button variant="solid" :label="__('Register a Sale')" @click="router.push({ name: 'KumarRegister' })" />
+        <Button
+          variant="solid"
+          theme="blue"
+          :label="__('Register a Sale')"
+          @click="router.push({ name: 'KumarRegister' })"
+        />
       </template>
     </LayoutHeader>
 
@@ -20,7 +25,7 @@
 
       <!-- Scan first: a scanner types fast and sends Enter, and the dealer
            holding the pump has the barcode, not the customer's name. -->
-      <div class="mb-3 flex flex-wrap items-end gap-2 rounded-lg border bg-surface-gray-1 p-3">
+      <div class="mb-3 flex flex-wrap items-end gap-3 rounded-lg border border-outline-gray-2 bg-surface-white p-4 shadow-sm">
         <div class="w-full sm:w-80">
           <label class="mb-1 block text-xs font-medium text-ink-gray-5">
             {{ __("Scan a barcode") }}
@@ -34,14 +39,15 @@
             @keydown.enter.prevent="onScan"
           />
         </div>
-        <Button :label="__('Find')" @click="onScan" />
+        <Button variant="subtle" theme="blue" :label="__('Find')" @click="onScan" />
+        <ScanButton @scanned="onCameraScan" />
         <div v-if="scanMsg" class="pb-2 text-xs" :class="scanOk ? 'text-ink-green-3' : 'text-ink-red-3'">
           {{ scanMsg }}
         </div>
       </div>
 
       <!-- the same five filters the portal has, plus the date range -->
-      <div class="mb-4 grid gap-3 rounded-lg border bg-surface-gray-1 p-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="mb-4 grid gap-3 rounded-lg border border-outline-gray-2 bg-surface-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-4">
         <FormControl v-model="f.q" type="text" :label="__('Search')"
           :placeholder="__('Customer, mobile, village or serial')" />
         <FormControl v-model="f.state" type="select" :label="__('Warranty')" :options="stateOptions" />
@@ -51,7 +57,7 @@
         <FormControl v-model="f.from" type="date" :label="__('Sold From')" />
         <FormControl v-model="f.to" type="date" :label="__('Sold To')" />
         <div class="flex items-end">
-          <Button class="w-full" :label="__('Clear filters')" @click="clear" />
+          <Button class="w-full" variant="outline" :label="__('Clear filters')" @click="clear" />
         </div>
       </div>
 
@@ -112,7 +118,19 @@
                 </div>
               </td>
               <td class="whitespace-nowrap px-3 py-2 text-right">
-                <Button :label="__('Complaint')" @click="complain(p)" />
+                <!-- the certificate is what the dealer owes the customer, so it
+                     belongs on the row rather than three clicks away -->
+                <Button
+                  variant="ghost"
+                  :label="__('Print')"
+                  @click="printCertificate(p)"
+                />
+                <Button
+                  class="ml-1"
+                  variant="subtle"
+                  :label="__('Complaint')"
+                  @click="complain(p)"
+                />
               </td>
             </tr>
           </tbody>
@@ -127,6 +145,7 @@ import { computed, nextTick, reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import { Badge, Button, FormControl, createResource } from "frappe-ui";
 import { LayoutHeader } from "@/components";
+import ScanButton from "./ScanButton.vue";
 import { __ } from "@/translation";
 
 const router = useRouter();
@@ -179,6 +198,13 @@ function clear() {
   highlighted.value = "";
 }
 
+// the camera hands back a decoded serial; run it through the same path a typed
+// one takes so both behave identically
+function onCameraScan(value: string) {
+  scan.value = value;
+  onScan();
+}
+
 function onScan() {
   const v = scan.value.trim();
   if (!v) return;
@@ -204,6 +230,11 @@ function themeFor(s: string) {
   if (s === "In Warranty") return "green";
   if (s === "Expiring Soon") return "orange";
   return "gray";
+}
+
+function printCertificate(p: any) {
+  if (!p.certificate_url) return;
+  window.open(p.certificate_url, "_blank", "noopener");
 }
 
 function complain(p: any) {

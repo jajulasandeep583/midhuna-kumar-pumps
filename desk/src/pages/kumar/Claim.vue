@@ -18,29 +18,20 @@
       <div class="mb-2 text-xs font-semibold uppercase tracking-wider text-ink-gray-5">
         {{ __("1. Which pump?") }}
       </div>
-      <FormControl
-        v-model="query"
-        type="text"
-        :placeholder="__('Type a serial, model or customer - or scan')"
-        autocomplete="off"
-        @update:model-value="onType"
-      />
-      <ul
-        v-if="matches.length && !picked"
-        class="mt-1 max-h-56 overflow-y-auto rounded border bg-surface-white shadow-sm"
-      >
-        <li
-          v-for="p in matches"
-          :key="p.serial_no"
-          class="cursor-pointer px-3 py-2 hover:bg-surface-gray-2"
-          @click="take(p)"
-        >
-          <div class="text-sm font-medium text-ink-gray-8">{{ p.serial_no }}</div>
-          <div class="text-xs text-ink-gray-5">
-            {{ [p.model, p.customer].filter(Boolean).join(" · ") }}
-          </div>
-        </li>
-      </ul>
+      <!-- the app's own combobox rather than a hand-rolled list: it gives
+           keyboard navigation, filtering and an empty state for free, and it is
+           the control every other link field in the desk already uses -->
+      <div class="flex items-center gap-2">
+        <div class="flex-1">
+          <Autocomplete
+            v-model="selected"
+            :options="pumpOptions"
+            :placeholder="__('Type a serial, model or customer')"
+            @update:model-value="onPick"
+          />
+        </div>
+        <ScanButton @scanned="onScanned" />
+      </div>
       <div v-if="snapshot" class="mt-3 rounded border bg-surface-gray-1 p-3 text-sm">
         <div class="font-medium text-ink-gray-8">{{ snapshot.pump_model }}</div>
         <Badge
@@ -82,6 +73,7 @@
       <Button
         class="mt-5 w-full"
         variant="solid"
+        theme="blue"
         :loading="submit.loading"
         :disabled="!picked"
         :label="__('Lodge Claim with KUMAR')"
@@ -97,10 +89,11 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { Badge, Button, ErrorMessage, FormControl, createResource } from "frappe-ui";
-import { LayoutHeader } from "@/components";
+import { Autocomplete, LayoutHeader } from "@/components";
+import ScanButton from "./ScanButton.vue";
 import { __ } from "@/translation";
 
-const query = ref("");
+const selected = ref<any>(null);
 const picked = ref<any>(null);
 const snapshot = ref<any>(null);
 const claimType = ref("Part Replacement");
@@ -112,35 +105,41 @@ const pumps = createResource({ url: "kumar_service.portal_api.my_pumps", auto: t
 const options = createResource({ url: "kumar_service.portal_api.portal_options", auto: true });
 
 const claimTypeOptions = computed(() =>
-  (options.data?.claim_types || []).map((c: string) => ({ label: __(c), value: c }))
+  (options.data?.claim_types?.length
+    ? options.data.claim_types
+    : ["Part Replacement", "Full Replacement", "Repair Reimbursement"]
+  ).map((c: string) => ({ label: __(c), value: c }))
 );
 const rootCauseOptions = computed(() => [
   { label: __("Not sure"), value: "" },
   ...(options.data?.root_causes || []).filter(Boolean).map((c: string) => ({ label: __(c), value: c })),
 ]);
 
-const matches = computed(() => {
-  const q = query.value.trim().toLowerCase();
-  if (q.length < 2) return [];
-  return (pumps.data || [])
-    .filter((p: any) =>
-      [p.serial_no, p.model, p.customer].some((f: string) => (f || "").toLowerCase().includes(q))
-    )
-    .slice(0, 25);
-});
 
-function onType() {
-  picked.value = null;
-  snapshot.value = null;
-  const exact = (pumps.data || []).find(
-    (p: any) => p.serial_no.toLowerCase() === query.value.trim().toLowerCase()
-  );
-  if (exact) take(exact);
+
+// label carries everything a dealer might search on, because Autocomplete
+// filters on the label - serial alone would not find "Gopal Rao"
+const pumpOptions = computed(() =>
+  (pumps.data || []).map((p: any) => ({
+    label: [p.serial_no, p.model, p.customer, p.district].filter(Boolean).join(" · "),
+    value: p.serial_no,
+  }))
+);
+
+function onScanned(serial: string) {
+  const hit = (pumps.data || []).find((p: any) => p.serial_no === serial);
+  if (hit) take(hit);
+}
+
+function onPick(opt: any) {
+  const serial = opt?.value || opt;
+  const hit = (pumps.data || []).find((p: any) => p.serial_no === serial);
+  if (hit) take(hit);
 }
 
 function take(p: any) {
   picked.value = p;
-  query.value = p.serial_no;
+  selected.value = { label: p.serial_no, value: p.serial_no };
   lookup.submit({ serial_no: p.serial_no });
 }
 
@@ -160,7 +159,7 @@ const submit = createResource({
   onSuccess: (d: any) => {
     done.value = d;
     picked.value = null;
-    query.value = "";
+    selected.value = null;
     snapshot.value = null;
     report.value = "";
   },

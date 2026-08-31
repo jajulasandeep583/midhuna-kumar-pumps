@@ -96,6 +96,46 @@ TICKET_FIELDS = [
 ]
 
 
+# Not every service need is a complaint. A dealer ringing about an installation,
+# a paid visit or a spare part was previously forced to file all of it as a
+# complaint, which made "complaints per model" a meaningless number and told the
+# service desk nothing about what was actually being asked for.
+#
+# One field on the request rather than a second form: two forms writing the same
+# doctype is how a dealer ends up guessing which one to use.
+REQUEST_TYPES = [
+	"Complaint",
+	"Installation",
+	"Paid Service",
+	"Spare Part",
+	"Enquiry",
+]
+
+SERVICE_REQUEST_FIELDS = [
+	{
+		"fieldname": "custom_request_type",
+		"fieldtype": "Select",
+		"label": "Request Type",
+		"options": "\n".join(REQUEST_TYPES),
+		"default": "Complaint",
+		"insert_after": "complaint_category",
+		"in_standard_filter": 1,
+		"description": "What the dealer is asking for. A complaint is a fault; "
+		"the rest are work they want done.",
+	}
+]
+
+
+def request_type_field():
+	if not frappe.db.exists("DocType", "Service Request"):
+		return []
+	from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
+
+	create_custom_fields({"Service Request": SERVICE_REQUEST_FIELDS}, ignore_validate=True,
+		update=True)
+	return [f["fieldname"] for f in SERVICE_REQUEST_FIELDS]
+
+
 def ticket_fields():
 	"""Put the pump facts on HD Ticket, as custom fields."""
 	if not frappe.db.exists("DocType", "HD Ticket"):
@@ -302,6 +342,7 @@ def build_all():
 		"agents": agents(),
 		"ticket_types": ticket_types(),
 		"ticket_fields": ticket_fields(),
+		"request_type_field": request_type_field(),
 		"dealer_permissions": dealer_permissions(),
 		"dealers": dealers(),
 	}

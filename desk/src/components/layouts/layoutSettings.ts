@@ -78,7 +78,7 @@ export const customerPortalSidebarOptions = [
     to: "KumarPumps",
   },
   {
-    label: __("Raise a Complaint"),
+    label: __("Raise a Request"),
     icon: LucideMessageSquare,
     to: "KumarComplaint",
   },

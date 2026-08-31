@@ -725,21 +725,14 @@ def run():
 	) or ""
 	check("the reply button is loaded by the desk bundle", "dealer_reply.js" in bundle)
 
-	# The chat panel on the document, so the desk shows the conversation the way
-	# staff read every other conversation they have.
-	chat_js = frappe.read_file(
-		frappe.get_app_path("kumar_service", "public", "js", "dealer_chat.js")
-	) or ""
-	check("the form carries a chat panel", "Conversation with Dealer" in chat_js)
-	check("the chat panel sends through the staff endpoint",
-		"staff_api.reply_to_dealer" in chat_js)
-	check("the chat panel can attach a file", "readAsDataURL" in chat_js)
-	check("the chat panel is loaded by the desk bundle", "dealer_chat.js" in bundle)
+	# The chat panel that used to be asserted here is gone: KUMAR Pumps Desk
+	# owns the conversation now, and running two chat UIs over one comment
+	# thread was worse than either on its own.
 
 	css = frappe.read_file(
 		frappe.get_app_path("kumar_service", "public", "css", "kumar.bundle.css")
 	) or ""
-	for needed in (".kchat-stream", ".kchat-bub", ".kchat-atts", ".kumar-attachments"):
+	for needed in (".kumar-attachments",):
 		check(f"the chat panel is styled: {needed}", needed in css)
 
 	# Attachments have to be visible in the DESK, not only in our own screens:

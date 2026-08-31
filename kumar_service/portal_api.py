@@ -103,6 +103,8 @@ def portal_options():
 		"claim_types": options("Kumar Warranty Claim", "claim_type"),
 		"root_causes": options("Kumar Warranty Claim", "root_cause"),
 		"applications": options("Pump Registration", "application_type"),
+		"request_types": options("Service Request", "custom_request_type")
+			or ["Complaint", "Installation", "Paid Service", "Spare Part", "Enquiry"],
 	}
 
 
@@ -181,6 +183,8 @@ def my_pumps(limit=600):
 		limit=cint(limit) or 600,
 	)
 
+	from kumar_service.api import certificate_url
+
 	# model -> family, so "What I Sold" can filter by product family the way the
 	# portal does. One query for the whole catalogue rather than one per row.
 	categories = dict(
@@ -208,6 +212,9 @@ def my_pumps(limit=600):
 		out.append(
 			{
 				"registration": r.name,
+				# the sheet the dealer actually owes the customer - without it
+				# they are back in the old portal to print a certificate
+				"certificate_url": certificate_url(r.name),
 				"serial_no": r.serial_no,
 				"model": r.pump_model or "",
 				"category": categories.get(r.pump_model) or "",
@@ -264,7 +271,8 @@ def pump_snapshot(serial_no):
 
 
 @frappe.whitelist()
-def raise_complaint(serial_no, complaint_category, complaint_description, priority="Medium"):
+def raise_complaint(serial_no, complaint_category, complaint_description, priority="Medium",
+		attachments=None, request_type="Complaint"):
 	"""A dealer logging a customer's complaint. Submits, so the SLA clock starts."""
 	reg = _my_serial(serial_no)
 
@@ -279,6 +287,7 @@ def raise_complaint(serial_no, complaint_category, complaint_description, priori
 			"serial_no": serial_no,
 			"complaint_category": complaint_category,
 			"complaint_description": complaint_description,
+			"custom_request_type": request_type or "Complaint",
 			"priority": priority or "Medium",
 			"reported_on": now_datetime(),
 		}
@@ -288,8 +297,32 @@ def raise_complaint(serial_no, complaint_category, complaint_description, priori
 	doc.insert(ignore_permissions=True)
 	doc.submit()
 
+	# Photographs and a short video are most of what a dealer has to offer: a
+	# picture of a burnt winding or a video of a pump that will not prime says
+	# more than a paragraph, and it is what decides whether a technician is sent.
+	# They ride on the ticket's own thread through the same path a reply takes,
+	# so the desk and the portal both show them with no special case.
+	attached = 0
+	if attachments:
+		# add_reply takes the raw [{filename, content}] list and does the
+		# decoding, size check and File row itself - the same path a reply with
+		# photos already takes, so there is one place where this can go wrong.
+		if isinstance(attachments, str):
+			attachments = frappe.parse_json(attachments)
+		attachments = [a for a in (attachments or []) if a]
+		if attachments:
+			add_reply(
+				"Service Request",
+				doc.name,
+				_("Photos from the dealer"),
+				notify_users=_staff_to_notify("Service Request", doc.name),
+				attachments=attachments,
+			)
+			attached = len(attachments)
+
 	return {
 		"name": doc.name,
+		"attached": attached,
 		"status": doc.status,
 		"is_under_warranty": cint(doc.is_under_warranty),
 		"response_due_on": doc.response_due_on,
@@ -976,13 +1009,12 @@ def ticket_thread(kind, name):
 	return {"kind": kind, "name": name, "thread": thread_for(doctype, name)}
 
 
-@frappe.whitelist()
-def post_reply(kind, name, message, attachments=None):
-	"""The dealer writing back to KUMAR, with photos if they have them."""
-	doctype, dealer = _my_ticket(kind, name)
+def _staff_to_notify(doctype, name):
+	"""Who at KUMAR should hear about this ticket.
 
-	# Tell the people who actually own the ticket: whoever it is assigned to, the
-	# technician on it, and the Service Managers.
+	Whoever it is assigned to, the technician on it, and the Service Managers.
+	Shared by a dealer's reply and by a complaint that arrives with photos.
+	"""
 	notify = set()
 	if doctype == "Service Request":
 		tech_user = frappe.db.get_value(
@@ -999,7 +1031,17 @@ def post_reply(kind, name, message, attachments=None):
 			pluck="parent",
 		)
 	)
-	notify.add(frappe.db.get_value(doctype, name, "owner"))
+	owner = frappe.db.get_value(doctype, name, "owner")
+	if owner:
+		notify.add(owner)
+	return notify
+
+
+@frappe.whitelist()
+def post_reply(kind, name, message, attachments=None):
+	"""The dealer writing back to KUMAR, with photos if they have them."""
+	doctype, dealer = _my_ticket(kind, name)
+	notify = _staff_to_notify(doctype, name)
 
 	add_reply(doctype, name, message, notify_users=notify, attachments=attachments)
 	reopened = _reopen_if_settled(doctype, name)

@@ -109,7 +109,9 @@ def customer_for(dealer):
 # -------------------------------------------------------------------- mirror
 
 def _subject(sr):
-	bits = [sr.get("complaint_category") or "Complaint"]
+	kind = sr.get("custom_request_type") or "Complaint"
+	# "Installation - KP-..." reads better in a queue than the category alone
+	bits = [kind if kind != "Complaint" else (sr.get("complaint_category") or "Complaint")]
 	if sr.get("serial_no"):
 		bits.append(sr.serial_no)
 	return " - ".join(bits)
@@ -132,6 +134,14 @@ def _description(sr):
 	)
 	body = frappe.utils.escape_html(sr.get("complaint_description") or "")
 	return f"<p>{body}</p><table>{lines}</table>"
+
+
+def _ticket_type(sr):
+	"""The desk's ticket type, from what the dealer said they wanted."""
+	wanted = sr.get("custom_request_type") or "Complaint"
+	if frappe.db.exists("HD Ticket Type", wanted):
+		return wanted
+	return "Complaint" if frappe.db.exists("HD Ticket Type", "Complaint") else None
 
 
 def mirror(doc, method=None):
@@ -171,7 +181,7 @@ def _mirror(sr):
 			doctype="HD Ticket",
 			description=_description(sr),
 			customer=customer_for(sr.get("dealer")),
-			ticket_type="Complaint" if frappe.db.exists("HD Ticket Type", "Complaint") else None,
+			ticket_type=_ticket_type(sr),
 			**values,
 		)
 	)

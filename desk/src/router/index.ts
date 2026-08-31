@@ -160,16 +160,15 @@ const portalRoutes = [
     props: true,
   },
   {
+    // A dealer raising a ticket is always raising it about a pump. The stock
+    // form asks for a subject and nothing else, which produces a ticket nobody
+    // can act on - no serial, no warranty position, no dealer. Send them to the
+    // complaint form, which asks the questions that matter and files a real
+    // Service Request behind it.
     path: "/my-tickets/new",
     name: "TicketNew",
-    component: () => import("@/pages/ticket/TicketNew.vue"),
-    props: true,
-    meta: {
-      onSuccessRoute: "TicketCustomer",
-      parent: "TicketsCustomer",
-      public: true,
-      auth: true,
-    },
+    redirect: { name: "KumarComplaint" },
+    meta: { public: true, auth: true },
   },
   // ------------------------------------------------- KUMAR dealer routes
   //

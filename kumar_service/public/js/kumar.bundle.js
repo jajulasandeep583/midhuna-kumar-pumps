@@ -13,6 +13,7 @@ import "./kumar_dashboard.js";
 // already have a script of their own, and its handlers simply never fire
 // anywhere else.
 import "./dealer_reply.js";
-// The chat panel on the Service Request / Warranty Claim form. Same two
-// doctypes, same reason for living in the shared bundle.
-import "./dealer_chat.js";
+// The chat panel that used to sit on the Service Request and Warranty Claim
+// forms is gone. It existed because frappe's comment timeline reads as an audit
+// log rather than a conversation - but the desk answers that properly now, and
+// two chat UIs over one thread is worse than either alone.

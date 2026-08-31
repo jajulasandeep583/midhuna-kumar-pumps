@@ -18,14 +18,18 @@
       <div class="mb-2 text-xs font-semibold uppercase tracking-wider text-ink-gray-5">
         {{ __("1. Which pump?") }}
       </div>
-      <FormControl
-        v-model="form.serial_no"
-        type="text"
-        :label="__('Serial number')"
-        :placeholder="__('KP-... (scan the barcode on the nameplate)')"
-        autocomplete="off"
-        @change="check"
-      />
+      <div class="flex items-end gap-2">
+        <FormControl
+          class="flex-1"
+          v-model="form.serial_no"
+          type="text"
+          :label="__('Serial number')"
+          :placeholder="__('KP-... or scan the nameplate')"
+          autocomplete="off"
+          @change="check"
+        />
+        <ScanButton @scanned="onScanned" />
+      </div>
       <div v-if="lookup.loading" class="mt-2 text-sm text-ink-gray-5">{{ __("Checking...") }}</div>
       <div v-else-if="found" class="mt-2 rounded border bg-surface-gray-1 p-3 text-sm">
         <span class="font-medium text-ink-gray-8">{{ found.pump_model }}</span>
@@ -53,7 +57,15 @@
         {{ __("4. Where it is installed") }}
       </div>
       <div class="grid gap-3 sm:grid-cols-2">
-        <FormControl v-model="form.installation_address" type="text" :label="__('Village / address')" />
+        <!-- an address is two or three lines, not a single-line box -->
+        <FormControl
+          class="sm:col-span-2"
+          v-model="form.installation_address"
+          type="textarea"
+          :rows="3"
+          :label="__('Village / address')"
+          :placeholder="__('House number, street, village')"
+        />
         <FormControl v-model="form.district" type="text" :label="__('District')" />
         <FormControl v-model="form.state" type="text" :label="__('State')" />
         <FormControl
@@ -69,6 +81,7 @@
       <Button
         class="mt-5 w-full"
         variant="solid"
+        theme="blue"
         :loading="submit.loading"
         :disabled="!canSubmit"
         :label="__('Register & Get Warranty Certificate')"
@@ -96,6 +109,7 @@
 import { computed, reactive, ref } from "vue";
 import { Button, ErrorMessage, FormControl, createResource } from "frappe-ui";
 import { LayoutHeader } from "@/components";
+import ScanButton from "./ScanButton.vue";
 import { __ } from "@/translation";
 
 const today = new Date().toISOString().slice(0, 10);
@@ -131,6 +145,11 @@ const lookup = createResource({
     lookupError.value = __("That serial is not available to register. Check the nameplate.");
   },
 });
+
+function onScanned(value: string) {
+  form.serial_no = value;
+  check();
+}
 
 function check() {
   found.value = null;
