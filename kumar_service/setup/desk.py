@@ -333,6 +333,64 @@ def dealers():
 	return linked
 
 
+# Screens that existed only because the desk did not. Each was a workaround for
+# something KUMAR Pumps Desk now does properly, and leaving them up means two
+# places to look and two places to fix.
+SUPERSEDED_PAGES = {
+	"dealer-conversations": "the desk's Tickets queue",
+	"service-command-centre": "/kumar-desk/manage",
+}
+
+
+def retire_superseded():
+	"""Take down what the desk replaced, and helpdesk's own out-of-box furniture.
+
+	Safe to run again: everything here checks before it deletes.
+	"""
+	done = []
+
+	# helpdesk ships a sample ticket, and it sits in a real queue looking like
+	# work somebody has to do
+	if frappe.db.exists("DocType", "HD Ticket"):
+		for t in frappe.get_all(
+			"HD Ticket", filters={"custom_service_request": ["in", ["", None]]}, pluck="name"
+		):
+			frappe.delete_doc("HD Ticket", t, force=True, ignore_permissions=True)
+			done.append(f"sample ticket {t}")
+
+	# The Page RECORDS are not deleted here. A Page is app code, and frappe only
+	# permits deleting one in developer mode - correctly, because the record is a
+	# shadow of a folder in the app. The folders are gone from the app, so
+	# `bench migrate` removes the orphaned records on its own. What this does is
+	# take away every way anyone still reaches them.
+
+	# a shortcut left pointing at a deleted page is a dead link on somebody's
+	# home screen, which is worse than no link at all
+	for link in frappe.get_all(
+		"Workspace Link",
+		filters={"link_to": ["in", list(SUPERSEDED_PAGES) +
+			["Dealer Conversations", "Service Command Centre"]]},
+		fields=["name", "parent"],
+	):
+		frappe.db.delete("Workspace Link", {"name": link.name})
+		done.append(f"dead link on {link.parent}")
+
+	# helpdesk's first-run tour teaches helpdesk's concepts, not KUMAR's
+	if frappe.db.exists("DocType", "HD Settings"):
+		s = frappe.get_single("HD Settings")
+		for flag in ("setup_complete", "initial_helpdesk_name_setup_skipped", "persona_captured"):
+			if s.meta.has_field(flag):
+				s.set(flag, 1)
+		if s.meta.has_field("show_customer_portal_permission_notice"):
+			s.set("show_customer_portal_permission_notice", 0)
+		s.flags.ignore_permissions = True
+		s.save(ignore_permissions=True)
+		done.append("helpdesk onboarding tour dismissed")
+
+	frappe.db.commit()
+	return done
+
+
 def build_all():
 	if not frappe.db.exists("DocType", "HD Settings"):
 		frappe.msgprint("helpdesk is not installed on this site; skipping the desk setup")
@@ -345,6 +403,7 @@ def build_all():
 		"request_type_field": request_type_field(),
 		"dealer_permissions": dealer_permissions(),
 		"dealers": dealers(),
+		"retired": retire_superseded(),
 	}
 	frappe.db.commit()
 	return out

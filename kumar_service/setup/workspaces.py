@@ -34,68 +34,6 @@ def _guide(title, purpose, steps, watch_outs=None):
 
 WORKSPACES = [
 	{
-		"name": "Kumar Management",
-		"label": "Management",
-		"title_text": "Management",
-		"icon": "kumar-management",
-		"sequence": 0,
-		"roles": ["System Manager", "Dealer Manager", "Service Manager",
-			"Production Manager", "Accounts User"],
-		"guide": _guide(
-			"Management",
-			"Six screens that read the same month from six angles. Nothing here is typed in - "
-			"every number is computed from the documents the plant and the dealers are already "
-			"raising, so if a figure looks wrong the answer is always in the document behind it. "
-			"Click any row to open the document it came from.",
-			[
-				"<b>Management Dashboard</b> is the daily one: revenue, spend, margin, output, "
-				"quality, complaints and the wage bill on one screen. It answers <i>how are we "
-				"doing</i>; the other five answer <i>why</i>.",
-				"<b>Sales Analytics</b> - revenue by day, best models, top dealers and customers, "
-				"and the receivable ageing. The order-to-invoice funnel shows where a sale is "
-				"stuck: ordered but not delivered, or delivered but not billed.",
-				"<b>Purchase Analytics</b> - spend by supplier and material, what has been ordered "
-				"and not received, and what has been received and not billed.",
-				"<b>Daily Production</b> - units built per day against units tested and passed, "
-				"split by shift, with the foundry and winding lines underneath.",
-				"<b>Dealer Network</b> - every dealer ranked, with a fault rate per dealer and the "
-				"districts the pumps actually landed in. Silent dealers are the ones to ring.",
-				"<b>People &amp; Payroll</b> - headcount by department, attendance for the period, "
-				"and what the last payroll run cost.",
-			],
-			[
-				"Every screen defaults to the last 30 days. Change the period at the top - the "
-				"whole screen, tiles and tables included, moves with it.",
-				"Money tiles are shortened to lakhs and crores so they read at a glance; hover for "
-				"the exact rupee figure.",
-				"A dealer login never sees this workspace. Dealers get <b>My Business</b>, which "
-				"shows only their own network.",
-			],
-		),
-		"shortcuts": [
-			("management-dashboard", "Page", "Management Dashboard", "blue"),
-			("sales-analytics", "Page", "Sales Analytics", "green"),
-			("purchase-analytics", "Page", "Purchase Analytics", "orange"),
-			("production-daily", "Page", "Daily Production", "purple"),
-			("dealer-network", "Page", "Dealer Network", "blue"),
-			# how well we are looking after customers and dealers - a management
-			# question, not only a service-desk one
-			("service-command-centre", "Page", "Service Command Centre", "red"),
-			("people-payroll", "Page", "People & Payroll", "grey"),
-		],
-		"links": [
-			("Sales", ["Sales Invoice", "Sales Order", "Delivery Note", "Customer", "Dealer"]),
-			("Purchase", ["Purchase Invoice", "Purchase Order", "Purchase Receipt",
-				"Material Request", "Supplier"]),
-			("Plant", ["Work Order", "Stock Entry", "BOM", "Pump Test Certificate",
-				"Heat Record", "Winding Batch Record"]),
-			("People", ["Employee", "Attendance", "Salary Slip", "Leave Application",
-				"Salary Structure"]),
-			("Money", ["Payment Entry", "Journal Entry", "Accounts Receivable",
-				"Accounts Payable", "General Ledger", "Profit and Loss Statement"]),
-		],
-	},
-	{
 		"name": "Kumar Dealer Desk",
 		"label": "Dealer Desk",
 		"title_text": "Dealer Desk",
@@ -135,51 +73,6 @@ WORKSPACES = [
 		"links": [
 			("Sales & Registration", ["Pump Registration", "Serial No", "Sales Invoice", "Delivery Note"]),
 			("Service", ["Service Request", "Service Visit", "Kumar Warranty Claim"]),
-		],
-	},
-	{
-		"name": "Kumar Service Desk",
-		"label": "Service Desk",
-		"title_text": "Service Desk",
-		"icon": "support",
-		"sequence": 2,
-		"roles": ["Service Manager", "Service Technician", "System Manager"],
-		"guide": _guide(
-			"the Service Desk",
-			"Everything after a customer complains: triage it, put a technician on it, and close it "
-			"inside the SLA the company promises (24 hours to respond).",
-			[
-				"Open the complaint from <b>Open Requests</b>. The pump's full history is already on "
-				"the form - check <b>Repeat Failure</b> before assuming it is a fresh fault.",
-				"Set <b>Technician</b> and <b>Service Centre</b>, then set status to Assigned. "
-				"The response clock stops when you fill <b>First Response</b>.",
-				"The technician records what happened in a <b>Service Visit</b>: findings, parts used, "
-				"labour. Warranty jobs default to non-chargeable.",
-				"Close the request with a <b>Root Cause</b>. That field is what feeds the Pareto chart "
-				"and tells the factory what to fix.",
-			],
-			[
-				"<b>SLA Breaches</b> is the list to clear first thing every morning.",
-				"If the root cause is a Manufacturing Defect, raise a Warranty Claim so the batch gets "
-				"analysed - otherwise the plant never learns.",
-			],
-		),
-		"shortcuts": [
-			# the two screens the service desk actually runs on
-			("service-command-centre", "Page", "Command Centre", "blue"),
-			("dealer-conversations", "Page", "Dealer Conversations", "green"),
-			("pump-lookup", "Page", "Pump Lookup", "blue"),
-			("Service Request", "DocType", "Open Requests", "red"),
-			("Service Visit", "DocType", "Today's Visits", "orange"),
-			("Service Technician", "DocType", "Technicians", "blue"),
-			("SLA Compliance", "Report", "SLA Compliance", "purple"),
-			# the company side of the dealer portal
-			("Dealer Requests and Claims", "Report", "Dealer Requests", "green"),
-		],
-		"links": [
-			("Service", ["Service Request", "Service Visit", "Service Technician"]),
-			("Analysis", ["Dealer Performance", "Technician Productivity", "Model Reliability",
-				"Dealer Requests and Claims"]),
 		],
 	},
 	{
