@@ -645,7 +645,7 @@ const articleActions = computed(() => [
     icon: "lucide-link",
     onClick: () => {
       const url = new URL(window.location.href);
-      url.pathname = `/helpdesk/kb-public/articles/${props.articleId}`;
+      url.pathname = `/kumar-desk/kb-public/articles/${props.articleId}`;
       copyToClipboard(url.toString(), __("Article link copied to clipboard"));
     },
   },

@@ -169,7 +169,7 @@ const groupByActions = [
     onClick: async ({ group }) => {
       const { label, value } = group;
       const url = new URL(window.location.href);
-      url.pathname = `/helpdesk/kb-public/${value}`;
+      url.pathname = `/kumar-desk/kb-public/${value}`;
       await copyToClipboard(
         url.toString(),
         __("Category '{0}' link copied to clipboard", [label])

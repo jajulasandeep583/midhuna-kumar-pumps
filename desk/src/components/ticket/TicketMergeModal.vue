@@ -195,7 +195,7 @@ const mergeTicket = createResource({
     showDialog.value = false;
     // open the target Ticket
     window.open(
-      window.location.origin + "/helpdesk/tickets/" + targetTicket.value,
+      window.location.origin + "/kumar-desk/tickets/" + targetTicket.value,
       "_blank"
     );
     targetTicket.value = null;

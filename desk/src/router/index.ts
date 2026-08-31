@@ -8,6 +8,13 @@ const { isMobileView } = useScreenSize();
 
 export const LOGIN_PAGE = "/login";
 
+// Where the desk is mounted. One constant, because this is both the vue-router
+// history base and the path every "send them to log in" redirect has to rebuild.
+// It used to be the literal "/kumar-desk" in three separate places, so serving the
+// app from a second path made the router treat its own routes as foreign and
+// bounce you to /login?redirect-to=/kumar-desk/kumar-desk - a path that is neither.
+export const DESK_BASE = "/kumar-desk";
+
 // type the meta fields
 declare module "vue-router" {
   interface RouteMeta {
@@ -222,7 +229,7 @@ const handleMobileView = (componentName: string) => {
 };
 
 export const router = createRouter({
-  history: createWebHistory("/helpdesk/"),
+  history: createWebHistory(`${DESK_BASE}/`),
   routes,
 });
 
@@ -241,7 +248,9 @@ router.beforeEach(async (to, _, next) => {
 
     window.location.href =
       LOGIN_PAGE +
-      (redirectURL ? `?redirect-to=/helpdesk${redirectURL}` : "/helpdesk");
+      (redirectURL
+        ? `?redirect-to=${DESK_BASE}${redirectURL}`
+        : `?redirect-to=${DESK_BASE}`);
   } else if (!to.meta.public && !authStore.hasDeskAccess) {
     next({ name: "TicketsCustomer" });
   } else if (to.name === "TicketAgent" && !authStore.isAgent) {

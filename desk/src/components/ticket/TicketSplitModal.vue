@@ -79,7 +79,7 @@ const splitTicket = createResource({
     toast.success(__("Ticket split successfully."));
     showDialog.value = false;
     window.open(
-      window.location.origin + "/helpdesk/tickets/" + newTicket,
+      window.location.origin + "/kumar-desk/tickets/" + newTicket,
       "_blank"
     );
     window.location.reload();

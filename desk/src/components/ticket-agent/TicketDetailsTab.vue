@@ -309,7 +309,7 @@ function formatDate(date: string) {
 }
 
 function openTicket(name: string) {
-  let url = window.location.origin + "/helpdesk/tickets/" + name;
+  let url = window.location.origin + "/kumar-desk/tickets/" + name;
   window.open(url, "_blank");
 }
 

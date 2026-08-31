@@ -79,7 +79,7 @@ app.config.globalProperties.$dialog = createDialog;
 let socket;
 if (import.meta.env.DEV) {
   frappeRequest({
-    url: "/api/method/helpdesk.www.helpdesk.index.get_context_for_dev",
+    url: "/api/method/kumar_service.www.helpdesk.index.get_context_for_dev",
   }).then((values) => {
     for (let key in values) {
       window[key] = values[key];

@@ -191,7 +191,7 @@ const detailFields = computed(() => {
       name: "ticket",
       value: ticketLink.link_name,
       link: () => {
-        window.open(`/helpdesk/tickets/${ticketLink.link_name}`);
+        window.open(`/kumar-desk/tickets/${ticketLink.link_name}`);
       },
     });
   }

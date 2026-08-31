@@ -55,7 +55,8 @@ def get_boot():
 
 
 def get_default_route():
-    return "/helpdesk"
+    # must match DESK_BASE in desk/src/router/index.ts - the SPA boots into this
+    return "/kumar-desk"
 
 
 def get_telemetry_boot():

@@ -348,7 +348,7 @@ const steps = [
     completed: false,
     icon: markRaw(Globe),
     onClick: () => {
-      window.open("/helpdesk/my-tickets", "_blank");
+      window.open("/kumar-desk/my-tickets", "_blank");
       updateOnboardingStep("explore_customer_portal");
       minimize.value = true;
     },

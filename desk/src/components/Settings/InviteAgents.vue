@@ -103,6 +103,7 @@
 </template>
 
 <script setup lang="ts">
+import { DESK_BASE } from "@/router";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { useAuthStore } from "@/stores/auth";
 import { capture } from "@/telemetry";
@@ -190,7 +191,7 @@ const onSubmit = async () => {
   await inviteByEmailResource.submit({
     emails: emails.value,
     roles: getInviteByEmailRoles(role.value),
-    redirect_to_path: "/helpdesk",
+    redirect_to_path: DESK_BASE,
     app_name: "helpdesk",
   });
   resetInputValues();

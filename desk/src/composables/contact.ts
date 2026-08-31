@@ -1,3 +1,4 @@
+import { DESK_BASE } from "@/router";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import type {
@@ -520,7 +521,7 @@ export function useContactInvite() {
       await call("frappe.core.api.user_invitation.invite_by_email", {
         emails: email,
         roles: ["HD Customer"],
-        redirect_to_path: "/helpdesk",
+        redirect_to_path: DESK_BASE,
         app_name: "helpdesk",
         contact: contactName,
       });

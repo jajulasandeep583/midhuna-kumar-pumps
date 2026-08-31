@@ -230,7 +230,14 @@ website_route_rules += [
     # matches every route inside the app but not its front door
     {"from_route": "/kumar-desk", "to_route": "helpdesk"},
     {"from_route": "/kumar-desk/<path:app_path>", "to_route": "helpdesk"},
-    {"from_route": "/helpdesk/<path:app_path>", "to_route": "helpdesk"},
+]
+
+# /helpdesk REDIRECTS here rather than serving the app a second time. Mounting
+# one SPA at two paths is what produced /login?redirect-to=/helpdesk/kumar-desk:
+# vue-router had /helpdesk/ as its history base, so a page served at /kumar-desk
+# was outside its own base and every rebuilt path glued the two together.
+website_redirects = [
+    {"source": r"/helpdesk(/.*)?", "target": "/kumar-desk", "match_with_query_string": True},
 ]
 
 add_to_apps_screen += [
