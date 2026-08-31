@@ -883,7 +883,62 @@ def post_reply(kind, name, message, attachments=None):
 	notify.add(frappe.db.get_value(doctype, name, "owner"))
 
 	add_reply(doctype, name, message, notify_users=notify, attachments=attachments)
-	return {"thread": thread_for(doctype, name), "message": _("Sent to KUMAR.")}
+	reopened = _reopen_if_settled(doctype, name)
+	return {
+		"thread": thread_for(doctype, name),
+		"reopened": reopened,
+		"status": frappe.db.get_value(doctype, name, "status"),
+		"message": _("Reopened, and sent to KUMAR.") if reopened else _("Sent to KUMAR."),
+	}
+
+
+# Who KUMAR still owes an answer to is derived from who wrote last, so a ticket
+# that is still open needs no status change when the dealer writes - it simply
+# moves to the top of the "waiting on KUMAR" queue.
+#
+# A ticket that was already resolved or closed is the problem. The staff queue
+# only lists open ones, so a dealer replying "it has failed again" to a closed
+# ticket was writing into a thread nobody was going to read. Their reply reopens
+# it, which is what a helpdesk does and what the dealer plainly expects.
+# Only the Service Request. A Kumar Warranty Claim is driven by a Workflow whose
+# Settled and Rejected states have no outgoing transition - they are terminal by
+# design, and an approver decided to end it there. Writing workflow_state back by
+# hand would walk around the workflow rather than through it, so a dealer replying
+# to a settled claim notifies the desk (which it already did) and leaves the state
+# alone. If the business does want claims reopened, that is a Workflow Transition
+# somebody has to add deliberately, not something this function should invent.
+_SETTLED = {"Service Request": ("Resolved", "Closed")}
+
+
+def _reopen_if_settled(doctype, name):
+	settled = _SETTLED.get(doctype) or ()
+	if not settled:
+		return False
+	status = frappe.db.get_value(doctype, name, "status")
+	if status not in settled:
+		return False
+
+	reopen_to = "Open"
+	field = frappe.get_meta(doctype).get_field("status")
+	allowed = (field.options or "").split("\n") if field else []
+	if reopen_to not in allowed:
+		# never invent a status the doctype does not define
+		return False
+
+	# update_modified so it surfaces at the top of a queue sorted by recency
+	frappe.db.set_value(doctype, name, "status", reopen_to)
+	frappe.get_doc(
+		{
+			"doctype": "Comment",
+			"comment_type": "Info",
+			"reference_doctype": doctype,
+			"reference_name": name,
+			"content": _("Reopened by the dealer, who replied after it was marked {0}.").format(
+				_(status)
+			),
+		}
+	).insert(ignore_permissions=True)
+	return True
 
 
 @frappe.whitelist()
