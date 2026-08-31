@@ -226,6 +226,14 @@ const portalRoutes = [
     meta: { public: true, auth: true },
   },
   {
+    // Agent-side: KUMAR schedules the visit, on behalf of a dealer or of a
+    // customer who bought direct and has no login of their own.
+    path: "/visits",
+    name: "KumarVisits",
+    component: () => import("@/pages/kumar/Visits.vue"),
+    meta: { auth: true },
+  },
+  {
     path: "/kb-public",
     name: "CustomerKnowledgeBase",
     component: () => import("@/pages/knowledge-base/KnowledgeBaseCustomer.vue"),

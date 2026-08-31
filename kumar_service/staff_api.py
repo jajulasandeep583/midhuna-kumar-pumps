@@ -304,3 +304,172 @@ def reply_to_dealer(kind, name, message, mark_responded=1, attachments=None, att
 			else _("Reply sent to {0}.").format(dealer)
 		),
 	}
+
+
+# ===================================================================== visits
+#
+# KUMAR's team schedules the visit, and does it on behalf of whoever the pump
+# belongs to - a dealer who raised the request, or a customer who bought direct
+# and has no login of their own. Either way the desk is where the work is
+# arranged, so scheduling lives here rather than on the dealer's side.
+
+
+@frappe.whitelist()
+def visit_board(limit=100):
+	"""What needs a visit, what is already booked, and who can go.
+
+	One call for the whole screen. A service manager deciding who goes where
+	tomorrow is holding three lists in their head at once, and three round trips
+	to paint them is three chances to see a stale one.
+	"""
+	_require_staff()
+	limit = cint(limit) or 100
+	today = nowdate()
+
+	open_requests = frappe.get_all(
+		"Service Request",
+		filters={
+			"status": ["not in", ("Resolved", "Closed", "Cancelled")],
+			"docstatus": ["<", 2],
+		},
+		fields=["name", "serial_no", "pump_model", "dealer", "end_customer_name",
+			"end_customer_mobile", "status", "priority", "complaint_category",
+			"custom_request_type", "is_under_warranty", "reported_on",
+			"resolution_due_on"],
+		order_by="reported_on asc",
+		limit=limit,
+	)
+
+	# a request that already has a visit booked is not waiting on one
+	booked = set(
+		frappe.get_all(
+			"Service Visit",
+			filters={"docstatus": ["<", 2], "visit_date": [">=", today]},
+			pluck="service_request",
+		)
+	)
+	# where to go is on the registration, not the request - and a technician
+	# cannot be sent anywhere without it
+	sites = {}
+	serials = [r["serial_no"] for r in open_requests if r["serial_no"]]
+	if serials:
+		for reg in frappe.get_all(
+			"Pump Registration",
+			filters={"serial_no": ["in", serials], "docstatus": 1},
+			fields=["serial_no", "installation_address", "district", "state"],
+			limit_page_length=0,
+		):
+			sites.setdefault(reg.serial_no, reg)
+
+	for r in open_requests:
+		site = sites.get(r["serial_no"]) or {}
+		r["where"] = site.get("installation_address") or ""
+		r["district"] = site.get("district") or ""
+		r["has_visit"] = r["name"] in booked
+		r["overdue"] = bool(
+			r["resolution_due_on"] and str(r["resolution_due_on"]) < str(now_datetime())
+		)
+
+	visits = frappe.get_all(
+		"Service Visit",
+		filters={"docstatus": ["<", 2], "visit_date": [">=", today]},
+		fields=["name", "service_request", "serial_no", "technician", "visit_date",
+			"visit_type", "is_chargeable", "docstatus"],
+		order_by="visit_date asc",
+		limit=limit,
+	)
+	for v in visits:
+		v["customer"] = frappe.db.get_value(
+			"Service Request", v.service_request, "end_customer_name"
+		)
+		v["dealer"] = frappe.db.get_value("Service Request", v.service_request, "dealer")
+
+	technicians = frappe.get_all(
+		"Service Technician",
+		filters={"status": "Active"} if frappe.get_meta("Service Technician").get_field("status")
+			else {},
+		fields=["name", "technician_name", "dealer", "mobile_no"],
+		order_by="technician_name",
+		limit_page_length=0,
+	)
+
+	return {
+		"needs_visit": [r for r in open_requests if not r["has_visit"]],
+		"scheduled": visits,
+		"technicians": technicians,
+		"visit_types": ["On-Site", "Workshop", "Telephonic"],
+	}
+
+
+@frappe.whitelist()
+def schedule_visit(service_request, technician, visit_date, visit_type="On-Site",
+		is_chargeable=None, note=None):
+	"""Book a technician onto a request, and tell the dealer it is booked.
+
+	The telling is the point. A visit scheduled in the desk and never mentioned
+	is a visit the dealer cannot plan around and the customer is not home for -
+	so this writes to the same thread the dealer already reads, through the same
+	path every other reply takes.
+	"""
+	_require_staff()
+	if not frappe.db.exists("Service Request", service_request):
+		frappe.throw(_("{0} does not exist").format(service_request), frappe.DoesNotExistError)
+	if not technician:
+		frappe.throw(_("Choose a technician"))
+	if not visit_date:
+		frappe.throw(_("Choose a date for the visit"))
+	if str(visit_date) < str(nowdate()):
+		frappe.throw(_("A visit cannot be scheduled in the past"))
+
+	sr = frappe.db.get_value(
+		"Service Request", service_request,
+		["serial_no", "dealer", "is_under_warranty", "end_customer_name"], as_dict=True,
+	)
+
+	# a pump in warranty is not chargeable unless somebody says otherwise
+	chargeable = cint(is_chargeable) if is_chargeable is not None else (
+		0 if cint(sr.is_under_warranty) else 1
+	)
+
+	visit = frappe.get_doc(
+		{
+			"doctype": "Service Visit",
+			"service_request": service_request,
+			"serial_no": sr.serial_no,
+			"technician": technician,
+			"visit_date": visit_date,
+			"visit_type": visit_type or "On-Site",
+			"is_chargeable": chargeable,
+		}
+	)
+	visit.flags.ignore_permissions = True
+	visit.insert(ignore_permissions=True)
+
+	tech_name = frappe.db.get_value("Service Technician", technician, "technician_name") or technician
+	when = frappe.utils.formatdate(visit_date, "dd-MM-yyyy")
+	message = _("Visit scheduled for {0}. {1} will attend.").format(when, tech_name)
+	if chargeable:
+		message += " " + _("This visit is chargeable.")
+	else:
+		message += " " + _("Warranty job - nothing to pay.")
+	if note:
+		message += "\n\n" + str(note)
+
+	# tell THIS dealer, walking up to a parent when a sub-dealer has no login of
+	# its own - the same rule the conversation notifications already use
+	from kumar_service.desk_bridge import contact_for
+
+	_contact, portal_user = contact_for(sr.dealer)
+	add_reply(
+		"Service Request",
+		service_request,
+		message,
+		notify_users={portal_user} if portal_user else None,
+	)
+
+	# the request is being worked now, not merely open
+	if frappe.db.get_value("Service Request", service_request, "status") in ("Open", "Assigned"):
+		frappe.db.set_value("Service Request", service_request, "status", "In Progress")
+
+	frappe.db.commit()
+	return {"name": visit.name, "message": message, "chargeable": bool(chargeable)}
