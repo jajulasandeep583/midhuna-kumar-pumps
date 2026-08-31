@@ -66,6 +66,16 @@ doc_events = {
 	"Sales Invoice": {
 		"on_submit": "kumar_service.warranty.auto_register_from_invoice",
 	},
+	# KUMAR Pumps Desk mirrors every request as an HD Ticket. The bridge is a
+	# no-op when helpdesk is not installed, and never blocks a save.
+	"Service Request": {
+		"after_insert": "kumar_service.desk_bridge.mirror",
+		"on_update": "kumar_service.desk_bridge.mirror",
+		"on_submit": "kumar_service.desk_bridge.mirror",
+	},
+	"HD Ticket": {
+		"on_update": "kumar_service.desk_bridge.set_status",
+	},
 }
 
 # -------------------------------------------------------------- permissions

@@ -34,6 +34,78 @@ TICKET_TYPES = (
 )
 
 
+# What HD Ticket has to carry to be a useful mirror of a Service Request. These
+# are custom fields on the fork's doctype rather than edits to its json, so the
+# fork stays mergeable with upstream.
+TICKET_FIELDS = [
+	{
+		"fieldname": "custom_kumar_section",
+		"fieldtype": "Section Break",
+		"label": "KUMAR Pump",
+		"insert_after": "description",
+	},
+	{
+		"fieldname": "custom_service_request",
+		"fieldtype": "Link",
+		"options": "Service Request",
+		"label": "Service Request",
+		"read_only": 1,
+		"in_standard_filter": 1,
+		"insert_after": "custom_kumar_section",
+		"description": "The request this ticket mirrors. That document, not this one, is the record.",
+	},
+	{
+		"fieldname": "custom_serial_no",
+		"fieldtype": "Link",
+		"options": "Serial No",
+		"label": "Serial No",
+		"read_only": 1,
+		"in_standard_filter": 1,
+		"insert_after": "custom_service_request",
+	},
+	{
+		"fieldname": "custom_pump_model",
+		"fieldtype": "Data",
+		"label": "Pump Model",
+		"read_only": 1,
+		"insert_after": "custom_serial_no",
+	},
+	{
+		"fieldname": "custom_kumar_col",
+		"fieldtype": "Column Break",
+		"insert_after": "custom_pump_model",
+	},
+	{
+		"fieldname": "custom_dealer",
+		"fieldtype": "Link",
+		"options": "Dealer",
+		"label": "Dealer",
+		"read_only": 1,
+		"in_standard_filter": 1,
+		"insert_after": "custom_kumar_col",
+	},
+	{
+		"fieldname": "custom_warranty",
+		"fieldtype": "Data",
+		"label": "Warranty",
+		"read_only": 1,
+		"in_standard_filter": 1,
+		"insert_after": "custom_dealer",
+		"description": "Whether the visit is chargeable - the first thing a dealer asks.",
+	},
+]
+
+
+def ticket_fields():
+	"""Put the pump facts on HD Ticket, as custom fields."""
+	if not frappe.db.exists("DocType", "HD Ticket"):
+		return []
+	from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
+
+	create_custom_fields({"HD Ticket": TICKET_FIELDS}, ignore_validate=True, update=True)
+	return [f["fieldname"] for f in TICKET_FIELDS]
+
+
 def brand():
 	"""Name the product KUMAR Pumps Desk wherever the agent UI shows a name."""
 	if not frappe.db.exists("DocType", "HD Settings"):
@@ -117,6 +189,11 @@ def build_all():
 	if not frappe.db.exists("DocType", "HD Settings"):
 		frappe.msgprint("helpdesk is not installed on this site; skipping the desk setup")
 		return
-	out = {"brand": brand(), "agents": agents(), "ticket_types": ticket_types()}
+	out = {
+		"brand": brand(),
+		"agents": agents(),
+		"ticket_types": ticket_types(),
+		"ticket_fields": ticket_fields(),
+	}
 	frappe.db.commit()
 	return out
