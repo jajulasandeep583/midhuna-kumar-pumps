@@ -6,32 +6,41 @@
    not style, size or position. This is a single combobox: type to filter on
    serial, model or customer; arrow keys to move; Enter to take. A barcode
    scanner still works, because a scanner just types fast and presses Enter. #}
-{% macro pump_picker(prefix) %}
-<div class="kp-combo" data-combo="{{ prefix }}">
-  <label for="{{ prefix }}-serial">{{ _("Which pump?") }}</label>
+{% macro combo(id, label, placeholder, name="", required=False) %}
+<div class="kp-combo" data-combo="{{ id }}">
+  <label for="{{ id }}">{{ label }}</label>
   <div class="kp-combo-field">
     <svg class="kp-combo-ic" aria-hidden="true"><use href="#kp-art-search"></use></svg>
-    <input id="{{ prefix }}-serial" name="serial_no" class="kp-combo-input" required
-           placeholder="{{ _('Type a serial, model or customer - or scan') }}"
+    <input id="{{ id }}" {% if name %}name="{{ name }}"{% endif %} class="kp-combo-input"
+           {% if required %}required{% endif %}
+           placeholder="{{ placeholder }}"
            autocomplete="off" spellcheck="false"
            role="combobox" aria-expanded="false" aria-autocomplete="list"
-           aria-controls="{{ prefix }}-list" aria-haspopup="listbox">
+           aria-controls="{{ id }}-list" aria-haspopup="listbox">
     <button type="button" class="kp-combo-clear" hidden
             aria-label="{{ _('Clear') }}" tabindex="-1">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"
            fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
     </button>
     <button type="button" class="kp-combo-toggle" tabindex="-1"
-            aria-label="{{ _('Show the pumps you sold') }}">
+            aria-label="{{ _('Show the list') }}">
       <svg aria-hidden="true"><use href="#kp-art-chevron"></use></svg>
     </button>
   </div>
   <div class="kp-combo-pop" hidden>
-    <ul class="kp-combo-list" id="{{ prefix }}-list" role="listbox"
-        aria-label="{{ _('Pumps you sold') }}"></ul>
+    <ul class="kp-combo-list" id="{{ id }}-list" role="listbox"
+        aria-label="{{ label }}"></ul>
     <div class="kp-combo-foot"></div>
   </div>
 </div>
+{% endmacro %}
+
+{# The pump picker is the combo above, pre-labelled. Scanning a barcode works in
+   any of them: a scanner is a keyboard that types fast and sends Enter. #}
+{% macro pump_picker(prefix) %}
+{{ combo(prefix ~ "-serial", _("Which pump?"),
+         _("Type a serial, model or customer - or scan"),
+         name="serial_no", required=True) }}
 {% endmacro %}
 
 {% extends "templates/web.html" %}
@@ -268,6 +277,16 @@
              border-radius:0; box-shadow:none; scrollbar-width:none;
              transition:box-shadow .16s; }
   .kp-tabs.stuck { box-shadow:var(--e3); }
+  /* Scrolling DOWN means the dealer is reading or typing further down the page,
+     and a bar pinned over that content is in the way - it was sitting on top of
+     the chat's Send button. Scrolling UP means they are going back for the
+     navigation, so it returns. */
+  .kp-tabs.hide-nav { transform:translateY(-105%); }
+  .kp-tabs { transition:box-shadow .16s, transform .2s ease; will-change:transform; }
+  @media (prefers-reduced-motion:reduce) { .kp-tabs { transition:none; } }
+  /* anything focused or jumped to clears the bar instead of hiding under it */
+  .kp input, .kp select, .kp textarea, .kp-panel, .kp-sec {
+      scroll-margin-top:calc(var(--kp-sticky,0px) + 64px); }
   @media (max-width:700px) {
     .kp-tabs { margin-left:-10px; margin-right:-10px;
                padding-left:10px; padding-right:10px; }
@@ -443,14 +462,18 @@
      the eye can hold its place across a wide row. */
   /* Data table, application-grade: a quiet header, hairline dividers, no zebra
      (the stripes fought the status pills), one hover tint, and numerals that
-     line up in their columns. The sticky header offsets itself below the nav
-     instead of sliding underneath it. */
+     line up in their columns.
+
+     thead sticks at top:0 of .kp-scroll, NOT at the nav offset. .kp-scroll sets
+     overflow-x, which makes it the scroll container, so a sticky offset there
+     is measured from the top of the table - pushing the header down into the
+     rows instead of clearing the navbar. */
   .kp-t { width:100%; border-collapse:separate; border-spacing:0; font-size:13.5px; }
   .kp-t thead th { text-align:left; font-size:11px; letter-spacing:.6px;
                    text-transform:uppercase; color:var(--mut); font-weight:600;
                    background:var(--bg); border-bottom:1px solid var(--line);
                    padding:10px 14px; white-space:nowrap;
-                   position:sticky; top:var(--kp-stick-all,0px); z-index:2; }
+                   position:sticky; top:0; z-index:2; }
   .kp-t td { padding:13px 14px; border-bottom:1px solid var(--line);
              vertical-align:middle; }
   .kp-t tbody tr { transition:background .1s; }
@@ -466,14 +489,24 @@
      Its own recessed ground, a tighter control height than a form field, and
      labels shrunk to captions - these are filters over a table, not questions
      the dealer has to answer before the page will work. */
-  .kp-filters { background:var(--bg); border:1px solid var(--line);
-                border-radius:var(--r-lg); padding:14px 16px; margin-bottom:14px; }
-  .kp-filters .kp-row + .kp-row { margin-top:12px !important; }
-  .kp-filters label { font-size:11px; font-weight:600; letter-spacing:.2px;
-                      color:var(--mut); margin-bottom:4px; }
-  .kp-filters input, .kp-filters select { padding:8px 11px; font-size:13.5px;
-                                          border-radius:var(--r); background:#fff; }
-  .kp-filters select { padding-right:34px; }
+  /* Named -bar, not -filters: .kp-filters is already the ticket chip row lower
+     down, and two rules for one class meant this panel silently inherited
+     display:flex and collapsed into narrow stacked columns.
+
+     One grid for every control, so the fields line up on a shared baseline
+     instead of two independent auto-fit rows drifting out of step. */
+  .kp-filterbar { background:var(--bg); border:1px solid var(--line);
+                  border-radius:var(--r-lg); padding:14px 16px; margin-bottom:14px;
+                  display:grid; gap:12px;
+                  grid-template-columns:repeat(auto-fit,minmax(165px,1fr));
+                  align-items:end; }
+  .kp-filterbar label { display:block; font-size:11px; font-weight:600;
+                        letter-spacing:.2px; color:var(--mut); margin-bottom:4px; }
+  .kp-filterbar input, .kp-filterbar select { padding:8px 11px; font-size:13.5px;
+                                              border-radius:var(--r); background:#fff; }
+  .kp-filterbar select { padding-right:34px; }
+  .kp-filterbar .act { display:flex; align-items:flex-end; }
+  .kp-filterbar .act .kp-btn { width:100%; }
   .kp-resultbar { display:flex; align-items:center; gap:10px; margin:0 0 10px;
                   font-size:12.5px; color:var(--mut); font-weight:500; }
 
@@ -1010,15 +1043,10 @@
 
         <div class="kp-step">{{ _("2. Which parts failed") }}</div>
         <div class="kp-row">
-          <div>
-            <label for="kw-item">{{ _("Part") }}</label>
-            <select id="kw-item">
-              <option value="">{{ _("Choose a part") }}</option>
-              {% for i in claim_items %}
-                <option value="{{ i.name }}">{{ i.item_name or i.name }}</option>
-              {% endfor %}
-            </select>
-          </div>
+          {# was a bare <select>: no search, and no way to scan the part number
+             off the spares bin, which is how a dealer actually identifies a
+             part they are holding #}
+          {{ combo("kw-item", _("Part"), _("Type a part name or code - or scan")) }}
           <div>
             <label for="kw-qty">{{ _("Qty") }}</label>
             <input id="kw-qty" type="number" min="1" step="1" value="1">
@@ -1067,58 +1095,56 @@
       {# The filters are a toolbar, not five more form fields: they sit on their
          own ground so the eye reads them as controls over the table below
          rather than as questions to answer. #}
-      <div class="kp-filters">
-        <div class="kp-row">
-          <div>
-            <label for="ks-search">{{ _("Search") }}</label>
-            <input id="ks-search" type="search" autocomplete="off"
-                   placeholder="{{ _('Customer, mobile, village or serial') }}">
-          </div>
-          <div>
-            <label for="ks-warranty">{{ _("Warranty") }}</label>
-            <select id="ks-warranty">
-              <option value="">{{ _("Any") }}</option>
-              <option value="In Warranty">{{ _("In Warranty") }}</option>
-              <option value="Expiring Soon">{{ _("Expiring Soon") }}</option>
-              <option value="Expired">{{ _("Expired") }}</option>
-            </select>
-          </div>
-          <div>
-            <label for="ks-category">{{ _("Product Family") }}</label>
-            <select id="ks-category">
-              <option value="">{{ _("Any family") }}</option>
-              {% for c in sold_categories %}<option value="{{ c }}">{{ _(c) }}</option>{% endfor %}
-            </select>
-          </div>
-          <div>
-            <label for="ks-model">{{ _("Model") }}</label>
-            <select id="ks-model">
-              <option value="">{{ _("Any model") }}</option>
-              {% for m in sold_models %}<option value="{{ m }}">{{ m }}</option>{% endfor %}
-            </select>
-          </div>
-          {% if sold_districts %}
-          <div>
-            <label for="ks-district">{{ _("District") }}</label>
-            <select id="ks-district">
-              <option value="">{{ _("Any district") }}</option>
-              {% for d in sold_districts %}<option value="{{ d }}">{{ d }}</option>{% endfor %}
-            </select>
-          </div>
-          {% endif %}
+      {# One grid, so every filter shares a baseline. These were two separate
+         auto-fit rows that reflowed independently and left holes between them. #}
+      <div class="kp-filterbar">
+        <div>
+          <label for="ks-search">{{ _("Search") }}</label>
+          <input id="ks-search" type="search" autocomplete="off"
+          placeholder="{{ _('Customer, mobile, village or serial') }}">
         </div>
-        <div class="kp-row" style="margin-top:12px">
-          <div>
-            <label for="ks-from">{{ _("Sold From") }}</label>
-            <input id="ks-from" type="date">
-          </div>
-          <div>
-            <label for="ks-to">{{ _("Sold To") }}</label>
-            <input id="ks-to" type="date">
-          </div>
-          <div style="align-self:end">
-            <button type="button" class="kp-btn sec" id="ks-clear">{{ _("Clear filters") }}</button>
-          </div>
+        <div>
+          <label for="ks-warranty">{{ _("Warranty") }}</label>
+          <select id="ks-warranty">
+          <option value="">{{ _("Any") }}</option>
+          <option value="In Warranty">{{ _("In Warranty") }}</option>
+          <option value="Expiring Soon">{{ _("Expiring Soon") }}</option>
+          <option value="Expired">{{ _("Expired") }}</option>
+          </select>
+        </div>
+        <div>
+          <label for="ks-category">{{ _("Product Family") }}</label>
+          <select id="ks-category">
+          <option value="">{{ _("Any family") }}</option>
+          {% for c in sold_categories %}<option value="{{ c }}">{{ _(c) }}</option>{% endfor %}
+          </select>
+        </div>
+        <div>
+          <label for="ks-model">{{ _("Model") }}</label>
+          <select id="ks-model">
+          <option value="">{{ _("Any model") }}</option>
+          {% for m in sold_models %}<option value="{{ m }}">{{ m }}</option>{% endfor %}
+          </select>
+        </div>
+        {% if sold_districts %}
+        <div>
+          <label for="ks-district">{{ _("District") }}</label>
+          <select id="ks-district">
+            <option value="">{{ _("Any district") }}</option>
+            {% for d in sold_districts %}<option value="{{ d }}">{{ d }}</option>{% endfor %}
+          </select>
+        </div>
+        {% endif %}
+        <div>
+          <label for="ks-from">{{ _("Sold From") }}</label>
+          <input id="ks-from" type="date">
+        </div>
+        <div>
+          <label for="ks-to">{{ _("Sold To") }}</label>
+          <input id="ks-to" type="date">
+        </div>
+        <div class="act">
+          <button type="button" class="kp-btn sec" id="ks-clear">{{ _("Clear filters") }}</button>
         </div>
       </div>
       <div class="kp-resultbar"><span id="ks-count"></span></div>
@@ -1373,11 +1399,6 @@ frappe.ready(function () {
       ? Math.round(nav.getBoundingClientRect().height) : 0;
     const root = document.documentElement;
     root.style.setProperty("--kp-sticky", h + "px");
-    // a sticky table header has to clear the nav AND our own tab strip, or it
-    // parks itself underneath them and the column titles disappear
-    const strip = document.querySelector(".kp-tabs");
-    const sh = strip ? Math.round(strip.getBoundingClientRect().height) : 0;
-    root.style.setProperty("--kp-stick-all", (h + sh) + "px");
   }
   fitSticky();
   window.addEventListener("resize", fitSticky);
@@ -1391,12 +1412,30 @@ frappe.ready(function () {
     /* Compared against the live sticky offset rather than the viewport top: the
        strip parks below frappe's navbar, whose height changes with the
        breakpoint, so a fixed threshold would fire early or late. */
+    let lastY = window.scrollY;
     function check() {
       queued = false;
       const pad = parseFloat(getComputedStyle(document.documentElement)
         .getPropertyValue("--kp-sticky")) || 0;
-      strip.classList.toggle("stuck", strip.getBoundingClientRect().top <= pad + 0.5);
+      const y = window.scrollY;
+      const stuck = strip.getBoundingClientRect().top <= pad + 0.5 || strip.classList.contains("hide-nav");
+      strip.classList.toggle("stuck", stuck && y > 0);
+
+      const dy = y - lastY;
+      // ignore the small jitter a touch scroll produces, and never hide while
+      // the strip is still in its resting place in the flow
+      if (Math.abs(dy) > 6 && stuck) {
+        if (dy > 0 && y > 160 && !strip.contains(document.activeElement)) {
+          strip.classList.add("hide-nav");
+        } else if (dy < 0) {
+          strip.classList.remove("hide-nav");
+        }
+      }
+      if (y <= 0) strip.classList.remove("hide-nav");
+      lastY = y;
     }
+    // reaching for a tab with the keyboard must always bring the bar back
+    strip.addEventListener("focusin", () => strip.classList.remove("hide-nav"));
     window.addEventListener("scroll", () => {
       if (queued) return;
       queued = true;
@@ -1441,6 +1480,7 @@ frappe.ready(function () {
     });
     panels.forEach((p) => p.classList.toggle("on", p.dataset.panel === name));
     closeAllCombos();
+    if (strip) strip.classList.remove("hide-nav");
 
     if (push && history.pushState) history.pushState({ kp: name }, "", "#" + name);
     else if (history.replaceState) history.replaceState({ kp: name }, "", "#" + name);
@@ -1539,7 +1579,7 @@ frappe.ready(function () {
      scanning still works: the exact-match branch takes the value and never
      opens the list. */
   const PUMPS = {{ picker_pumps | tojson }};
-  const BY_SERIAL = new Map(PUMPS.map((p) => [p.serial_no.toUpperCase(), p]));
+  const PARTS = {{ picker_parts | tojson }};
   const WCLASS = { "In Warranty": "ok", "Expiring Soon": "warn" };
   const norm = (v) => String(v == null ? "" : v).toLowerCase();
 
@@ -1554,7 +1594,36 @@ frappe.ready(function () {
 
   const LIMIT = 40;   // enough to scroll, few enough to stay fast on a phone
 
-  function makeCombo(root, onPick) {
+  /* A dataset the combobox can drive. `value` is what lands in the input and
+     gets posted; `title`/`sub` are what the row shows; `match` is every field
+     worth searching. Keeping this outside the component is what let the part
+     picker reuse it without the component knowing what a pump is. */
+  const SETS = {
+    pumps: {
+      rows: PUMPS,
+      value: (p) => p.serial_no,
+      title: (p) => p.serial_no,
+      sub: (p) => [p.model, p.customer, p.district],
+      badge: (p) => ({ text: p.state, cls: WCLASS[p.state] || "bad" }),
+      match: (p) => [p.serial_no, p.model, p.customer, p.district],
+      none: __("No pump of yours matches"),
+      hint: __("You can still type the full serial to raise this against a pump sold elsewhere."),
+      count: (n) => __("{0} of your pumps", [String(n)]),
+    },
+    parts: {
+      rows: PARTS,
+      value: (i) => i.item_code,
+      title: (i) => i.item_name || i.item_code,
+      sub: (i) => [i.item_code, i.rate ? money(i.rate) : ""],
+      badge: () => null,
+      match: (i) => [i.item_code, i.item_name],
+      none: __("No part matches"),
+      hint: __("Check the code on the spares bin."),
+      count: (n) => __("{0} parts", [String(n)]),
+    },
+  };
+
+  function makeCombo(root, set, onPick) {
     const input = root.querySelector(".kp-combo-input");
     const pop = root.querySelector(".kp-combo-pop");
     const list = root.querySelector(".kp-combo-list");
@@ -1564,14 +1633,15 @@ frappe.ready(function () {
     let rows = [];
     let at = -1;
     let open = false;
+    const all = set.rows || [];
+    const byValue = new Map(all.map((r) => [String(set.value(r)).toUpperCase(), r]));
 
     function match(q) {
-      if (!q) return PUMPS.slice(0, LIMIT);
+      if (!q) return all.slice(0, LIMIT);
       const out = [];
-      for (let i = 0; i < PUMPS.length && out.length < LIMIT; i++) {
-        const p = PUMPS[i];
-        if (norm(p.serial_no).indexOf(q) !== -1 || norm(p.model).indexOf(q) !== -1 ||
-            norm(p.customer).indexOf(q) !== -1 || norm(p.district).indexOf(q) !== -1) out.push(p);
+      for (let i = 0; i < all.length && out.length < LIMIT; i++) {
+        const r = all[i];
+        if (set.match(r).some((f) => norm(f).indexOf(q) !== -1)) out.push(r);
       }
       return out;
     }
@@ -1580,28 +1650,27 @@ frappe.ready(function () {
       rows = match(q);
       at = -1;
       if (!rows.length) {
-        list.innerHTML = `<li class="kp-combo-none">${
-          __("No pump of yours matches")} <b>${esc(q)}</b><br>${
-          __("You can still type the full serial to raise this against a pump sold elsewhere.")}</li>`;
+        list.innerHTML = `<li class="kp-combo-none">${set.none} <b>${esc(q)}</b><br>${
+          set.hint}</li>`;
         foot.textContent = "";
         return;
       }
-      list.innerHTML = rows.map((p, i) => {
-        const cls = WCLASS[p.state] || "bad";
-        const sub = [p.model, p.customer, p.district].filter(Boolean);
+      list.innerHTML = rows.map((r, i) => {
+        const b = set.badge(r);
+        const sub = set.sub(r).filter(Boolean);
         return `<li class="kp-opt" role="option" id="${root.dataset.combo}-o${i}"
                     aria-selected="false" data-i="${i}">
           <span class="t">
-            <span class="s">${hilite(p.serial_no, q)}</span>
+            <span class="s">${hilite(set.title(r), q)}</span>
             <span class="m">${sub.map((x) => hilite(x, q)).join(" &middot; ")}</span>
           </span>
-          <span class="w ${cls}">${esc(__(p.state || ""))}</span>
+          ${b ? `<span class="w ${b.cls}">${esc(__(b.text || ""))}</span>` : ""}
         </li>`;
       }).join("");
       const shown = rows.length;
       foot.textContent = shown >= LIMIT
         ? __("Showing the first {0} - keep typing to narrow it", [String(LIMIT)])
-        : __("{0} of your pumps", [String(shown)]);
+        : set.count(shown);
     }
 
     function openList(q) {
@@ -1637,19 +1706,27 @@ frappe.ready(function () {
       input.setAttribute("aria-activedescendant", el.id);
     }
 
-    function take(p) {
-      input.value = p.serial_no;
+    function take(r) {
+      input.value = set.value(r);
+      input.dataset.value = set.value(r);
       clear.hidden = false;
       close();
-      onPick(p.serial_no);
+      onPick(set.value(r), r);
     }
 
     input.addEventListener("input", () => {
       const raw = input.value.trim();
       clear.hidden = !raw;
       // a scanner fires one exact serial: take it and stay closed
-      const exact = BY_SERIAL.get(raw.toUpperCase());
-      if (exact && raw.length >= 6) { close(); onPick(exact.serial_no); return; }
+      // a scanner fires one exact value: take it and stay closed
+      const exact = byValue.get(raw.toUpperCase());
+      if (exact && raw.length >= 4) {
+        input.dataset.value = set.value(exact);
+        close();
+        onPick(set.value(exact), exact);
+        return;
+      }
+      delete input.dataset.value;
       openList(norm(raw));
     });
 
@@ -1660,7 +1737,8 @@ frappe.ready(function () {
         // never let the picker submit the form by accident
         e.preventDefault();
         if (open && at >= 0 && rows[at]) take(rows[at]);
-        else { close(); onPick(input.value.trim()); }
+        else if (rows.length === 1) take(rows[0]);   // one hit left: take it
+        else { close(); onPick(input.value.trim(), null); }
       } else if (e.key === "Escape") { if (open) { e.stopPropagation(); close(); } }
       else if (e.key === "Tab") close();
     });
@@ -1681,8 +1759,9 @@ frappe.ready(function () {
       input.value = "";
       clear.hidden = true;
       input.focus();
+      delete input.dataset.value;
       openList("");
-      onPick("");
+      onPick("", null);
     });
 
     input.addEventListener("blur", () => setTimeout(close, 120));
@@ -1708,7 +1787,7 @@ frappe.ready(function () {
     if (!input) return;
     const root = input.closest(".kp-combo");
     if (!root) return;
-    makeCombo(root, (serial) => describePump(serial, intoId));
+    return makeCombo(root, SETS.pumps, (serial) => describePump(serial, intoId));
   }
 
   /* ------------------------------------------------ register a sale */
@@ -1878,17 +1957,38 @@ frappe.ready(function () {
         }));
     }
 
+    /* The part picker is the same combobox as the pump one. It reports the row
+       it matched, so we keep the item's real name for the line rather than
+       whatever the dealer happened to type. */
+    let pickedPart = null;
+    const partCombo = makeCombo($("kw-item").closest(".kp-combo"), SETS.parts,
+      (code, row) => { pickedPart = row; });
+
     $("kw-add").addEventListener("click", function () {
-      const sel = $("kw-item");
-      const code = sel.value;
-      if (!code) return;
+      const input = $("kw-item");
+      // only a row the dealer actually picked counts - a half-typed name is not
+      // a part number, and sending one would fail validation server-side
+      const code = (pickedPart && pickedPart.item_code) || input.dataset.value || "";
+      if (!code) {
+        say("kw-done", "bad", __("Choose a part from the list before adding it."));
+        input.focus();
+        return;
+      }
+      const row = pickedPart ||
+        PARTS.find((x) => x.item_code === code) || { item_name: code, item_code: code };
       parts.push({
         item_code: code,
-        label: sel.options[sel.selectedIndex].text,
+        label: row.item_name || code,
         qty: parseFloat($("kw-qty").value) || 1,
         defect_observed: $("kw-def").value,
       });
-      sel.value = ""; $("kw-qty").value = 1; $("kw-def").value = "";
+      pickedPart = null;
+      input.value = "";
+      delete input.dataset.value;
+      const pc = input.parentElement.querySelector(".kp-combo-clear");
+      if (pc) pc.hidden = true;
+      $("kw-qty").value = 1; $("kw-def").value = "";
+      $("kw-done").innerHTML = "";
       drawParts();
     });
 

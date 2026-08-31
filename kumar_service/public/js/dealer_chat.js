@@ -232,5 +232,62 @@ kumar.chat.draw = function (frm, $section, thread) {
 	if (node) node.scrollTop = node.scrollHeight;
 };
 
-frappe.ui.form.on("Service Request", { refresh: kumar.chat.render });
-frappe.ui.form.on("Kumar Warranty Claim", { refresh: kumar.chat.render });
+/* The conversation is STORED as comments on the document, so frappe's timeline
+   renders the very same thread a second time underneath the chat panel - the
+   dealer's messages appeared twice on every ticket.
+
+   Hiding the plain comment box is not only about the duplicate. A reply typed
+   there is written straight to Comment, which skips `reply_to_dealer`: the
+   dealer is never notified and the SLA first response is never stamped. So the
+   box is not a second way to do the same thing, it is a way to answer a dealer
+   who then never hears about it. The chat panel is the only correct route, and
+   the timeline keeps everything else - assignments, edits, status changes. */
+kumar.chat.foldTimelineComments = function (frm) {
+	const wrap = frm.timeline && frm.timeline.wrapper;
+	if (!wrap) return;
+	// this function inserts a node INTO the subtree the observer watches, so
+	// without a re-entrancy guard it would call itself forever
+	if (frm.__kumar_folding) return;
+	frm.__kumar_folding = true;
+	try {
+		kumar.chat._fold(frm, wrap);
+	} finally {
+		frm.__kumar_folding = false;
+	}
+};
+
+kumar.chat._fold = function (frm, wrap) {
+	const $w = $(wrap);
+
+	// the box you type a comment into
+	$w.find(".comment-box").addClass("hide");
+
+	// and the comment entries themselves, which the chat panel already shows
+	$w.find('.timeline-item[data-doctype="Comment"]').addClass("hide");
+
+	if (!$w.find(".kchat-timeline-note").length) {
+		$w.find(".comment-box").before(
+			`<div class="kchat-timeline-note text-muted small" style="padding:8px 0 12px">
+				${__("Dealer messages live in <b>Conversation with Dealer</b> above - replying there notifies the dealer and records the first response.")}
+			</div>`
+		);
+	}
+};
+
+function onRefresh(frm) {
+	kumar.chat.render(frm);
+	kumar.chat.foldTimelineComments(frm);
+	// the timeline renders after refresh, and again after every reply, so one
+	// pass on refresh alone leaves comments visible the moment anything reloads
+	if (!frm.__kumar_timeline_watch && frm.timeline && frm.timeline.wrapper) {
+		frm.__kumar_timeline_watch = new MutationObserver(() => {
+			kumar.chat.foldTimelineComments(frm);
+		});
+		frm.__kumar_timeline_watch.observe(frm.timeline.wrapper, {
+			childList: true, subtree: true,
+		});
+	}
+}
+
+frappe.ui.form.on("Service Request", { refresh: onRefresh });
+frappe.ui.form.on("Kumar Warranty Claim", { refresh: onRefresh });

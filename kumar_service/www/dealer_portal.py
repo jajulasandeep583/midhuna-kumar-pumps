@@ -184,6 +184,17 @@ def get_context(context):
 		limit=60,
 	)
 
+	# Same shape as picker_pumps: the part picker searches in the browser, so it
+	# needs codes and names as data, not as rendered <option> elements.
+	context.picker_parts = [
+		{
+			"item_code": i["name"],
+			"item_name": i["item_name"] or i["name"],
+			"rate": i["valuation_rate"] or 0,
+		}
+		for i in context.claim_items
+	]
+
 	# Which pumps of theirs KUMAR has flagged as coming off warranty - the
 	# dealer's best reason to ring a customer.
 	context.notices = _notices(context, scope)
