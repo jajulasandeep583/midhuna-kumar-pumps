@@ -9,6 +9,13 @@ __pycache__
 # built by `bench build` from the .bundle.* sources, so it is regenerated on
 # every deploy and the hashed filenames would churn the diff on each build
 kumar_service/public/dist
+# The desk SPA's compiled bundle. `bench build` regenerates it from desk/, and
+# committing 52 MB of hashed chunks would churn the diff on every build.
+# A fresh clone needs: yarn --cwd desk install && bench build --app kumar_service
+kumar_service/public/desk
+desk/node_modules
+desk/dist
+
 
 # never let a site's own config near the app
 site_config.json

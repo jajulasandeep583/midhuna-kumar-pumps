@@ -5,7 +5,8 @@ app_description = "Serial and batch traceability, warranty and dealer service ma
 app_email = "aimidhunatech@gmail.com"
 app_license = "mit"
 
-required_apps = ["erpnext"]
+# telephony is the desk's own dependency, inherited when it was vendored in
+required_apps = ["erpnext", "telephony"]
 
 # ------------------------------------------------------------------ includes
 
@@ -157,3 +158,98 @@ fixtures = [
 
 after_install = "kumar_service.install.after_install"
 after_migrate = "kumar_service.install.after_migrate"
+
+
+# ===================================================================== DESK
+#
+# KUMAR Pumps Desk. frappe/helpdesk is vendored into this app rather than
+# installed beside it, because this ships as one product: one app, one repo,
+# one install. Its python lives in kumar_service/hd/, its frappe module in
+# kumar_service/helpdesk/, and everything below is its hooks folded into ours.
+#
+# The trade, stated plainly: upstream helpdesk fixes can no longer be merged.
+# Their patches address paths that no longer exist here. This is now our code
+# to maintain.
+
+# --- desk doc events, merged into the doc_events above by _merge_desk_events
+DESK_DOC_EVENTS = {
+    "Assignment Rule": {
+        "on_trash": "kumar_service.hd.extends.assignment_rule.on_assignment_rule_trash",
+        "validate": "kumar_service.hd.extends.assignment_rule.on_assignment_rule_validate",
+    },
+    "Email Account": {
+        "validate": "kumar_service.hd.extends.email_account.validate",
+    },
+}
+
+for _dt, _events in DESK_DOC_EVENTS.items():
+    doc_events.setdefault(_dt, {}).update(_events)
+
+has_permission.update({
+    "HD Agent": "kumar_service.kumar_service.hd.doctype.hd_agent.hd_agent.has_permission",
+    "HD Ticket": "kumar_service.kumar_service.hd.doctype.hd_ticket.hd_ticket.has_permission",
+    "HD Saved Reply": "kumar_service.kumar_service.hd.doctype.hd_saved_reply.hd_saved_reply.has_permission",
+    "HD Customer": "kumar_service.kumar_service.hd.doctype.hd_customer.hd_customer.has_permission",
+})
+
+permission_query_conditions.update({
+    "HD Ticket": "kumar_service.kumar_service.hd.doctype.hd_ticket.hd_ticket.permission_query",
+    "HD Saved Reply": "kumar_service.kumar_service.hd.doctype.hd_saved_reply.hd_saved_reply.permission_query",
+    "HD Customer": "kumar_service.kumar_service.hd.doctype.hd_customer.hd_customer.permission_query",
+})
+
+override_doctype_class = {
+    "Email Account": "kumar_service.hd.overrides.email_account.CustomEmailAccount",
+    "Assignment Rule": "kumar_service.hd.overrides.assignment_rule.HelpdeskAssignmentRule",
+    "User Invitation": "kumar_service.hd.overrides.user_invitation.HelpdeskUserInvitation",
+}
+
+auth_hooks = ["kumar_service.hd.auth.authenticate"]
+
+ignore_links_on_delete = ["HD Notification", "HD Ticket Comment"]
+
+sqlite_search = ["kumar_service.hd.search_sqlite.HelpdeskSearch"]
+
+get_site_info = "kumar_service.hd.activation.get_site_info"
+
+user_invitation = {
+    "allowed_roles": {
+        "Agent Manager": ["Agent", "Agent Manager", "HD Customer", "HD Customer Manager"],
+        "System Manager": [
+            "Agent", "Agent Manager", "System Manager", "HD Customer", "HD Customer Manager",
+        ],
+    },
+    "after_accept": "kumar_service.kumar_service.hd.hooks.user_invitation.after_accept",
+    "extra_invite_params": ["customer", "contact"],
+}
+
+# the desk SPA is served from /kumar-desk; /helpdesk is kept so an agent who
+# has bookmarked the old path still lands somewhere
+website_route_rules += [
+    # the bare path as well as the sub-paths: a rule for /kumar-desk/<...> alone
+    # matches every route inside the app but not its front door
+    {"from_route": "/kumar-desk", "to_route": "helpdesk"},
+    {"from_route": "/kumar-desk/<path:app_path>", "to_route": "helpdesk"},
+    {"from_route": "/helpdesk/<path:app_path>", "to_route": "helpdesk"},
+]
+
+add_to_apps_screen += [
+    {
+        "name": "kumar_desk",
+        "logo": "/assets/kumar_service/desk/favicon.svg",
+        "title": "KUMAR Pumps Desk",
+        "route": "/kumar-desk",
+        "has_permission": "kumar_service.hd.api.permission.has_app_permission",
+    }
+]
+
+scheduler_events.setdefault("all", []).extend([
+    "kumar_service.hd.search.build_index_if_not_exists",
+    "kumar_service.hd.search.download_corpus",
+])
+scheduler_events.setdefault("daily", []).append(
+    "kumar_service.kumar_service.hd.doctype.hd_ticket.hd_ticket.close_tickets_after_n_days"
+)
+scheduler_events.setdefault("hourly_long", []).append(
+    "kumar_service.kumar_service.hd.doctype.hd_ticket.hd_ticket.update_sla_status_in_ticket"
+)

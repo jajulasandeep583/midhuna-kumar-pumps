@@ -16,6 +16,17 @@ requires = ["flit_core >=3.4,<4"]
 build-backend = "flit_core.buildapi"
 
 # These dependencies are only installed when developer mode is enabled
+# The desk SPA (vendored from frappe/helpdesk). `bench build` compiles
+# desk/ into kumar_service/public/desk and rewrites the index it is served from.
+[tool.bench.assets]
+build_dir = "./desk"
+out_dir = "./kumar_service/public/desk"
+index_html_path = "./kumar_service/www/helpdesk/index.html"
+
+[tool.bench.frappe-dependencies]
+frappe = ">=16.0.0-dev,<18.0.0"
+telephony = ">=0.0.1,<1.0.0"
+
 [tool.bench.dev-dependencies]
 # package_name = "~=1.1.0"
 
