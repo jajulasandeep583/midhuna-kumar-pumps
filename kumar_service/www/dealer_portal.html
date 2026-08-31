@@ -479,7 +479,10 @@
   .kp-t tbody tr { transition:background .1s; }
   .kp-t tbody tr:hover td { background:#f8fafc; }
   .kp-t tbody tr:last-child td { border-bottom:0; }
-  .kp-t td:last-child, .kp-t th:last-child { text-align:right; }
+  /* Opt-in, not last-child: the last column is an action strip on some of these
+     tables and a plain date on others, and blanket-aligning it right shunted
+     "Expires" to the far edge for no reason. */
+  .kp-t th.actions, .kp-t td.actions { text-align:right; white-space:nowrap; }
   /* serials, money and dates are compared down the column, so they get the
      tabular figures that make that possible */
   .kp-t .num, .kp-t .mono { font-variant-numeric:tabular-nums; }
@@ -512,6 +515,33 @@
 
   .kp-empty { text-align:center; padding:40px 20px; color:var(--mut); font-size:14px;
               background:#fff; border:1px dashed #d3d9e0; border-radius:var(--r-lg); }
+
+  /* ---------- key / value list ----------
+     "Your Outlet" and the ticket detail panel were both built out of .kp-t, the
+     wide data table. Two things went wrong with that. Its value cell is the row's
+     last child, which the table rules align right, so on a wide screen the label
+     sat at the far left and its value at the far right with a hand's width of
+     nothing between them. And its row divider is on `td` only, so a row whose
+     first cell is a `th` drew its line starting halfway across.
+
+     A key/value list is not a table of records. The label column is sized to the
+     longest label and no wider, the value sits straight after it, and the divider
+     runs the whole width. */
+  .kp-kv { width:100%; border-collapse:collapse; font-size:13.5px; }
+  .kp-kv th, .kp-kv td { padding:11px 14px; text-align:left; vertical-align:top;
+                         border-bottom:1px solid var(--line); }
+  .kp-kv tr:last-child th, .kp-kv tr:last-child td { border-bottom:0; }
+  .kp-kv th { width:1%; white-space:nowrap; font-weight:600; color:var(--mut);
+              background:var(--bg); }
+  .kp-kv td { color:var(--ink); width:auto; }
+  .kp-kv td b { font-weight:600; }
+  .kp-kv td small { color:var(--mut); }
+  /* on a phone the label column would squeeze the value into a ribbon */
+  @media (max-width:560px) {
+    .kp-kv th, .kp-kv td { display:block; width:auto; border-bottom:0; }
+    .kp-kv th { background:none; padding:10px 14px 0; font-size:11.5px; }
+    .kp-kv td { padding:2px 14px 11px; border-bottom:1px solid var(--line); }
+  }
 
   /* ---------- status pills ---------- */
   /* A status badge, not a sticker: a dot carries the state so it survives a
@@ -849,7 +879,7 @@
         <table class="kp-t" id="kr-table">
           <thead><tr>
             <th>{{ _("Serial") }}</th><th>{{ _("Customer") }}</th><th>{{ _("Sold") }}</th>
-            <th>{{ _("Warranty Upto") }}</th><th>{{ _("Certificate") }}</th>
+            <th>{{ _("Warranty Upto") }}</th><th class="actions">{{ _("Certificate") }}</th>
           </tr></thead>
           <tbody>
           {% for r in registrations %}
@@ -862,7 +892,7 @@
                 <a href="tel:{{ r.end_customer_mobile }}" style="font-size:12.5px">{{ r.end_customer_mobile }}</a></td>
               <td>{{ frappe.utils.format_date(r.sale_date) }}</td>
               <td>{{ frappe.utils.format_date(r.warranty_expiry_date) }}</td>
-              <td><a class="kp-btn sec sm" href="{{ r.certificate_url }}" target="_blank"
+              <td class="actions"><a class="kp-btn sec sm" href="{{ r.certificate_url }}" target="_blank"
                      rel="noopener">{{ _("Print") }}</a></td>
             </tr>
           {% endfor %}
@@ -1155,7 +1185,7 @@
           <thead><tr>
             <th>{{ _("Serial") }}</th><th>{{ _("Customer") }}</th>
             <th>{{ _("Where") }}</th><th>{{ _("Sold") }}</th>
-            <th>{{ _("Warranty") }}</th><th></th>
+            <th>{{ _("Warranty") }}</th><th class="actions"></th>
           </tr></thead>
           <tbody>
           {% for r in my_serials %}
@@ -1189,12 +1219,11 @@
                     &middot; {{ _("{0} days left").format(r.days_left) }}
                   {% endif %}</small>
               </td>
-              <td>
+              <td class="actions">
                 <a class="kp-btn ghost sm" href="{{ r.certificate_url }}" target="_blank"
                    rel="noopener">{{ _("Print") }}</a>
                 <button type="button" class="kp-btn sec sm ks-complain"
-                        data-serial="{{ r.serial_no }}"
-                        style="margin-top:5px">{{ _("Complaint") }}</button>
+                        data-serial="{{ r.serial_no }}">{{ _("Complaint") }}</button>
               </td>
             </tr>
           {% endfor %}
@@ -1342,7 +1371,7 @@
     <div class="kp-sec">
       <div class="kp-h"><svg><use href="#kp-art-monobloc"></use></svg>{{ _("Your Outlet") }}</div>
       <div class="kp-scroll">
-        <table class="kp-t">
+        <table class="kp-kv">
           <tbody>
             <tr><th>{{ _("Dealer Name") }}</th><td>{{ outlet.dealer_name }}</td></tr>
             <tr><th>{{ _("Dealer Code") }}</th><td>{{ outlet.code or "-" }}</td></tr>
@@ -1943,11 +1972,11 @@ frappe.ready(function () {
       $("kw-parts").innerHTML = `
         <div class="kp-scroll"><table class="kp-t">
           <thead><tr><th>${__("Part")}</th><th>${__("Qty")}</th>
-            <th>${__("Defect Observed")}</th><th></th></tr></thead>
+            <th>${__("Defect Observed")}</th><th class="actions"></th></tr></thead>
           <tbody>${parts.map((p, i) => `
             <tr><td><b>${esc(p.label)}</b></td><td>${esc(p.qty)}</td>
               <td>${esc(p.defect_observed || "")}</td>
-              <td><button type="button" class="kp-btn sec sm" data-drop="${i}">&times;</button></td></tr>`
+              <td class="actions"><button type="button" class="kp-btn sec sm" data-drop="${i}">&times;</button></td></tr>`
           ).join("")}</tbody>
         </table></div>`;
       $("kw-parts").querySelectorAll("[data-drop]").forEach((b) =>
@@ -2446,7 +2475,7 @@ frappe.ready(function () {
               }
             }
             box.innerHTML = `<div class="kp-scroll" style="margin-top:12px">
-              <table class="kp-t"><tbody>${rows}</tbody></table></div>`;
+              <table class="kp-kv"><tbody>${rows}</tbody></table></div>`;
           },
           error: function () {
             box.innerHTML = `<div class="kp-msg bad">${__("Not permitted")}</div>`;
