@@ -28,6 +28,7 @@
         </RouterLink>
       </template>
     </LayoutHeader>
+    <KumarNav v-if="isCustomerPortal" />
     <ListViewBuilder
       ref="listViewRef"
       :options="options"
@@ -71,6 +72,7 @@
 
 <script setup lang="ts">
 import { LayoutHeader, ListViewBuilder } from "@/components";
+import KumarNav from "@/pages/kumar/KumarNav.vue";
 import { TicketIcon } from "@/components/icons";
 import IndicatorIcon from "@/components/icons/IndicatorIcon.vue";
 import TicketPriority from "@/components/TicketPriority.vue";

@@ -171,6 +171,22 @@ const portalRoutes = [
       auth: true,
     },
   },
+  // ------------------------------------------------- KUMAR dealer routes
+  // The dealer's own work, inside the desk rather than on a separate website.
+  // Both call kumar_service.portal_api, which is already scoped to the caller's
+  // dealer tree - so these pages inherit that scoping rather than restating it.
+  {
+    path: "/raise-complaint",
+    name: "KumarComplaint",
+    component: () => import("@/pages/kumar/RaiseComplaint.vue"),
+    meta: { public: true, auth: true },
+  },
+  {
+    path: "/my-pumps",
+    name: "KumarPumps",
+    component: () => import("@/pages/kumar/MyPumps.vue"),
+    meta: { public: true, auth: true },
+  },
   {
     path: "/kb-public",
     name: "CustomerKnowledgeBase",

@@ -13,7 +13,7 @@ posting somebody else's serial number gets a permission error, not their data.
 
 import frappe
 from frappe import _
-from frappe.utils import cint, flt, now_datetime, nowdate
+from frappe.utils import add_days, cint, flt, now_datetime, nowdate
 
 from kumar_service.utils import dealer_and_descendants, user_dealer
 
@@ -104,6 +104,56 @@ def portal_options():
 		"root_causes": options("Kumar Warranty Claim", "root_cause"),
 		"applications": options("Pump Registration", "application_type"),
 	}
+
+
+@frappe.whitelist()
+def my_pumps(limit=600):
+	"""The dealer's own pumps, slim enough to search in the browser.
+
+	The same rows the portal renders into its picker, exposed as an endpoint so
+	the desk can offer the same "type a serial, model or customer" search
+	without a round trip per keystroke. Scoped by _my_scope, so it can only ever
+	return pumps this dealer's tree sold.
+	"""
+	scope = _my_scope()
+	rows = frappe.get_all(
+		"Pump Registration",
+		filters={"dealer": ["in", scope], "docstatus": 1},
+		fields=["serial_no", "pump_model", "end_customer_name", "district",
+			"warranty_expiry_date", "sale_date"],
+		order_by="sale_date desc, creation desc",
+		limit=cint(limit) or 600,
+	)
+
+	from frappe.utils import getdate
+
+	today = getdate(nowdate())
+	soon = add_days(today, 45)
+	out = []
+	for r in rows:
+		if not r.serial_no:
+			continue
+		expiry = getdate(r.warranty_expiry_date) if r.warranty_expiry_date else None
+		if not expiry:
+			state = "Not Registered"
+		elif expiry < today:
+			state = "Expired"
+		elif expiry <= soon:
+			state = "Expiring Soon"
+		else:
+			state = "In Warranty"
+		out.append(
+			{
+				"serial_no": r.serial_no,
+				"model": r.pump_model or "",
+				"customer": r.end_customer_name or "",
+				"district": r.district or "",
+				"sale_date": r.sale_date,
+				"warranty_expiry_date": r.warranty_expiry_date,
+				"state": state,
+			}
+		)
+	return out
 
 
 @frappe.whitelist()
