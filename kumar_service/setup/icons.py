@@ -96,7 +96,7 @@ EXTRA_ICONS = {
 	"Warranty Cost Analysis": "kumar-claim",
 	"Stock vs Registration Reconciliation": "kumar-warehouse",
 	# the company side of the dealer portal; the shortcut carries a shorter label
-	"Dealer Requests & Claims": "kumar-portal",
+	"Dealer Requests and Claims": "kumar-portal",
 	"Dealer Requests": "kumar-portal",
 	"Dealer Conversations": "kumar-portal",
 	"Command Centre": "kumar-report",

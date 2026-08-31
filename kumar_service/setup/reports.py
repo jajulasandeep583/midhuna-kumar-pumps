@@ -717,6 +717,20 @@ data = columns, out
 
 
 def build_all():
+	"""The five Query Reports. Nothing else belongs here any more.
+
+	The seven Script Reports this used to create as `is_standard: No` records
+	kept their python inside the Report row and ran it through safe_exec, which
+	frappe v16 permits only when server_script_enabled is set in
+	common_site_config - a bench-wide switch that hands any System Manager on
+	any site on the bench arbitrary python execution. Turning that on to read a
+	warranty cost report was the wrong trade, and with it off the reports simply
+	failed.
+
+	They are ordinary app code now, under kumar_service/report/<name>/, synced
+	by `bench migrate` like every other standard report: version-controlled,
+	reviewable, testable, and needing no bench-wide switch at all.
+	"""
 	_report("Warranty Expiring Soon", "Serial No", "Query Report", query=WARRANTY_EXPIRING,
 		roles=["System Manager", "Warranty Approver", "Service Manager", "Dealer Manager", "Dealer"])
 	_report("Unregistered Stock", "Serial No", "Query Report", query=UNREGISTERED_STOCK,
@@ -727,72 +741,5 @@ def build_all():
 		roles=["System Manager", "Quality Engineer", "Production Manager"])
 	_report("Technician Productivity", "Service Visit", "Query Report", query=TECHNICIAN_PRODUCTIVITY,
 		roles=["System Manager", "Service Manager"])
-
-	_report("Batch Defect Analysis", "Serial No", "Script Report", script=BATCH_DEFECT_SCRIPT,
-		roles=["System Manager", "Quality Engineer", "Warranty Approver", "Production Manager"],
-		filters=[
-			{"fieldname": "batch_type", "label": "Batch Type", "fieldtype": "Select",
-				"options": "\nHeat\nWinding", "default": ""},
-		])
-	_report("Serial Genealogy", "Serial No", "Script Report", script=SERIAL_GENEALOGY_SCRIPT,
-		roles=["System Manager", "Quality Engineer", "Service Manager", "Production Manager"],
-		filters=[
-			{"fieldname": "serial_no", "label": "Serial No", "fieldtype": "Link",
-				"options": "Serial No", "reqd": 1},
-		])
-	_report("Dealer Performance", "Pump Registration", "Script Report", script=DEALER_PERFORMANCE_SCRIPT,
-		roles=["System Manager", "Dealer Manager", "Service Manager"],
-		filters=[
-			{"fieldname": "dealer_type", "label": "Dealer Type", "fieldtype": "Select",
-				"options": "\nBranch Office\nAuthorised Distributor\nDealer\nSub-Dealer\nService Centre"},
-			{"fieldname": "state", "label": "State", "fieldtype": "Data"},
-		])
-	_report("Model Reliability", "Pump Registration", "Script Report", script=MODEL_RELIABILITY_SCRIPT,
-		roles=["System Manager", "Quality Engineer", "Production Manager", "Service Manager"],
-		filters=[
-			{"fieldname": "pump_category", "label": "Pump Category", "fieldtype": "Link",
-				"options": "Pump Category"},
-		])
-	_report("Stock vs Registration Reconciliation", "Serial No", "Script Report",
-		script=STOCK_RECONCILIATION_SCRIPT,
-		roles=["System Manager", "Warranty Approver", "Service Manager", "Dealer Manager",
-			"Production Manager"],
-		filters=[
-			{"fieldname": "verdict", "label": "Verdict", "fieldtype": "Select",
-				"options": "\nSHIPPED - NOT REGISTERED\nNo stock record at all\n"
-					"Held - QC not passed\nIn stock - not sold yet\nRegistered"},
-			{"fieldname": "pump_model", "label": "Pump Model", "fieldtype": "Link",
-				"options": "Pump Model"},
-			{"fieldname": "item_code", "label": "Item", "fieldtype": "Link", "options": "Item"},
-			{"fieldname": "from_date", "label": "Built From", "fieldtype": "Date"},
-			{"fieldname": "to_date", "label": "Built To", "fieldtype": "Date"},
-			{"fieldname": "include_settled", "label": "Include Already Registered",
-				"fieldtype": "Check", "default": 0},
-		])
-	_report("Warranty Cost Analysis", "Kumar Warranty Claim", "Script Report", script=WARRANTY_COST_SCRIPT,
-		roles=["System Manager", "Warranty Approver", "Accounts User"],
-		filters=[
-			{"fieldname": "from_date", "label": "From Date", "fieldtype": "Date",
-				"default": "frappe.datetime.add_months(frappe.datetime.get_today(), -3)"},
-			{"fieldname": "to_date", "label": "To Date", "fieldtype": "Date",
-				"default": "frappe.datetime.get_today()"},
-		])
-
-	_report("Dealer Requests & Claims", "Service Request", "Script Report",
-		script=DEALER_REQUESTS_SCRIPT,
-		roles=["System Manager", "Service Manager", "Warranty Approver", "Dealer Manager"],
-		filters=[
-			{"fieldname": "kind", "label": "Type", "fieldtype": "Select",
-				"options": "\nComplaint\nWarranty Claim"},
-			{"fieldname": "source", "label": "Raised From", "fieldtype": "Select",
-				"options": "\nPortal\nDesk"},
-			{"fieldname": "dealer", "label": "Dealer (with its network)", "fieldtype": "Link",
-				"options": "Dealer"},
-			{"fieldname": "status", "label": "Status", "fieldtype": "Data"},
-			{"fieldname": "from_date", "label": "Raised From Date", "fieldtype": "Date",
-				"default": "frappe.datetime.add_months(frappe.datetime.get_today(), -3)"},
-			{"fieldname": "to_date", "label": "Raised To Date", "fieldtype": "Date",
-				"default": "frappe.datetime.get_today()"},
-		])
 
 	frappe.db.commit()

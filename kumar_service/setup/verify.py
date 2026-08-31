@@ -597,7 +597,7 @@ def run():
 
 	# The company side of the portal: staff must be able to see what dealers
 	# raised, and tell portal from desk.
-	requests_report = "Dealer Requests & Claims"
+	requests_report = "Dealer Requests and Claims"
 	check("the dealer-requests report exists", frappe.db.exists("Report", requests_report))
 	if frappe.db.exists("Report", requests_report):
 		try:

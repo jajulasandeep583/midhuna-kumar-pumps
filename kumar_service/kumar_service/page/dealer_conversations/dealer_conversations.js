@@ -67,8 +67,8 @@ frappe.pages["dealer-conversations"].on_page_load = function (wrapper) {
 
 	page.add_menu_item(__("Open Service Request List"), () =>
 		frappe.set_route("List", "Service Request"));
-	page.add_menu_item(__("Dealer Requests & Claims report"), () =>
-		frappe.set_route("query-report", "Dealer Requests & Claims"));
+	page.add_menu_item(__("Dealer Requests and Claims report"), () =>
+		frappe.set_route("query-report", "Dealer Requests and Claims"));
 
 	// ------------------------------------------------------------------ load
 	function load() {

@@ -109,9 +109,9 @@
    "hidden": 0,
    "icon": "kumar-portal",
    "is_query_report": 1,
-   "label": "Dealer Requests & Claims",
+   "label": "Dealer Requests and Claims",
    "link_count": 0,
-   "link_to": "Dealer Requests & Claims",
+   "link_to": "Dealer Requests and Claims",
    "link_type": "Report",
    "onboard": 0,
    "type": "Link"

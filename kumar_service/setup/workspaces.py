@@ -174,12 +174,12 @@ WORKSPACES = [
 			("Service Technician", "DocType", "Technicians", "blue"),
 			("SLA Compliance", "Report", "SLA Compliance", "purple"),
 			# the company side of the dealer portal
-			("Dealer Requests & Claims", "Report", "Dealer Requests", "green"),
+			("Dealer Requests and Claims", "Report", "Dealer Requests", "green"),
 		],
 		"links": [
 			("Service", ["Service Request", "Service Visit", "Service Technician"]),
 			("Analysis", ["Dealer Performance", "Technician Productivity", "Model Reliability",
-				"Dealer Requests & Claims"]),
+				"Dealer Requests and Claims"]),
 		],
 	},
 	{
@@ -216,7 +216,7 @@ WORKSPACES = [
 		"links": [
 			("Claims", ["Kumar Warranty Claim", "Service Request"]),
 			("Reports", ["Warranty Expiring Soon", "Warranty Cost Analysis", "Unregistered Stock",
-				"Stock vs Registration Reconciliation", "Dealer Requests & Claims"]),
+				"Stock vs Registration Reconciliation", "Dealer Requests and Claims"]),
 		],
 	},
 	{

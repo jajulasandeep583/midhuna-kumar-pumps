@@ -69,6 +69,17 @@ def company():
 	return frappe.defaults.get_defaults().get("company") or frappe.db.get_value("Company", {}, "name")
 
 
+HSN_PUMP = "841370"
+HSN_PUMP_PART = "84139190"
+
+
+def _hsn(code):
+	"""None on a site without india_compliance, where the field does not exist."""
+	if not frappe.db.table_exists("GST HSN Code"):
+		return None
+	return code if frappe.db.exists("GST HSN Code", code) else None
+
+
 def item_group():
 	for group in ("Finished Pumps", "Products", "All Item Groups"):
 		if frappe.db.exists("Item Group", group):
@@ -104,6 +115,9 @@ def pump_item(item_code=PUMP_ITEM, serialised=True):
 					"is_stock_item": 1,
 					"has_serial_no": 1 if serialised else 0,
 					"custom_is_finished_pump": 1 if serialised else 0,
+					# india_compliance makes this mandatory; without it every
+					# fixture that touches an Item fails on a GST-enabled site
+					"gst_hsn_code": _hsn(HSN_PUMP),
 				}
 			)
 		)
@@ -122,6 +136,7 @@ def spare_item():
 					"stock_uom": "Nos",
 					"is_stock_item": 1,
 					"valuation_rate": 250,
+					"gst_hsn_code": _hsn(HSN_PUMP_PART),
 				}
 			)
 		)

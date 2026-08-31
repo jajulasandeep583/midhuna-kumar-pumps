@@ -76,12 +76,20 @@ permission_query_conditions = {
 	"Kumar Warranty Claim": "kumar_service.permissions.warranty_claim_query",
 	"Serial No": "kumar_service.permissions.serial_no_query",
 	"Dealer": "kumar_service.permissions.dealer_query",
+	# Service Visit has no dealer field of its own; scoped via its ticket
+	"Service Visit": "kumar_service.permissions.service_visit_query",
+	"Pump Test Certificate": "kumar_service.permissions.test_certificate_query",
 }
 
 has_permission = {
 	"Service Request": "kumar_service.permissions.service_request_has_permission",
 	"Pump Registration": "kumar_service.permissions.pump_registration_has_permission",
 	"Kumar Warranty Claim": "kumar_service.permissions.warranty_claim_has_permission",
+	# the Dealer list was scoped by permission_query_conditions, but a direct
+	# read of one Dealer document was not - see dealer_has_permission
+	"Dealer": "kumar_service.permissions.dealer_has_permission",
+	"Service Visit": "kumar_service.permissions.service_visit_has_permission",
+	"Pump Test Certificate": "kumar_service.permissions.test_certificate_has_permission",
 }
 
 # --------------------------------------------------------------- scheduler

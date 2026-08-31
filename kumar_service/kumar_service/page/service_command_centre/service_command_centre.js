@@ -43,8 +43,8 @@ frappe.pages["service-command-centre"].on_page_load = function (wrapper) {
 
 	page.add_menu_item(__("Dealer Conversations"), () =>
 		frappe.set_route("dealer-conversations"));
-	page.add_menu_item(__("Dealer Requests & Claims report"), () =>
-		frappe.set_route("query-report", "Dealer Requests & Claims"));
+	page.add_menu_item(__("Dealer Requests and Claims report"), () =>
+		frappe.set_route("query-report", "Dealer Requests and Claims"));
 	page.add_menu_item(__("Export Open Tickets (CSV)"), () => {
 		if (!latest) return;
 		kumar.dash.csv("kumar-open-tickets.csv", OLDEST_COLUMNS, latest.oldest_open);

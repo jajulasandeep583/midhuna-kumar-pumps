@@ -439,6 +439,43 @@ def operations():
 		upsert("Operation", {"name": name}, {"__newname": name, "operation_name": name})
 
 
+# --------------------------------------------------------------------- HSN
+#
+# india_compliance makes gst_hsn_code mandatory on every Item, so on a site with
+# it installed the whole catalogue refuses to save without one. These are the
+# headings for what KUMAR actually builds:
+#
+#   841370    other centrifugal pumps - what KUMAR builds
+#   84139190  parts of those pumps
+#   850152    AC motors over 750 W and up to 75 kW
+#
+# india_compliance requires 6 or 8 digits, so the 4-digit headings (8413, 8501)
+# are rejected outright - these are the narrowest headings that still cover the
+# whole range.
+#
+# They are defaults, not tax advice. A pumpset billed as one unit and a bare
+# motor billed separately do not always attract the same rate, so the accountant
+# should confirm these against the company's own classification before the first
+# GST return - and can override any of them on the Item itself.
+HSN_PUMP = "841370"
+HSN_PUMP_PART = "84139190"
+HSN_MOTOR = "850152"
+
+
+def hsn(code):
+	"""The HSN to stamp on an Item, or None where GST is not in play.
+
+	Returns None when india_compliance is not installed, so the same masters
+	load cleanly on a site that never asked for GST - the field will not exist
+	there, and setting it would be a stray key on the doc.
+	"""
+	if not frappe.db.table_exists("GST HSN Code"):
+		return None
+	if not frappe.db.exists("GST HSN Code", code):
+		return None
+	return code
+
+
 def component_items():
 	for code, name, group, batched, rate in COMPONENTS:
 		if frappe.db.exists("Item", code):
@@ -461,6 +498,10 @@ def component_items():
 				"custom_trace_group": group,
 				"valuation_rate": rate,
 				"is_purchase_item": 1 if group == "Bought-out" else 0,
+				# a stator or a rotor is a motor part; everything else on the
+				# pump is a pump part
+				"gst_hsn_code": hsn(HSN_MOTOR if group in ("Stator", "Rotor")
+					else HSN_PUMP_PART),
 			}
 		).insert(ignore_permissions=True)
 
@@ -491,6 +532,7 @@ def pump_items():
 				"valuation_rate": rate,
 				"standard_rate": flt(rate * 1.35, 0),
 				"is_sales_item": 1,
+				"gst_hsn_code": hsn(HSN_PUMP),
 			}
 		).insert(ignore_permissions=True)
 		frappe.db.set_value("Pump Model", code, "item", item_code, update_modified=False)

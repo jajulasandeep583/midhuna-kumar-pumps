@@ -1348,7 +1348,7 @@ def attribute_portal_requests(portal_share=0.55):
 	"""Mark a realistic share of dealer complaints and claims as portal-raised.
 
 	The demo builder creates everything as Administrator, so every row in the
-	"Dealer Requests & Claims" report read "Desk" - which is not what the company
+	"Dealer Requests and Claims" report read "Desk" - which is not what the company
 	would actually see, because a dealer with a portal login raises complaints
 	from the portal, not by ringing the branch to type it in for them.
 
