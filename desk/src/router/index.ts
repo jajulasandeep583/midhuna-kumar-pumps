@@ -172,20 +172,57 @@ const portalRoutes = [
     },
   },
   // ------------------------------------------------- KUMAR dealer routes
-  // The dealer's own work, inside the desk rather than on a separate website.
-  // Both call kumar_service.portal_api, which is already scoped to the caller's
-  // dealer tree - so these pages inherit that scoping rather than restating it.
+  //
+  // Everything a dealer does, behind one sidebar, inside the desk. These used to
+  // be seven tabs on a separate website; the dealer should not have to know
+  // there were ever two systems.
+  //
+  // They are children of one shell so the rail is mounted once and does not
+  // rebuild - and every one of them calls kumar_service.portal_api, which is
+  // already scoped to the caller's dealer tree, so the pages inherit that
+  // scoping rather than restating it.
   {
-    path: "/raise-complaint",
-    name: "KumarComplaint",
-    component: () => import("@/pages/kumar/RaiseComplaint.vue"),
+    path: "/dealer",
+    component: () => import("@/pages/kumar/KumarShell.vue"),
     meta: { public: true, auth: true },
-  },
-  {
-    path: "/my-pumps",
-    name: "KumarPumps",
-    component: () => import("@/pages/kumar/MyPumps.vue"),
-    meta: { public: true, auth: true },
+    children: [
+      {
+        path: "",
+        name: "KumarHome",
+        component: () => import("@/pages/kumar/Home.vue"),
+        meta: { public: true, auth: true },
+      },
+      {
+        path: "register",
+        name: "KumarRegister",
+        component: () => import("@/pages/kumar/Register.vue"),
+        meta: { public: true, auth: true },
+      },
+      {
+        path: "pumps",
+        name: "KumarPumps",
+        component: () => import("@/pages/kumar/MyPumps.vue"),
+        meta: { public: true, auth: true },
+      },
+      {
+        path: "complaint",
+        name: "KumarComplaint",
+        component: () => import("@/pages/kumar/RaiseComplaint.vue"),
+        meta: { public: true, auth: true },
+      },
+      {
+        path: "claim",
+        name: "KumarClaim",
+        component: () => import("@/pages/kumar/Claim.vue"),
+        meta: { public: true, auth: true },
+      },
+      {
+        path: "contact",
+        name: "KumarContact",
+        component: () => import("@/pages/kumar/Contact.vue"),
+        meta: { public: true, auth: true },
+      },
+    ],
   },
   {
     path: "/kb-public",
@@ -268,7 +305,10 @@ router.beforeEach(async (to, _, next) => {
         ? `?redirect-to=${DESK_BASE}${redirectURL}`
         : `?redirect-to=${DESK_BASE}`);
   } else if (!to.meta.public && !authStore.hasDeskAccess) {
-    next({ name: "TicketsCustomer" });
+    // a dealer has no agent desk, so send them to their own home rather than
+    // to a bare ticket list - registering a pump and raising a complaint are
+    // most of what they came for
+    next({ name: "KumarHome" });
   } else if (to.name === "TicketAgent" && !authStore.isAgent) {
     const ticketId = to.params.ticketId;
     next({

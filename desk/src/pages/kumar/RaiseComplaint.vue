@@ -7,7 +7,6 @@
         </div>
       </template>
     </LayoutHeader>
-    <KumarNav />
 
     <div class="mx-auto max-w-3xl px-5 py-6">
       <p class="mb-5 text-sm text-ink-gray-6">
@@ -124,7 +123,6 @@ import { useRouter } from "vue-router";
 import { Badge, Button, ErrorMessage, FormControl, createResource } from "frappe-ui";
 import { LayoutHeader } from "@/components";
 import { __ } from "@/translation";
-import KumarNav from "./KumarNav.vue";
 
 const router = useRouter();
 

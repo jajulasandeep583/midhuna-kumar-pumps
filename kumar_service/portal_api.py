@@ -13,7 +13,7 @@ posting somebody else's serial number gets a permission error, not their data.
 
 import frappe
 from frappe import _
-from frappe.utils import add_days, cint, flt, now_datetime, nowdate
+from frappe.utils import add_days, cint, flt, getdate, now_datetime, nowdate
 
 from kumar_service.utils import dealer_and_descendants, user_dealer
 
@@ -103,6 +103,61 @@ def portal_options():
 		"claim_types": options("Kumar Warranty Claim", "claim_type"),
 		"root_causes": options("Kumar Warranty Claim", "root_cause"),
 		"applications": options("Pump Registration", "application_type"),
+	}
+
+
+@frappe.whitelist()
+def my_summary():
+	"""The counts the dealer's sidebar and home screen read.
+
+	One call, because the rail needs three numbers and a name and firing four
+	requests to paint a sidebar is how a page ends up feeling slow on a phone
+	on a village connection.
+	"""
+	me = _me()
+	scope = _my_scope()
+	today = getdate(nowdate())
+	soon = add_days(today, 45)
+
+	pumps = frappe.get_all(
+		"Pump Registration",
+		filters={"dealer": ["in", scope], "docstatus": 1},
+		fields=["warranty_expiry_date"],
+		limit_page_length=0,
+	)
+	in_warranty = expiring = expired = 0
+	for r in pumps:
+		expiry = getdate(r.warranty_expiry_date) if r.warranty_expiry_date else None
+		if not expiry:
+			continue
+		if expiry < today:
+			expired += 1
+		elif expiry <= soon:
+			expiring += 1
+		else:
+			in_warranty += 1
+
+	open_requests = frappe.db.count(
+		"Service Request",
+		{"dealer": ["in", scope], "status": ["not in", ("Resolved", "Closed", "Cancelled")],
+		 "docstatus": ["<", 2]},
+	)
+	open_claims = frappe.db.count(
+		"Kumar Warranty Claim",
+		{"dealer": ["in", scope], "workflow_state": ["not in", ("Settled", "Rejected")],
+		 "docstatus": ["<", 2]},
+	)
+
+	return {
+		"dealer": me.name,
+		"dealer_name": frappe.db.get_value("Dealer", me.name, "dealer_name") or me.name,
+		"pumps": len(pumps),
+		"in_warranty": in_warranty,
+		"expiring": expiring,
+		"expired": expired,
+		"open_tickets": open_requests + open_claims,
+		"open_requests": open_requests,
+		"open_claims": open_claims,
 	}
 
 

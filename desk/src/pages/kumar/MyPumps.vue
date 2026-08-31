@@ -5,7 +5,6 @@
         <div class="text-lg font-semibold text-ink-gray-9">{{ __("My Pumps") }}</div>
       </template>
     </LayoutHeader>
-    <KumarNav />
 
     <div class="px-5 py-5">
       <div class="mb-4 flex flex-wrap items-center gap-3">
@@ -73,7 +72,6 @@ import { useRouter } from "vue-router";
 import { Badge, Button, FormControl, createResource } from "frappe-ui";
 import { LayoutHeader } from "@/components";
 import { __ } from "@/translation";
-import KumarNav from "./KumarNav.vue";
 
 const router = useRouter();
 const q = ref("");
