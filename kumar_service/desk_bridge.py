@@ -71,6 +71,29 @@ def _quietly(fn, *args, **kwargs):
 
 # ------------------------------------------------------------------ customer
 
+def contact_for(dealer):
+	"""The Contact of the dealer's portal login, walking up to a parent if needed.
+
+	This is what makes a mirrored ticket visible to the dealer at all. Helpdesk
+	shows a non-agent the tickets they own, are the contact on, or raised - and
+	a ticket inserted by the bridge is owned by whoever triggered it, usually
+	Administrator. Setting the contact is what puts it in the dealer's list.
+
+	A sub-dealer with no login of its own is handled by its parent, the same way
+	the conversation notifications already are.
+	"""
+	hops = 0
+	while dealer and hops < 8:
+		user = frappe.db.get_value("Dealer", dealer, "portal_user")
+		if user:
+			contact = frappe.db.get_value("Contact", {"user": user})
+			if contact:
+				return contact, user
+		dealer = frappe.db.get_value("Dealer", dealer, "parent_dealer")
+		hops += 1
+	return None, None
+
+
 def customer_for(dealer):
 	"""One HD Customer per Dealer, so an agent can filter the queue by outlet."""
 	if not dealer or not frappe.db.exists("DocType", "HD Customer"):
@@ -122,9 +145,13 @@ def _mirror(sr):
 	existing = frappe.db.get_value("HD Ticket", {"custom_service_request": sr.name}, "name")
 	desk_status = STATUS_TO_DESK.get(sr.get("status"), "Open")
 
+	contact, portal_user = contact_for(sr.get("dealer"))
 	values = {
 		"subject": _subject(sr),
 		"status": desk_status,
+		# without these the dealer who raised it cannot see their own ticket
+		"contact": contact,
+		"raised_by": portal_user,
 		"custom_service_request": sr.name,
 		"custom_serial_no": sr.get("serial_no"),
 		"custom_dealer": sr.get("dealer"),
@@ -187,6 +214,32 @@ def _set_status(ticket):
 
 
 # -------------------------------------------------------------- backfill
+
+def relink(limit=None):
+	"""Put the contact and raiser back on tickets mirrored before we set them.
+
+	Separate from backfill because these tickets exist and are correct in every
+	other respect - they were simply invisible to the dealer they belong to.
+	"""
+	if not desk_installed():
+		return {"relinked": 0, "skipped": "helpdesk is not installed"}
+	done = 0
+	for t in frappe.get_all(
+		"HD Ticket",
+		filters={"custom_service_request": ["is", "set"]},
+		fields=["name", "custom_dealer", "contact", "raised_by"],
+		limit_page_length=cint(limit) or None,
+	):
+		if t.contact and t.raised_by:
+			continue
+		contact, user = contact_for(t.custom_dealer)
+		if not contact:
+			continue
+		frappe.db.set_value("HD Ticket", t.name, {"contact": contact, "raised_by": user})
+		done += 1
+	frappe.db.commit()
+	return {"relinked": done}
+
 
 def backfill(limit=None):
 	"""Mirror the requests that already existed before the desk did."""

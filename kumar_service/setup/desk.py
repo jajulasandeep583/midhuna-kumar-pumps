@@ -185,6 +185,79 @@ def ticket_types():
 	return made
 
 
+# ---------------------------------------------------------------- dealers
+
+def dealers():
+	"""Give every dealer login the desk as a customer, not as an agent.
+
+	A dealer logging in saw an empty desk, and the reason is worth stating
+	because it is not obvious. Helpdesk shows a non-agent only the tickets they
+	own, are the contact on, or raised - plus the tickets of any HD Customer
+	they are a member of. Our mirrored tickets were inserted by Administrator
+	with a customer but no contact and no raiser, so a dealer matched none of
+	the three and the queue came back empty.
+
+	The chain helpdesk actually walks is
+	    User -> Contact (Contact.user) -> HD Customer Member -> HD Customer
+	so a dealer needs a Contact bound to their login and a membership row on
+	their outlet's customer. is_manager is set, which is what lets a group
+	dealer see the tickets of the whole outlet rather than only the ones they
+	personally opened.
+
+	They get the HD Customer role, never Agent: an agent sees the queue.
+	"""
+	if not frappe.db.exists("DocType", "HD Customer"):
+		return {"linked": [], "skipped": "helpdesk is not installed"}
+
+	from kumar_service.desk_bridge import customer_for
+
+	linked = []
+	for d in frappe.get_all(
+		"Dealer", fields=["name", "portal_user", "dealer_name"], limit_page_length=0
+	):
+		user = d.portal_user
+		if not user or not frappe.db.exists("User", user):
+			continue
+
+		customer = customer_for(d.name)
+		if not customer:
+			continue
+
+		# 1. the role that opens the desk at all
+		roles = set(frappe.get_roles(user))
+		if "HD Customer" not in roles and frappe.db.exists("Role", "HD Customer"):
+			u = frappe.get_doc("User", user)
+			u.append("roles", {"role": "HD Customer"})
+			u.flags.ignore_permissions = True
+			u.save(ignore_permissions=True)
+
+		# 2. the Contact that ties the login to a person
+		contact = frappe.db.get_value("Contact", {"user": user})
+		if not contact:
+			c = frappe.get_doc(
+				{
+					"doctype": "Contact",
+					"first_name": d.dealer_name or d.name,
+					"user": user,
+					"email_ids": [{"email_id": user, "is_primary": 1}],
+				}
+			)
+			c.flags.ignore_permissions = True
+			c.insert(ignore_permissions=True)
+			contact = c.name
+
+		# 3. the membership that says which outlet's tickets they may see
+		# the child table is `contacts`, of HD Customer Member - not `members`
+		cust = frappe.get_doc("HD Customer", customer)
+		if not any(m.contact_name == contact for m in (cust.get("contacts") or [])):
+			cust.append("contacts", {"contact_name": contact, "is_manager": 1})
+			cust.flags.ignore_permissions = True
+			cust.save(ignore_permissions=True)
+
+		linked.append({"dealer": d.name, "user": user, "contact": contact})
+	return linked
+
+
 def build_all():
 	if not frappe.db.exists("DocType", "HD Settings"):
 		frappe.msgprint("helpdesk is not installed on this site; skipping the desk setup")
@@ -194,6 +267,7 @@ def build_all():
 		"agents": agents(),
 		"ticket_types": ticket_types(),
 		"ticket_fields": ticket_fields(),
+		"dealers": dealers(),
 	}
 	frappe.db.commit()
 	return out

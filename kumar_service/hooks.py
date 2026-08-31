@@ -186,16 +186,16 @@ for _dt, _events in DESK_DOC_EVENTS.items():
     doc_events.setdefault(_dt, {}).update(_events)
 
 has_permission.update({
-    "HD Agent": "kumar_service.kumar_service.hd.doctype.hd_agent.hd_agent.has_permission",
-    "HD Ticket": "kumar_service.kumar_service.hd.doctype.hd_ticket.hd_ticket.has_permission",
-    "HD Saved Reply": "kumar_service.kumar_service.hd.doctype.hd_saved_reply.hd_saved_reply.has_permission",
-    "HD Customer": "kumar_service.kumar_service.hd.doctype.hd_customer.hd_customer.has_permission",
+    "HD Agent": "kumar_service.helpdesk.doctype.hd_agent.hd_agent.has_permission",
+    "HD Ticket": "kumar_service.helpdesk.doctype.hd_ticket.hd_ticket.has_permission",
+    "HD Saved Reply": "kumar_service.helpdesk.doctype.hd_saved_reply.hd_saved_reply.has_permission",
+    "HD Customer": "kumar_service.helpdesk.doctype.hd_customer.hd_customer.has_permission",
 })
 
 permission_query_conditions.update({
-    "HD Ticket": "kumar_service.kumar_service.hd.doctype.hd_ticket.hd_ticket.permission_query",
-    "HD Saved Reply": "kumar_service.kumar_service.hd.doctype.hd_saved_reply.hd_saved_reply.permission_query",
-    "HD Customer": "kumar_service.kumar_service.hd.doctype.hd_customer.hd_customer.permission_query",
+    "HD Ticket": "kumar_service.helpdesk.doctype.hd_ticket.hd_ticket.permission_query",
+    "HD Saved Reply": "kumar_service.helpdesk.doctype.hd_saved_reply.hd_saved_reply.permission_query",
+    "HD Customer": "kumar_service.helpdesk.doctype.hd_customer.hd_customer.permission_query",
 })
 
 override_doctype_class = {
@@ -219,7 +219,7 @@ user_invitation = {
             "Agent", "Agent Manager", "System Manager", "HD Customer", "HD Customer Manager",
         ],
     },
-    "after_accept": "kumar_service.kumar_service.hd.hooks.user_invitation.after_accept",
+    "after_accept": "kumar_service.helpdesk.hooks.user_invitation.after_accept",
     "extra_invite_params": ["customer", "contact"],
 }
 
@@ -255,8 +255,8 @@ scheduler_events.setdefault("all", []).extend([
     "kumar_service.hd.search.download_corpus",
 ])
 scheduler_events.setdefault("daily", []).append(
-    "kumar_service.kumar_service.hd.doctype.hd_ticket.hd_ticket.close_tickets_after_n_days"
+    "kumar_service.helpdesk.doctype.hd_ticket.hd_ticket.close_tickets_after_n_days"
 )
 scheduler_events.setdefault("hourly_long", []).append(
-    "kumar_service.kumar_service.hd.doctype.hd_ticket.hd_ticket.update_sla_status_in_ticket"
+    "kumar_service.helpdesk.doctype.hd_ticket.hd_ticket.update_sla_status_in_ticket"
 )

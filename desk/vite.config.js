@@ -47,9 +47,22 @@ export default defineConfig(async ({ mode }) => {
       vue(),
       vueJsx(),
       VitePWA({
+        // The service worker is deliberately off.
+        //
+        // It precached index.html and served it for any navigation, so after the
+        // desk moved from /helpdesk to /kumar-desk a browser that had visited the
+        // old path kept serving the old shell - the app landed on
+        // /kumar-desk/kumar-desk from a cache the server could not see or clear.
+        // Offline caching buys an internal tool on the office LAN nothing, and it
+        // cost a bug that looks exactly like a routing fault and is not one.
+        //
+        // The manifest is kept so the desk can still be installed to a home
+        // screen; injectRegister:null means nothing registers a worker.
+        selfDestroying: true,
+        injectRegister: null,
         registerType: "autoUpdate",
         devOptions: {
-          enabled: true,
+          enabled: false,
         },
         workbox: {
           cleanupOutdatedCaches: true,
@@ -57,11 +70,11 @@ export default defineConfig(async ({ mode }) => {
         },
         manifest: {
           display: "standalone",
-          name: "Frappe Helpdesk",
-          short_name: "Helpdesk",
-          start_url: "/helpdesk",
+          name: "KUMAR Pumps Desk",
+          short_name: "KUMAR Desk",
+          start_url: "/kumar-desk",
           description:
-            "Modern, Streamlined, Free and Open Source Customer Service Software",
+            "Dealer service, warranty and traceability for KUMAR pumpsets - Sri Lakshmi Ganapathi Engineering Works, Tenali",
           icons: [
             {
               src: "/assets/kumar_service/desk/manifest/manifest-icon-192.maskable.png",
