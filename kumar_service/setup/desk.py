@@ -187,6 +187,41 @@ def ticket_types():
 
 # ---------------------------------------------------------------- dealers
 
+# Doctypes a dealer must be able to READ for the desk pages to work at all.
+# Each one is already row-scoped by a permission_query_conditions entry and a
+# has_permission hook in kumar_service.permissions, so granting the role read
+# widens which doctypes they may touch, never which rows.
+DEALER_READ = ("Serial No",)
+
+
+def dealer_permissions():
+	"""Grant the Dealer role read on what the desk pages actually open.
+
+	The role could read Pump Model and Pump Category but not Serial No, so
+	anything reaching a serial through the ORM - the claim page, a registration
+	lookup, the REST API - failed with "does not have doctype access". The
+	portal never noticed because it reads serials with frappe.db.get_value,
+	which does not check permissions at all.
+	"""
+	from frappe.permissions import add_permission, update_permission_property
+
+	granted = []
+	for doctype in DEALER_READ:
+		if not frappe.db.exists("DocType", doctype):
+			continue
+		if frappe.db.exists("Custom DocPerm", {"parent": doctype, "role": "Dealer"}) or \
+			frappe.db.exists("DocPerm", {"parent": doctype, "role": "Dealer"}):
+			continue
+		add_permission(doctype, "Dealer", 0)
+		# read only: a dealer never writes a serial, the plant does
+		for prop in ("write", "create", "delete", "submit", "cancel", "amend"):
+			update_permission_property(doctype, "Dealer", 0, prop, 0)
+		granted.append(doctype)
+	if granted:
+		frappe.clear_cache()
+	return granted
+
+
 def dealers():
 	"""Give every dealer login the desk as a customer, not as an agent.
 
@@ -267,6 +302,7 @@ def build_all():
 		"agents": agents(),
 		"ticket_types": ticket_types(),
 		"ticket_fields": ticket_fields(),
+		"dealer_permissions": dealer_permissions(),
 		"dealers": dealers(),
 	}
 	frappe.db.commit()

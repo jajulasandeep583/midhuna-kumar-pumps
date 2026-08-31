@@ -181,48 +181,50 @@ const portalRoutes = [
   // rebuild - and every one of them calls kumar_service.portal_api, which is
   // already scoped to the caller's dealer tree, so the pages inherit that
   // scoping rather than restating it.
+  // ------------------------------------------------- KUMAR dealer routes
+  //
+  // Flat, and deliberately not behind a shell of their own. The customer portal
+  // already renders a sidebar; wrapping these in a second one put two rails on
+  // the screen at once. The KUMAR items live in that rail instead - see
+  // customerPortalSidebarOptions.
+  //
+  // Every one of them calls kumar_service.portal_api, already scoped to the
+  // caller's dealer tree, so none of them restates the scoping.
   {
     path: "/dealer",
-    component: () => import("@/pages/kumar/KumarShell.vue"),
+    name: "KumarHome",
+    component: () => import("@/pages/kumar/Home.vue"),
     meta: { public: true, auth: true },
-    children: [
-      {
-        path: "",
-        name: "KumarHome",
-        component: () => import("@/pages/kumar/Home.vue"),
-        meta: { public: true, auth: true },
-      },
-      {
-        path: "register",
-        name: "KumarRegister",
-        component: () => import("@/pages/kumar/Register.vue"),
-        meta: { public: true, auth: true },
-      },
-      {
-        path: "pumps",
-        name: "KumarPumps",
-        component: () => import("@/pages/kumar/MyPumps.vue"),
-        meta: { public: true, auth: true },
-      },
-      {
-        path: "complaint",
-        name: "KumarComplaint",
-        component: () => import("@/pages/kumar/RaiseComplaint.vue"),
-        meta: { public: true, auth: true },
-      },
-      {
-        path: "claim",
-        name: "KumarClaim",
-        component: () => import("@/pages/kumar/Claim.vue"),
-        meta: { public: true, auth: true },
-      },
-      {
-        path: "contact",
-        name: "KumarContact",
-        component: () => import("@/pages/kumar/Contact.vue"),
-        meta: { public: true, auth: true },
-      },
-    ],
+  },
+  {
+    path: "/dealer/register",
+    name: "KumarRegister",
+    component: () => import("@/pages/kumar/Register.vue"),
+    meta: { public: true, auth: true },
+  },
+  {
+    path: "/dealer/pumps",
+    name: "KumarPumps",
+    component: () => import("@/pages/kumar/MyPumps.vue"),
+    meta: { public: true, auth: true },
+  },
+  {
+    path: "/dealer/complaint",
+    name: "KumarComplaint",
+    component: () => import("@/pages/kumar/RaiseComplaint.vue"),
+    meta: { public: true, auth: true },
+  },
+  {
+    path: "/dealer/claim",
+    name: "KumarClaim",
+    component: () => import("@/pages/kumar/Claim.vue"),
+    meta: { public: true, auth: true },
+  },
+  {
+    path: "/dealer/contact",
+    name: "KumarContact",
+    component: () => import("@/pages/kumar/Contact.vue"),
+    meta: { public: true, auth: true },
   },
   {
     path: "/kb-public",

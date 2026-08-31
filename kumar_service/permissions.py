@@ -161,6 +161,32 @@ def test_certificate_has_permission(doc, user=None, permission_type=None):
 	return owner in dealer_and_descendants(d.name)
 
 
+def serial_no_has_permission(doc, user=None, permission_type=None):
+	"""A dealer may read the serials their own tree sold, and nothing else.
+
+	serial_no_query already scoped the LIST, but there was no document-level
+	rule and the Dealer role held no Serial No permission at all - so the desk's
+	claim and registration pages died on "does not have doctype access" the
+	moment anything went through the ORM rather than frappe.db.get_value.
+
+	Read only. A dealer never writes a serial: the pump is created in the plant
+	and the sale is recorded through Pump Registration, which has its own rules.
+	"""
+	user = user or frappe.session.user
+	if has_full_access(user):
+		return True
+	d = user_dealer(user)
+	if not d:
+		return "Service Technician" in frappe.get_roles(user)
+	if permission_type and permission_type not in ("read", "select"):
+		return False
+	owner = doc.get("custom_dealer") if hasattr(doc, "get") else None
+	if not owner:
+		# an unsold serial still sitting in the plant belongs to nobody yet
+		return False
+	return owner in dealer_and_descendants(d.name)
+
+
 def dealer_has_permission(doc, user=None, permission_type=None):
 	"""The same rule `dealer_query` applies to the list, applied to one document.
 

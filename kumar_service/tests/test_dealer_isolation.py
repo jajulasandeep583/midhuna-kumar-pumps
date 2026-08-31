@@ -139,6 +139,54 @@ class TestDealerIsolation(IntegrationTestCase):
 			self.skipTest("no test certificates on this site")
 		self.assertLess(visible, total, "a dealer can see every test certificate")
 
+	# ------------------------------------------------------------- Serial No
+
+	def test_a_dealer_can_read_a_serial_it_sold(self):
+		"""The Dealer role held no Serial No permission at all, so every desk
+		page that reached a serial through the ORM died on doctype access."""
+		mine = dealer_and_descendants(self.me)
+		sn = frappe.get_all(
+			"Serial No", filters={"custom_dealer": ["in", mine]}, pluck="name", limit=1
+		)
+		if not sn:
+			self.skipTest("this dealer's tree has sold no serials")
+		self.assertTrue(
+			frappe.has_permission("Serial No", doc=sn[0], user=self.user),
+			f"{self.user} cannot read {sn[0]}, a serial its own tree sold",
+		)
+
+	def test_a_dealer_cannot_read_a_serial_someone_else_sold(self):
+		frappe.set_user("Administrator")
+		mine = set(dealer_and_descendants(self.me))
+		foreign = None
+		for r in frappe.get_all(
+			"Serial No", fields=["name", "custom_dealer"], limit_page_length=0
+		):
+			if r.custom_dealer and r.custom_dealer not in mine:
+				foreign = r.name
+				break
+		frappe.set_user(self.user)
+		if not foreign:
+			self.skipTest("every sold serial belongs to this dealer's tree")
+		self.assertFalse(
+			frappe.has_permission("Serial No", doc=foreign, user=self.user),
+			f"{self.user} can read {foreign}, another dealer's serial",
+		)
+
+	def test_a_dealer_can_never_write_a_serial(self):
+		"""A pump is created in the plant. A dealer records the sale through
+		Pump Registration, which has its own rules - never by editing a serial."""
+		mine = dealer_and_descendants(self.me)
+		sn = frappe.get_all(
+			"Serial No", filters={"custom_dealer": ["in", mine]}, pluck="name", limit=1
+		)
+		if not sn:
+			self.skipTest("this dealer's tree has sold no serials")
+		self.assertFalse(
+			frappe.has_permission("Serial No", ptype="write", doc=sn[0], user=self.user),
+			"a dealer can write a Serial No",
+		)
+
 	# ----------------------------------------------------------- the portal API
 
 	def test_portal_refuses_a_pump_this_dealer_did_not_sell(self):

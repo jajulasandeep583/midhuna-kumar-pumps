@@ -101,6 +101,8 @@ has_permission = {
 	"Dealer": "kumar_service.permissions.dealer_has_permission",
 	"Service Visit": "kumar_service.permissions.service_visit_has_permission",
 	"Pump Test Certificate": "kumar_service.permissions.test_certificate_has_permission",
+	# the list was scoped by serial_no_query; a document read was not
+	"Serial No": "kumar_service.permissions.serial_no_has_permission",
 }
 
 # --------------------------------------------------------------- scheduler

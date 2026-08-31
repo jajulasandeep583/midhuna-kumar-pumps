@@ -1,3 +1,9 @@
+import LucideHome from "~icons/lucide/home";
+import LucideFilePlus from "~icons/lucide/file-plus";
+import LucideList from "~icons/lucide/list";
+import LucideMessageSquare from "~icons/lucide/message-square";
+import LucideShieldCheck from "~icons/lucide/shield-check";
+import LucidePhone from "~icons/lucide/phone";
 import { ref } from "vue";
 import LucideBookOpen from "~icons/lucide/book-open";
 import LucideUsers from "~icons/lucide/users";
@@ -52,11 +58,44 @@ export const agentPortalSidebarOptions = [
   },
 ];
 
+// A dealer's whole job, in the one rail the customer portal already has.
+// These used to live in a second sidebar of our own, which meant the desk
+// showed two rails side by side - the app's and ours.
 export const customerPortalSidebarOptions = [
   {
-    label: __("Tickets"),
+    label: __("Home"),
+    icon: LucideHome,
+    to: "KumarHome",
+  },
+  {
+    label: __("Register a Sale"),
+    icon: LucideFilePlus,
+    to: "KumarRegister",
+  },
+  {
+    label: __("What I Sold"),
+    icon: LucideList,
+    to: "KumarPumps",
+  },
+  {
+    label: __("Raise a Complaint"),
+    icon: LucideMessageSquare,
+    to: "KumarComplaint",
+  },
+  {
+    label: __("Warranty Claim"),
+    icon: LucideShieldCheck,
+    to: "KumarClaim",
+  },
+  {
+    label: __("My Tickets"),
     icon: LucideTicket,
     to: "TicketsCustomer",
+  },
+  {
+    label: __("Contact KUMAR"),
+    icon: LucidePhone,
+    to: "KumarContact",
   },
   {
     label: __("Knowledge Base"),
