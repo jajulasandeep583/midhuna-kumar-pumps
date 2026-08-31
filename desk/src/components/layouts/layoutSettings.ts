@@ -1,3 +1,4 @@
+import LucideGauge from "~icons/lucide/gauge";
 import LucideCalendarCheck from "~icons/lucide/calendar-check";
 import LucideHome from "~icons/lucide/home";
 import LucideFilePlus from "~icons/lucide/file-plus";
@@ -22,6 +23,11 @@ import { __ } from "@/translation";
 export const showShortcutsModal = ref(false);
 
 export const agentPortalSidebarOptions = [
+  {
+    label: __("Command Centre"),
+    icon: LucideGauge,
+    to: "KumarManage",
+  },
   {
     label: __("Visits"),
     icon: LucideCalendarCheck,

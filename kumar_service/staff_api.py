@@ -473,3 +473,178 @@ def schedule_visit(service_request, technician, visit_date, visit_type="On-Site"
 
 	frappe.db.commit()
 	return {"name": visit.name, "message": message, "chargeable": bool(chargeable)}
+
+
+# ================================================================== manager
+#
+# What a manager asks is not what an agent asks. An agent asks "what is my next
+# ticket"; a manager asks "what is going wrong, who is it going wrong for, and
+# what is it costing me". This is one call because that question is one glance -
+# a manager who has to click four times to assemble the picture stops looking.
+
+
+@frappe.whitelist()
+def manager_dashboard(days=30):
+	_require_staff()
+	days = cint(days) or 30
+	since = add_days(nowdate(), -days)
+	today = nowdate()
+	now = now_datetime()
+
+	OPEN = ("Resolved", "Closed", "Cancelled")
+
+	# ---------------------------------------------------------------- work
+	open_requests = frappe.get_all(
+		"Service Request",
+		filters={"status": ["not in", OPEN], "docstatus": ["<", 2]},
+		fields=["name", "dealer", "serial_no", "pump_model", "status", "priority",
+			"complaint_category", "custom_request_type", "is_under_warranty",
+			"reported_on", "response_due_on", "first_response_on", "resolution_due_on",
+			"end_customer_name"],
+		limit_page_length=0,
+	)
+	breached, unanswered = [], []
+	for r in open_requests:
+		r["overdue"] = bool(r["resolution_due_on"] and str(r["resolution_due_on"]) < str(now))
+		r["no_reply"] = not r["first_response_on"] and bool(
+			r["response_due_on"] and str(r["response_due_on"]) < str(now)
+		)
+		if r["overdue"]:
+			breached.append(r)
+		if r["no_reply"]:
+			unanswered.append(r)
+
+	# ---------------------------------------------------------- money owed
+	claims = frappe.get_all(
+		"Kumar Warranty Claim",
+		filters={"docstatus": ["<", 2]},
+		fields=["name", "dealer", "serial_no", "claim_type", "claim_amount",
+			"approved_amount", "workflow_state", "creation"],
+		limit_page_length=0,
+	)
+	pending = [c for c in claims if c.workflow_state in ("Pending Review", "Under Investigation")]
+	approved = [c for c in claims if c.workflow_state == "Approved"]
+	settled = [c for c in claims if c.workflow_state == "Settled"
+		and str(c.creation)[:10] >= since]
+
+	# ------------------------------------------------------------- warranty
+	regs = frappe.get_all(
+		"Pump Registration",
+		filters={"docstatus": 1},
+		fields=["dealer", "warranty_expiry_date"],
+		limit_page_length=0,
+	)
+	soon = add_days(today, 45)
+	in_warranty = expiring = expired = 0
+	for r in regs:
+		e = r.warranty_expiry_date
+		if not e:
+			continue
+		if str(e) < today:
+			expired += 1
+		elif str(e) <= soon:
+			expiring += 1
+		else:
+			in_warranty += 1
+
+	# --------------------------------------------------------------- visits
+	visits = frappe.get_all(
+		"Service Visit",
+		filters={"docstatus": ["<", 2], "visit_date": [">=", today]},
+		fields=["name", "visit_date", "technician", "serial_no", "is_chargeable"],
+		order_by="visit_date asc",
+		limit_page_length=0,
+	)
+
+	# ---------------------------------------------------- the dealer network
+	#
+	# One row per outlet: what they sell, what they are complaining about, and
+	# what they are claiming. A dealer with many pumps and no requests is not
+	# necessarily healthy - they may simply not be using the portal - so silence
+	# is shown rather than hidden.
+	dealers = {}
+	for d in frappe.get_all(
+		"Dealer", fields=["name", "dealer_name", "city", "state", "is_own_outlet"],
+		limit_page_length=0
+	):
+		dealers[d.name] = {
+			"dealer": d.name, "label": d.dealer_name or d.name,
+			"city": d.city, "state": d.state, "own": cint(d.is_own_outlet),
+			"pumps": 0, "open": 0, "breached": 0, "claims": 0, "claim_value": 0.0,
+		}
+	for r in regs:
+		if r.dealer in dealers:
+			dealers[r.dealer]["pumps"] += 1
+	for r in open_requests:
+		row = dealers.get(r["dealer"])
+		if row:
+			row["open"] += 1
+			if r["overdue"]:
+				row["breached"] += 1
+	for c in claims:
+		row = dealers.get(c.dealer)
+		if row and c.workflow_state not in ("Rejected",):
+			row["claims"] += 1
+			row["claim_value"] += flt(c.approved_amount) or flt(c.claim_amount)
+
+	network = sorted(
+		[d for d in dealers.values() if d["pumps"] or d["open"] or d["claims"]],
+		key=lambda d: (-d["breached"], -d["open"], -d["pumps"]),
+	)
+
+	# ------------------------------------------------- what keeps breaking
+	by_category = {}
+	for r in frappe.get_all(
+		"Service Request",
+		filters={"reported_on": [">=", since], "docstatus": ["<", 2]},
+		fields=["complaint_category", "custom_request_type"],
+		limit_page_length=0,
+	):
+		key = r.complaint_category or r.custom_request_type or "Other"
+		by_category[key] = by_category.get(key, 0) + 1
+	top_faults = sorted(
+		[{"label": k, "count": v} for k, v in by_category.items()],
+		key=lambda x: -x["count"],
+	)[:6]
+
+	def slim(rows, n=8):
+		return [
+			{
+				"name": r["name"], "dealer": r["dealer"], "serial_no": r["serial_no"],
+				"what": r["custom_request_type"] or r["complaint_category"],
+				"customer": r["end_customer_name"], "status": r["status"],
+				"reported_on": r["reported_on"],
+				"warranty": bool(cint(r["is_under_warranty"])),
+			}
+			for r in sorted(rows, key=lambda x: str(x["reported_on"]))[:n]
+		]
+
+	return {
+		"window_days": days,
+		"work": {
+			"open": len(open_requests),
+			"breached": len(breached),
+			"unanswered": len(unanswered),
+			"visits_booked": len(visits),
+			"visits_today": len([v for v in visits if str(v.visit_date) == today]),
+		},
+		"money": {
+			"pending_count": len(pending),
+			"pending_value": sum(flt(c.claim_amount) for c in pending),
+			"approved_count": len(approved),
+			"approved_value": sum(flt(c.approved_amount) or flt(c.claim_amount) for c in approved),
+			"settled_count": len(settled),
+			"settled_value": sum(flt(c.approved_amount) or flt(c.claim_amount) for c in settled),
+		},
+		"warranty": {
+			"in_warranty": in_warranty, "expiring": expiring, "expired": expired,
+			"total": len(regs),
+		},
+		"needs_you": {
+			"breached": slim(breached),
+			"unanswered": slim(unanswered),
+		},
+		"visits": visits[:8],
+		"network": network,
+		"top_faults": top_faults,
+	}

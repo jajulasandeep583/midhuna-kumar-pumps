@@ -226,6 +226,13 @@ const portalRoutes = [
     meta: { public: true, auth: true },
   },
   {
+    // The owner's view: what is going wrong, who for, and what it costs.
+    path: "/manage",
+    name: "KumarManage",
+    component: () => import("@/pages/kumar/Manage.vue"),
+    meta: { auth: true },
+  },
+  {
     // Agent-side: KUMAR schedules the visit, on behalf of a dealer or of a
     // customer who bought direct and has no login of their own.
     path: "/visits",
