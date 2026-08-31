@@ -344,6 +344,7 @@ def raise_claim(
 	technician_report=None,
 	service_request=None,
 	parts=None,
+	attachments=None,
 ):
 	"""A dealer asking KUMAR to settle a warranty claim.
 
@@ -389,8 +390,28 @@ def raise_claim(
 			)
 
 	doc.insert(ignore_permissions=True)
+
+	# A claim is money, and a claim with evidence is settled faster than one
+	# without - a photograph of the failed part is the whole argument. Same path
+	# a complaint's photos take, so there is one place this can go wrong.
+	attached = 0
+	if attachments:
+		if isinstance(attachments, str):
+			attachments = frappe.parse_json(attachments)
+		attachments = [a for a in (attachments or []) if a]
+		if attachments:
+			add_reply(
+				"Kumar Warranty Claim",
+				doc.name,
+				_("Photos from the dealer"),
+				notify_users=_staff_to_notify("Kumar Warranty Claim", doc.name),
+				attachments=attachments,
+			)
+			attached = len(attachments)
+
 	return {
 		"name": doc.name,
+		"attached": attached,
 		"state": doc.get("workflow_state") or "Draft",
 		"claim_amount": flt(doc.claim_amount),
 		"message": _("Claim {0} has been lodged. KUMAR will review it and you can follow it under My Tickets.").format(doc.name),

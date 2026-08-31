@@ -124,7 +124,7 @@ scheduler_events = {
 # filename cannot be imported, and the controller is silently skipped
 website_route_rules = [
 	{"from_route": "/warranty-check", "to_route": "warranty_check"},
-	{"from_route": "/dealer-portal", "to_route": "dealer_portal"},
+
 ]
 
 # ---------------------------------------------------------------- fixtures
@@ -240,6 +240,14 @@ website_route_rules += [
 # was outside its own base and every rebuilt path glued the two together.
 website_redirects = [
     {"source": r"/helpdesk(/.*)?", "target": "/kumar-desk", "match_with_query_string": True},
+    # The jinja dealer portal is retired: the desk carries all seven of its
+    # screens, and leaving both up means two front doors, two places to fix a
+    # bug, and a dealer who has bookmarked the one that no longer gets worked
+    # on. The routes redirect rather than 404 - a bookmark should land, not
+    # break - and the templates stay in the tree until the desk has had a few
+    # weeks of real use behind it.
+    {"source": r"/dealer[-_]portal(/.*)?", "target": "/kumar-desk/dealer",
+     "match_with_query_string": True},
 ]
 
 add_to_apps_screen += [
