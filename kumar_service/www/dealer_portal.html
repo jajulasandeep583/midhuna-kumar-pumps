@@ -98,7 +98,17 @@
      (warranty state, claim outcome). The decorative violet/teal/amber/rose
      accents are kept as aliases so nothing that referenced them breaks, but
      they now resolve to the same restrained slate as everything else. */
-  .kp { --blue:#12569b; --blue-d:#0d3f74; --blue-l:#2a7bc8;
+  /* ---------- design tokens ----------
+     A scale rather than ad-hoc numbers: every radius, shadow and step of space
+     below comes from here, which is what stops a long page drifting into forty
+     slightly different greys and nine slightly different corner radii. */
+  .kp { --r-sm:6px; --r:8px; --r-lg:12px; --r-xl:16px;
+        --e1:0 1px 2px rgba(16,24,40,.05);
+        --e2:0 1px 3px rgba(16,24,40,.10), 0 1px 2px rgba(16,24,40,.06);
+        --e3:0 4px 8px -2px rgba(16,24,40,.10), 0 2px 4px -2px rgba(16,24,40,.06);
+        --e4:0 12px 16px -4px rgba(16,24,40,.08), 0 4px 6px -2px rgba(16,24,40,.03);
+        --ring:0 0 0 3px rgba(42,123,200,.18);
+        --blue:#12569b; --blue-d:#0d3f74; --blue-l:#2a7bc8;
         --ink:#161d26; --mut:#5a6875; --line:#e3e7ec; --bg:#f7f8fa;
         --ok:#12734a; --ok-bg:#e8f4ee; --warn:#8a5300; --warn-bg:#fdf3e3;
         --bad:#a5251a; --bad-bg:#fbeceb; --info:#12569b; --info-bg:#eaf1f9;
@@ -116,7 +126,7 @@
             flex-wrap:wrap; padding:14px 18px; margin-bottom:14px;
             background:#fff; border:1px solid var(--line); border-radius:14px;
             box-shadow:0 1px 2px rgba(16,24,40,.04); }
-  .kp-brand { display:flex; align-items:center; gap:10px; font-size:22px; font-weight:800;
+  .kp-brand { display:flex; align-items:center; gap:10px; font-size:19px; font-weight:700;
               color:var(--blue); letter-spacing:.4px; }
   .kp-brand small { display:block; font-size:10.5px; font-weight:600; color:var(--mut);
                     letter-spacing:1.6px; text-transform:uppercase; }
@@ -142,7 +152,7 @@
                     padding:12px 18px; background:#f7f8fa; color:var(--ink);
                     border-bottom:1px solid var(--line);
                     font-size:11.5px; letter-spacing:1.4px; text-transform:uppercase;
-                    font-weight:800; }
+                    font-weight:600; }
   .kp-notice-head svg { color:var(--blue); }
   .kp-notice-head svg { width:17px; height:17px; }
   .kp-notice-head .count { margin-left:auto; display:flex; align-items:center; gap:8px;
@@ -166,7 +176,7 @@
   .kp-notice.warn { border-left-color:var(--warn); background:#fffaf0; color:#8a5200; }
   .kp-notice.warn .dot { background:var(--warn); }
   .kp-notice.bad  { border-left-color:var(--bad); background:#fef5f4; color:var(--bad);
-                    font-weight:800; }
+                    font-weight:600; }
   .kp-notice.bad .dot  { background:var(--bad); }
   .kp-notice.info { border-left-color:var(--info); color:#123c66; }
   .kp-notice.info .dot { background:var(--info); }
@@ -180,39 +190,42 @@
      the group" board on a distributor's wall. */
   .kp-banners { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
                 gap:13px; margin-bottom:16px; }
-  .kp-banner { position:relative; overflow:hidden; border-radius:16px; padding:18px 20px;
-               color:#fff; min-height:118px;
-               box-shadow:0 4px 16px rgba(11,83,148,.16); }
-  .kp-banner.b1 { background:linear-gradient(130deg,#1a74c4,#0b5394); }
-  .kp-banner.b2 { background:linear-gradient(130deg,#0d7a72,#075c56); }
-  .kp-banner.b3 { background:linear-gradient(130deg,#a86a00,#7a4d00); }
-  .kp-banner.b4 { background:linear-gradient(130deg,#6b3fa0,#4c2b74); }
-  .kp-banner .big { font-size:31px; font-weight:800; line-height:1.05;
+  .kp-banner { position:relative; overflow:hidden; border-radius:var(--r-lg);
+               padding:17px 19px; min-height:112px; background:#fff;
+               border:1px solid var(--line); color:var(--ink); box-shadow:var(--e1); }
+  .kp-banner::before { content:""; position:absolute; left:0; top:0; bottom:0; width:2px;
+                       background:var(--bc,var(--blue)); }
+  .kp-banner.b1 { --bc:var(--blue); } .kp-banner.b2 { --bc:var(--ok); }
+  .kp-banner.b3 { --bc:var(--warn); } .kp-banner.b4 { --bc:var(--mut); }
+  .kp-banner .big { font-size:27px; font-weight:700; line-height:1.1; letter-spacing:-.6px;
                     font-variant-numeric:tabular-nums; }
-  .kp-banner .lbl { font-size:11px; letter-spacing:2px; text-transform:uppercase;
-                    font-weight:700; opacity:.82; }
-  .kp-banner .sub { font-size:12.5px; line-height:1.5; margin-top:7px; opacity:.92; }
-  .kp-banner svg { position:absolute; right:-8px; bottom:-8px; width:88px; height:88px;
-                   opacity:.20; pointer-events:none; }
+  .kp-banner .lbl { font-size:11px; letter-spacing:.4px; text-transform:uppercase;
+                    font-weight:600; color:var(--mut); }
+  .kp-banner .sub { font-size:12.5px; line-height:1.5; margin-top:6px; color:var(--mut); }
+  .kp-banner svg { position:absolute; right:-6px; bottom:-6px; width:76px; height:76px;
+                   opacity:.05; pointer-events:none; color:var(--bc,var(--blue)); }
 
   /* ---------- hero banner ---------- */
-  .kp-hero { position:relative; overflow:hidden; border-radius:20px; color:#fff;
-             background:linear-gradient(118deg,#1a74c4 0%,#0b5394 52%,#062f52 100%);
-             padding:26px 28px; margin-bottom:18px;
-             box-shadow:0 10px 30px rgba(11,83,148,.22); }
+  /* The one place brand colour is allowed to fill a surface. Kept, because a
+     dealer's home screen should say KUMAR - but flattened to a single hue and
+     a shadow that reads as depth rather than as a glow. */
+  .kp-hero { position:relative; overflow:hidden; border-radius:var(--r-xl); color:#fff;
+             background:linear-gradient(135deg,#12569b 0%,#0d3f74 100%);
+             padding:26px 28px; margin-bottom:18px; box-shadow:var(--e2); }
   .kp-hero-art { position:absolute; right:-10px; bottom:-6px; width:340px; height:150px;
                  opacity:.5; pointer-events:none; }
   .kp-hero-in { position:relative; z-index:1; max-width:64%; }
   .kp-eyebrow { font-size:11px; letter-spacing:2.4px; font-weight:700; color:#a8d4f7;
                 text-transform:uppercase; }
-  .kp-big { font-size:52px; font-weight:800; line-height:1; margin:8px 0 2px;
+  .kp-big { font-size:44px; font-weight:700; line-height:1; margin:8px 0 2px;
+           letter-spacing:-1.2px;
             font-variant-numeric:tabular-nums; }
   .kp-big-lbl { font-size:14.5px; color:#d6e9fb; font-weight:600; }
   .kp-big-sub { margin-top:9px; font-size:13px; color:#a8d4f7; }
   .kp-rank { display:inline-flex; align-items:baseline; gap:7px; margin-top:14px;
              background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.32);
              padding:7px 14px; border-radius:30px; }
-  .kp-rank b { font-size:20px; font-weight:800; }
+  .kp-rank b { font-size:19px; font-weight:700; }
   .kp-rank span { font-size:12.5px; color:#d6e9fb; }
   @media (max-width:700px){ .kp-hero-in{max-width:100%} .kp-hero-art{opacity:.18} .kp-big{font-size:40px} }
 
@@ -221,30 +234,44 @@
               margin-bottom:18px; }
   /* a faint tint from the card's own accent, so six stat cards are not six white
      rectangles */
-  .kp-stat { border:1px solid var(--line); border-radius:14px; padding:15px 16px;
-             background:linear-gradient(180deg,#fbfdff,#ffffff);
-             border-top:3px solid var(--blue); box-shadow:0 3px 12px rgba(11,83,148,.09);
-             transition:transform .12s, box-shadow .12s; }
-  .kp-stat:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(11,83,148,.15); }
-  .kp-stat b { display:block; font-size:25px; font-weight:800; line-height:1.15;
+  /* A metric tile: the number is the loudest thing on it, the label is a quiet
+     caption above, and the accent is a 2px marker rather than a coloured card.
+     The hover lift is gone - these are readouts, not buttons. */
+  .kp-stat { position:relative; border:1px solid var(--line); border-radius:var(--r-lg);
+             padding:16px 18px 15px; background:#fff; box-shadow:var(--e1);
+             overflow:hidden; }
+  .kp-stat::before { content:""; position:absolute; left:0; right:0; top:0; height:2px;
+                     background:var(--sc,var(--blue)); }
+  .kp-stat span { display:block; order:-1; font-size:11.5px; color:var(--mut);
+                  font-weight:600; letter-spacing:.2px; margin-bottom:7px; }
+  .kp-stat b { display:block; font-size:27px; font-weight:700; line-height:1.1;
+               letter-spacing:-.6px; color:var(--ink);
                font-variant-numeric:tabular-nums; }
-  .kp-stat span { font-size:12px; color:var(--mut); font-weight:600; }
-  .kp-stat.c1 { border-top-color:var(--blue);   } .kp-stat.c1 b { color:var(--blue); }
-  .kp-stat.c2 { border-top-color:var(--ok);     } .kp-stat.c2 b { color:var(--ok); }
-  .kp-stat.c3 { border-top-color:var(--teal);   } .kp-stat.c3 b { color:var(--teal); }
-  .kp-stat.c4 { border-top-color:var(--amber);  } .kp-stat.c4 b { color:var(--amber); }
-  .kp-stat.c5 { border-top-color:var(--rose);   } .kp-stat.c5 b { color:var(--rose); }
-  .kp-stat.c6 { border-top-color:var(--violet); } .kp-stat.c6 b { color:var(--violet); }
+  .kp-stat { display:flex; flex-direction:column; }
+  .kp-stat.c1 { --sc:var(--blue);  } .kp-stat.c2 { --sc:var(--ok);    }
+  .kp-stat.c3 { --sc:var(--teal);  } .kp-stat.c4 { --sc:var(--warn);  }
+  .kp-stat.c5 { --sc:var(--bad);   } .kp-stat.c6 { --sc:var(--mut);   }
 
   /* ---------- tabs ----------
      Sticky, because the tab bar IS the portal's navigation: scrolling a long
      ticket list must never leave the dealer with no way back. */
-  .kp-tabs { display:flex; gap:7px; overflow-x:auto; padding:10px 12px; margin-bottom:16px;
+  /* The nav was a translucent floating pill, so the filter row underneath it
+     showed through and got sliced in half as it scrolled past - which is what
+     made the page look broken rather than layered. An application nav is opaque
+     and full-bleed: content passes cleanly behind it, and it only grows a
+     shadow once it is actually stuck to the top. */
+  .kp-tabs { display:flex; gap:2px; overflow-x:auto; padding:7px 8px;
+             margin:0 -26px 18px; padding-left:26px; padding-right:26px;
              -webkit-overflow-scrolling:touch; position:sticky;
-             top:var(--kp-sticky,0px); z-index:20;
-             background:rgba(255,255,255,.92); backdrop-filter:blur(8px);
-             border:1px solid var(--line); border-radius:14px;
-             box-shadow:0 1px 2px rgba(16,24,40,.05); scrollbar-width:none; }
+             top:var(--kp-sticky,0px); z-index:30;
+             background:#fff; border:0; border-bottom:1px solid var(--line);
+             border-radius:0; box-shadow:none; scrollbar-width:none;
+             transition:box-shadow .16s; }
+  .kp-tabs.stuck { box-shadow:var(--e3); }
+  @media (max-width:700px) {
+    .kp-tabs { margin-left:-10px; margin-right:-10px;
+               padding-left:10px; padding-right:10px; }
+  }
   .kp-tabs::-webkit-scrollbar { display:none; }
   .kp-tab { flex:0 0 auto; display:inline-flex; align-items:center; gap:7px; cursor:pointer;
             border:1px solid transparent; background:transparent; color:var(--mut);
@@ -263,20 +290,23 @@
   /* ---------- action tiles ---------- */
   .kp-acts { display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr)); gap:12px;
              margin-bottom:20px; }
+  /* Six tiles that each had their own icon colour read as a sticker sheet. They
+     are one family now; the border and the icon warm on hover, which is the
+     part that says "this is clickable" without six hues saying it at once. */
   .kp-act { display:flex; gap:13px; align-items:flex-start; text-align:left; cursor:pointer;
-            border:1px solid var(--line); border-radius:16px; padding:17px; background:#fff;
-            width:100%; transition:transform .12s, box-shadow .12s; }
-  .kp-act:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(11,83,148,.12); }
-  .kp-act .ic { flex:0 0 42px; height:42px; border-radius:12px; display:grid; place-items:center; }
-  .kp-act .ic svg { width:22px; height:22px; }
-  .kp-act h4 { margin:1px 0 3px; font-size:15.5px; font-weight:800; }
+            border:1px solid var(--line); border-radius:var(--r-lg); padding:16px;
+            background:#fff; width:100%; box-shadow:var(--e1);
+            transition:border-color .12s, box-shadow .12s, background .12s; }
+  .kp-act:hover { border-color:#c2cdd9; box-shadow:var(--e2); background:#fcfdfe; }
+  .kp-act:focus-visible { outline:2px solid var(--blue-l); outline-offset:2px; }
+  .kp-act .ic { flex:0 0 36px; height:36px; border-radius:var(--r); display:grid;
+                place-items:center; background:var(--mute-bg); color:var(--mut);
+                transition:background .12s, color .12s; }
+  .kp-act:hover .ic { background:var(--info-bg); color:var(--blue); }
+  .kp-act .ic svg { width:18px; height:18px; }
+  .kp-act h4 { margin:1px 0 3px; font-size:14.5px; font-weight:650;
+               letter-spacing:-.1px; color:var(--ink); }
   .kp-act p { margin:0; font-size:12.5px; color:var(--mut); line-height:1.5; }
-  .kp-act.a1 .ic { background:var(--info-bg); color:var(--info); }
-  .kp-act.a2 .ic { background:var(--amber-bg); color:var(--amber); }
-  .kp-act.a3 .ic { background:var(--violet-bg); color:var(--violet); }
-  .kp-act.a4 .ic { background:var(--teal-bg); color:var(--teal); }
-  .kp-act.a5 .ic { background:var(--ok-bg); color:var(--ok); }
-  .kp-act.a6 .ic { background:var(--rose-bg); color:var(--rose); }
 
   /* ---------- sections, forms, tables ---------- */
   .kp-sec { background:#fff; border:1px solid var(--line); border-radius:14px;
@@ -294,11 +324,13 @@
   .kp-sec > .kp-hint, .kp-sec > :not(.kp-h) { margin-left:20px; margin-right:20px; }
   .kp-sec > .kp-hint { margin-top:14px; }
   .kp-sec > *:last-child { margin-bottom:20px; }
-  .kp-h { display:flex; align-items:center; gap:10px; font-size:17px; font-weight:800; }
-  .kp-h svg { width:22px; height:22px; color:var(--blue); flex:0 0 22px;
-              padding:4px; background:var(--info-bg); border-radius:8px; box-sizing:content-box; }
+  .kp-h { display:flex; align-items:center; gap:10px; font-size:15.5px; font-weight:650;
+          letter-spacing:-.2px; }
+  .kp-h svg { width:16px; height:16px; color:var(--blue); flex:0 0 16px;
+              padding:6px; background:var(--info-bg); border-radius:var(--r);
+              box-sizing:content-box; }
   .kp-hint { font-size:12.5px; color:var(--mut); margin-bottom:15px; line-height:1.55; }
-  .kp-step { display:flex; align-items:center; gap:8px; font-size:11.5px; font-weight:800;
+  .kp-step { display:flex; align-items:center; gap:8px; font-size:11px; font-weight:600;
              letter-spacing:1.4px; text-transform:uppercase; color:var(--blue);
              margin:18px 0 9px; }
   .kp-step::after { content:""; flex:1; height:1px; background:var(--line); }
@@ -365,7 +397,7 @@
   .kp-opt .m { font-size:12px; color:var(--mut); margin-top:2px;
                white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .kp-opt mark { background:#fde68a; color:inherit; padding:0 1px; border-radius:2px; }
-  .kp-opt .w { flex:0 0 auto; font-size:10px; font-weight:800; letter-spacing:.4px;
+  .kp-opt .w { flex:0 0 auto; font-size:10px; font-weight:600; letter-spacing:.2px;
                text-transform:uppercase; padding:3px 8px; border-radius:20px; }
   .kp-opt .w.ok { background:var(--ok-bg); color:var(--ok); }
   .kp-opt .w.warn { background:var(--warn-bg); color:var(--warn); }
@@ -385,48 +417,84 @@
   .kp-btn.wide { width:100%; margin-top:18px; padding:15px; font-size:16px; }
   .kp-btn.sec { background:#fff; color:var(--ink); border:1px solid #cdd4dd; font-weight:600; }
   .kp-btn.sec:hover { background:var(--bg); color:var(--ink); }
-  .kp-btn.sm { padding:8px 14px; font-size:13px; border-radius:9px; }
+  .kp-btn.sm { padding:6px 12px; font-size:12.5px; border-radius:var(--r-sm);
+               font-weight:600; }
+  .kp-btn:active { transform:translateY(.5px); }
+  /* a third rank below "sec": no border until you reach for it. Table rows are
+     full of these, and 30 outlined buttons in a column is visual noise. */
+  .kp-btn.ghost { background:transparent; color:var(--mut); border:1px solid transparent;
+                  font-weight:600; }
+  .kp-btn.ghost:hover { background:var(--bg); color:var(--ink); }
+  .kp-t td .kp-btn + .kp-btn { margin-left:6px; }
   .kp-find { display:grid; grid-template-columns:1fr auto; gap:10px; align-items:end; }
   .kp-hide { display:none; }
 
   .kp-msg { border-radius:11px; padding:13px 15px; font-size:14px; margin-top:12px; line-height:1.55; }
   .kp-msg.good { background:var(--ok-bg); color:var(--ok); border:1px solid #b6e2c8; }
   .kp-msg.bad  { background:var(--bad-bg); color:var(--bad); border:1px solid #f2c2bd; }
-  .kp-msg.info { background:var(--info-bg); color:var(--info); border:1px solid #bcd9f5; }
-  .kp-found { background:linear-gradient(120deg,#eef6ff,#e3f0fd); border:1px solid #bcd9f5;
-              border-radius:13px; padding:15px; margin-top:12px; font-size:15px; }
+  .kp-msg.info { background:var(--info-bg); color:var(--info); border:1px solid #c9dcef; }
+  .kp-found { background:var(--bg); border:1px solid var(--line);
+              border-radius:var(--r-lg); padding:14px 16px; margin-top:12px;
+              font-size:14.5px; }
   .kp-warr { margin-top:8px; font-size:13.5px; color:var(--info); }
 
   /* A table that reads as part of the product rather than a spreadsheet paste:
      tinted sticky header, zebra rows, and a brand rail that appears on hover so
      the eye can hold its place across a wide row. */
-  .kp-t { width:100%; border-collapse:separate; border-spacing:0; font-size:13.5px;
-          border-radius:12px; overflow:hidden; }
-  .kp-t thead th { text-align:left; font-size:11px; letter-spacing:1.2px;
-                   text-transform:uppercase; color:#33475b; font-weight:800;
-                   background:linear-gradient(180deg,#eef5fd,#e3eefb);
-                   border-bottom:1px solid #cfdcea; padding:11px 12px;
-                   position:sticky; top:0; z-index:2; }
-  .kp-t td { padding:12px; border-bottom:1px solid #eff3f8; vertical-align:top; }
-  .kp-t tbody tr:nth-child(even) td { background:#fbfdff; }
-  .kp-t tbody tr:hover td { background:#eff7ff; }
-  .kp-t tbody tr { box-shadow:inset 3px 0 0 transparent; transition:box-shadow .12s; }
-  .kp-t tbody tr:hover { box-shadow:inset 3px 0 0 var(--blue-l); }
+  /* Data table, application-grade: a quiet header, hairline dividers, no zebra
+     (the stripes fought the status pills), one hover tint, and numerals that
+     line up in their columns. The sticky header offsets itself below the nav
+     instead of sliding underneath it. */
+  .kp-t { width:100%; border-collapse:separate; border-spacing:0; font-size:13.5px; }
+  .kp-t thead th { text-align:left; font-size:11px; letter-spacing:.6px;
+                   text-transform:uppercase; color:var(--mut); font-weight:600;
+                   background:var(--bg); border-bottom:1px solid var(--line);
+                   padding:10px 14px; white-space:nowrap;
+                   position:sticky; top:var(--kp-stick-all,0px); z-index:2; }
+  .kp-t td { padding:13px 14px; border-bottom:1px solid var(--line);
+             vertical-align:middle; }
+  .kp-t tbody tr { transition:background .1s; }
+  .kp-t tbody tr:hover td { background:#f8fafc; }
   .kp-t tbody tr:last-child td { border-bottom:0; }
-  .kp-scroll { overflow-x:auto; border:1px solid var(--line); border-radius:12px;
-               background:#fff; }
-  .kp-empty { text-align:center; padding:34px 18px; color:var(--mut); font-size:14px;
-              background:linear-gradient(180deg,#f7fafd,#eef4fa);
-              border:1px dashed #cfdcea; border-radius:14px; }
+  .kp-t td:last-child, .kp-t th:last-child { text-align:right; }
+  /* serials, money and dates are compared down the column, so they get the
+     tabular figures that make that possible */
+  .kp-t .num, .kp-t .mono { font-variant-numeric:tabular-nums; }
+  .kp-scroll { overflow-x:auto; border:1px solid var(--line); border-radius:var(--r-lg);
+               background:#fff; box-shadow:var(--e1); }
+  /* ---------- filter toolbar ----------
+     Its own recessed ground, a tighter control height than a form field, and
+     labels shrunk to captions - these are filters over a table, not questions
+     the dealer has to answer before the page will work. */
+  .kp-filters { background:var(--bg); border:1px solid var(--line);
+                border-radius:var(--r-lg); padding:14px 16px; margin-bottom:14px; }
+  .kp-filters .kp-row + .kp-row { margin-top:12px !important; }
+  .kp-filters label { font-size:11px; font-weight:600; letter-spacing:.2px;
+                      color:var(--mut); margin-bottom:4px; }
+  .kp-filters input, .kp-filters select { padding:8px 11px; font-size:13.5px;
+                                          border-radius:var(--r); background:#fff; }
+  .kp-filters select { padding-right:34px; }
+  .kp-resultbar { display:flex; align-items:center; gap:10px; margin:0 0 10px;
+                  font-size:12.5px; color:var(--mut); font-weight:500; }
+
+  .kp-empty { text-align:center; padding:40px 20px; color:var(--mut); font-size:14px;
+              background:#fff; border:1px dashed #d3d9e0; border-radius:var(--r-lg); }
 
   /* ---------- status pills ---------- */
-  .kp-pill { display:inline-block; padding:4px 11px; border-radius:20px; font-size:11.5px;
-             font-weight:800; letter-spacing:.3px; white-space:nowrap; }
-  .kp-pill.ok   { background:var(--ok-bg);   color:var(--ok); }
-  .kp-pill.warn { background:var(--warn-bg); color:var(--warn); }
-  .kp-pill.bad  { background:var(--bad-bg);  color:var(--bad); }
-  .kp-pill.info { background:var(--info-bg); color:var(--info); }
-  .kp-pill.mute { background:var(--mute-bg); color:var(--mute); }
+  /* A status badge, not a sticker: a dot carries the state so it survives a
+     greyscale print and a colour-blind reader, and the weight comes down from
+     800 so a table of them is not a wall of shouting. */
+  .kp-pill { display:inline-flex; align-items:center; gap:6px;
+             padding:3px 9px 3px 8px; border-radius:var(--r-sm); font-size:11.5px;
+             font-weight:600; letter-spacing:0; white-space:nowrap;
+             border:1px solid transparent; }
+  .kp-pill::before { content:""; width:6px; height:6px; border-radius:50%;
+                     background:currentColor; flex:0 0 6px; }
+  .kp-pill.ok   { background:var(--ok-bg);   color:var(--ok);   border-color:#c6e3d3; }
+  .kp-pill.warn { background:var(--warn-bg); color:var(--warn); border-color:#efdcbb; }
+  .kp-pill.bad  { background:var(--bad-bg);  color:var(--bad);  border-color:#efc9c5; }
+  .kp-pill.info { background:var(--info-bg); color:var(--info); border-color:#c9dcef; }
+  .kp-pill.mute { background:var(--mute-bg); color:var(--mute); border-color:#dde1e7; }
   .kp-free { background:var(--ok-bg); color:var(--ok); }
   .kp-paid { background:var(--warn-bg); color:var(--warn); }
 
@@ -438,7 +506,7 @@
   .kp-tk-top { display:flex; justify-content:space-between; gap:10px; align-items:flex-start;
                flex-wrap:wrap; }
   .kp-tk-id { font-size:12px; color:var(--mut); font-weight:700; }
-  .kp-tk-h { font-size:15.5px; font-weight:800; margin:2px 0 5px; }
+  .kp-tk-h { font-size:15px; font-weight:650; margin:2px 0 5px; letter-spacing:-.1px; }
   .kp-tk-m { font-size:12.5px; color:var(--mut); line-height:1.6; }
   .kp-tk-acts { margin-top:11px; display:flex; gap:8px; flex-wrap:wrap; }
   .kp-filters { display:flex; gap:7px; margin-bottom:14px; flex-wrap:wrap; }
@@ -458,7 +526,7 @@
                   border-bottom-left-radius:4px; }
   .kp-bub.dealer { align-self:flex-end; background:#eef2f6; color:var(--ink);
                    border-bottom-right-radius:4px; }
-  .kp-bub-who { font-size:10.5px; font-weight:800; opacity:.8; margin-bottom:3px;
+  .kp-bub-who { font-size:10.5px; font-weight:600; opacity:.8; margin-bottom:3px;
                 letter-spacing:.4px; }
   .kp-replybox { margin-top:14px; padding:14px; border-radius:13px; background:var(--bg);
                  border:1px solid var(--line); }
@@ -484,14 +552,15 @@
 
   /* ---------- contacts ---------- */
   .kp-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(255px,1fr)); gap:13px; }
-  .kp-ct { border:1px solid var(--line); border-radius:16px; padding:18px; background:#fff;
-           border-top:3px solid var(--teal); }
-  .kp-ct .role { font-size:11px; letter-spacing:1.3px; text-transform:uppercase;
-                 font-weight:800; color:var(--teal); }
-  .kp-ct h4 { margin:7px 0 4px; font-size:16px; font-weight:800; }
+  .kp-ct { border:1px solid var(--line); border-radius:var(--r-lg); padding:17px;
+           background:#fff; box-shadow:var(--e1); }
+  .kp-ct .role { font-size:11px; letter-spacing:.4px; text-transform:uppercase;
+                 font-weight:600; color:var(--mut); }
+  .kp-ct h4 { margin:7px 0 4px; font-size:15px; font-weight:650; }
   .kp-ct p { margin:0 0 12px; font-size:12.5px; color:var(--mut); line-height:1.6; }
   .kp-ct a.tel { display:inline-flex; align-items:center; gap:7px; font-size:15px;
-                 font-weight:800; color:var(--blue); text-decoration:none; }
+                 font-weight:600; color:var(--blue); text-decoration:none;
+                 font-variant-numeric:tabular-nums; }
   .kp-ct a.tel svg { width:16px; height:16px; }
 
   /* ---------- family strip ----------
@@ -499,24 +568,27 @@
      family now owns a colour, and the whole tile is a FILTER - click a family
      and the full sales list opens showing only those pumps. */
   .kp-fam { display:grid; grid-template-columns:repeat(auto-fit,minmax(158px,1fr)); gap:12px; }
-  .kp-fam button { border:0; cursor:pointer; font-family:inherit; text-align:center;
-                   border-radius:16px; padding:17px 14px; color:#fff; width:100%;
-                   position:relative; overflow:hidden;
-                   transition:transform .13s, box-shadow .13s;
-                   box-shadow:0 3px 14px rgba(11,83,148,.16); }
-  .kp-fam button:hover { transform:translateY(-3px); box-shadow:0 9px 24px rgba(11,83,148,.24); }
-  .kp-fam svg { width:40px; height:40px; color:#fff; opacity:.9; }
-  .kp-fam b { display:block; font-size:27px; font-weight:800; margin-top:5px; line-height:1.05;
+  /* These were six saturated gradient tiles cycled by position. They are the
+     same object repeated - a product family and a count - so they are one card
+     repeated, and the count is what the eye should land on. */
+  .kp-fam button { cursor:pointer; font-family:inherit; text-align:left; width:100%;
+                   border:1px solid var(--line); border-radius:var(--r-lg);
+                   padding:14px 15px; background:#fff; color:var(--ink);
+                   position:relative; overflow:hidden; box-shadow:var(--e1);
+                   transition:border-color .12s, box-shadow .12s, background .12s; }
+  .kp-fam button:hover { border-color:#c2cdd9; box-shadow:var(--e2); background:#fcfdfe; }
+  .kp-fam button:focus-visible { outline:2px solid var(--blue-l); outline-offset:2px; }
+  .kp-fam svg { width:22px; height:22px; color:var(--mut); opacity:1;
+                transition:color .12s; }
+  .kp-fam button:hover svg { color:var(--blue); }
+  .kp-fam b { display:block; font-size:24px; font-weight:700; margin-top:8px;
+              line-height:1.1; letter-spacing:-.5px; color:var(--ink);
               font-variant-numeric:tabular-nums; }
-  .kp-fam span { font-size:12px; font-weight:700; opacity:.92; display:block; margin-top:2px; }
-  .kp-fam .go { position:absolute; right:11px; top:9px; font-size:12px; opacity:.55; }
-  /* six hues, cycled by position so the strip never repeats a colour side by side */
-  .kp-fam button:nth-child(6n+1) { background:linear-gradient(135deg,#1a74c4,#0b5394); }
-  .kp-fam button:nth-child(6n+2) { background:linear-gradient(135deg,#12907f,#0a6357); }
-  .kp-fam button:nth-child(6n+3) { background:linear-gradient(135deg,#c07a12,#8a5200); }
-  .kp-fam button:nth-child(6n+4) { background:linear-gradient(135deg,#7d4bb0,#553080); }
-  .kp-fam button:nth-child(6n+5) { background:linear-gradient(135deg,#c33a63,#8e2545); }
-  .kp-fam button:nth-child(6n+6) { background:linear-gradient(135deg,#2a8f57,#17603a); }
+  .kp-fam span { font-size:12px; font-weight:500; color:var(--mut); display:block;
+                 margin-top:2px; }
+  .kp-fam .go { position:absolute; right:12px; top:12px; font-size:12px;
+                color:var(--mut); opacity:0; transition:opacity .12s; }
+  .kp-fam button:hover .go { opacity:1; }
 </style>
 
 <div class="kp"><div class="kp-wrap">
@@ -992,59 +1064,64 @@
       {# Filters. Everything is already on the page, so this is instant even on a
          weak connection - and a dealer looking for one customer should not wait
          on a round trip. #}
-      <div class="kp-row">
-        <div>
-          <label for="ks-search">{{ _("Search") }}</label>
-          <input id="ks-search" type="search" autocomplete="off"
-                 placeholder="{{ _('Customer, mobile, village or serial') }}">
+      {# The filters are a toolbar, not five more form fields: they sit on their
+         own ground so the eye reads them as controls over the table below
+         rather than as questions to answer. #}
+      <div class="kp-filters">
+        <div class="kp-row">
+          <div>
+            <label for="ks-search">{{ _("Search") }}</label>
+            <input id="ks-search" type="search" autocomplete="off"
+                   placeholder="{{ _('Customer, mobile, village or serial') }}">
+          </div>
+          <div>
+            <label for="ks-warranty">{{ _("Warranty") }}</label>
+            <select id="ks-warranty">
+              <option value="">{{ _("Any") }}</option>
+              <option value="In Warranty">{{ _("In Warranty") }}</option>
+              <option value="Expiring Soon">{{ _("Expiring Soon") }}</option>
+              <option value="Expired">{{ _("Expired") }}</option>
+            </select>
+          </div>
+          <div>
+            <label for="ks-category">{{ _("Product Family") }}</label>
+            <select id="ks-category">
+              <option value="">{{ _("Any family") }}</option>
+              {% for c in sold_categories %}<option value="{{ c }}">{{ _(c) }}</option>{% endfor %}
+            </select>
+          </div>
+          <div>
+            <label for="ks-model">{{ _("Model") }}</label>
+            <select id="ks-model">
+              <option value="">{{ _("Any model") }}</option>
+              {% for m in sold_models %}<option value="{{ m }}">{{ m }}</option>{% endfor %}
+            </select>
+          </div>
+          {% if sold_districts %}
+          <div>
+            <label for="ks-district">{{ _("District") }}</label>
+            <select id="ks-district">
+              <option value="">{{ _("Any district") }}</option>
+              {% for d in sold_districts %}<option value="{{ d }}">{{ d }}</option>{% endfor %}
+            </select>
+          </div>
+          {% endif %}
         </div>
-        <div>
-          <label for="ks-warranty">{{ _("Warranty") }}</label>
-          <select id="ks-warranty">
-            <option value="">{{ _("Any") }}</option>
-            <option value="In Warranty">{{ _("In Warranty") }}</option>
-            <option value="Expiring Soon">{{ _("Expiring Soon") }}</option>
-            <option value="Expired">{{ _("Expired") }}</option>
-          </select>
+        <div class="kp-row" style="margin-top:12px">
+          <div>
+            <label for="ks-from">{{ _("Sold From") }}</label>
+            <input id="ks-from" type="date">
+          </div>
+          <div>
+            <label for="ks-to">{{ _("Sold To") }}</label>
+            <input id="ks-to" type="date">
+          </div>
+          <div style="align-self:end">
+            <button type="button" class="kp-btn sec" id="ks-clear">{{ _("Clear filters") }}</button>
+          </div>
         </div>
-        <div>
-          <label for="ks-category">{{ _("Product Family") }}</label>
-          <select id="ks-category">
-            <option value="">{{ _("Any family") }}</option>
-            {% for c in sold_categories %}<option value="{{ c }}">{{ _(c) }}</option>{% endfor %}
-          </select>
-        </div>
-        <div>
-          <label for="ks-model">{{ _("Model") }}</label>
-          <select id="ks-model">
-            <option value="">{{ _("Any model") }}</option>
-            {% for m in sold_models %}<option value="{{ m }}">{{ m }}</option>{% endfor %}
-          </select>
-        </div>
-        {% if sold_districts %}
-        <div>
-          <label for="ks-district">{{ _("District") }}</label>
-          <select id="ks-district">
-            <option value="">{{ _("Any district") }}</option>
-            {% for d in sold_districts %}<option value="{{ d }}">{{ d }}</option>{% endfor %}
-          </select>
-        </div>
-        {% endif %}
       </div>
-      <div class="kp-row" style="margin-top:12px">
-        <div>
-          <label for="ks-from">{{ _("Sold From") }}</label>
-          <input id="ks-from" type="date">
-        </div>
-        <div>
-          <label for="ks-to">{{ _("Sold To") }}</label>
-          <input id="ks-to" type="date">
-        </div>
-        <div style="align-self:end">
-          <button type="button" class="kp-btn sec" id="ks-clear">{{ _("Clear filters") }}</button>
-        </div>
-      </div>
-      <div id="ks-count" class="kp-hint" style="margin:14px 0 8px"></div>
+      <div class="kp-resultbar"><span id="ks-count"></span></div>
 
       {% if my_serials %}
       <div class="kp-scroll">
@@ -1087,9 +1164,9 @@
                   {% endif %}</small>
               </td>
               <td>
-                <a class="kp-btn sec sm" href="{{ r.certificate_url }}" target="_blank"
+                <a class="kp-btn ghost sm" href="{{ r.certificate_url }}" target="_blank"
                    rel="noopener">{{ _("Print") }}</a>
-                <button type="button" class="kp-btn sm ks-complain"
+                <button type="button" class="kp-btn sec sm ks-complain"
                         data-serial="{{ r.serial_no }}"
                         style="margin-top:5px">{{ _("Complaint") }}</button>
               </td>
@@ -1294,10 +1371,40 @@ frappe.ready(function () {
     const nav = document.querySelector(".navbar, header.sticky-top, .navbar-expand");
     const h = nav && getComputedStyle(nav).position !== "static"
       ? Math.round(nav.getBoundingClientRect().height) : 0;
-    document.documentElement.style.setProperty("--kp-sticky", h + "px");
+    const root = document.documentElement;
+    root.style.setProperty("--kp-sticky", h + "px");
+    // a sticky table header has to clear the nav AND our own tab strip, or it
+    // parks itself underneath them and the column titles disappear
+    const strip = document.querySelector(".kp-tabs");
+    const sh = strip ? Math.round(strip.getBoundingClientRect().height) : 0;
+    root.style.setProperty("--kp-stick-all", (h + sh) + "px");
   }
   fitSticky();
   window.addEventListener("resize", fitSticky);
+
+  /* The strip only earns a shadow once it is actually stuck - a permanent one
+     makes a bar that is sitting in the flow look like it is floating. */
+  (function stickShadow() {
+    const strip = document.querySelector(".kp-tabs");
+    if (!strip) return;
+    let queued = false;
+    /* Compared against the live sticky offset rather than the viewport top: the
+       strip parks below frappe's navbar, whose height changes with the
+       breakpoint, so a fixed threshold would fire early or late. */
+    function check() {
+      queued = false;
+      const pad = parseFloat(getComputedStyle(document.documentElement)
+        .getPropertyValue("--kp-sticky")) || 0;
+      strip.classList.toggle("stuck", strip.getBoundingClientRect().top <= pad + 0.5);
+    }
+    window.addEventListener("scroll", () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(check);
+    }, { passive: true });
+    window.addEventListener("resize", check);
+    check();
+  })();
 
   /* wire the strip up as a real tablist so a keyboard and a screen reader can
      both drive it - it was a row of plain buttons before */
