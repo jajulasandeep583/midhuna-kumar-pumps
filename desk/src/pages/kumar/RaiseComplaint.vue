@@ -119,12 +119,13 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { Badge, Button, ErrorMessage, FormControl, createResource } from "frappe-ui";
 import { LayoutHeader } from "@/components";
 import { __ } from "@/translation";
 
 const router = useRouter();
+const route = useRoute();
 
 const query = ref("");
 const picked = ref<any>(null);
@@ -139,7 +140,18 @@ const done = ref<any>(null);
 const pumps = createResource({
   url: "kumar_service.portal_api.my_pumps",
   auto: true,
+  onSuccess: () => preselect(),
 });
+
+// Arriving from a row in What I Sold: fill the pump in rather than making the
+// dealer pick the one they just clicked. The list has to have loaded first,
+// hence doing it on the resource rather than on mount.
+function preselect() {
+  const wanted = String(route.query.serial || "");
+  if (!wanted || picked.value) return;
+  const hit = (pumps.data || []).find((p: any) => p.serial_no === wanted);
+  if (hit) take(hit);
+}
 
 const options = createResource({
   url: "kumar_service.portal_api.portal_options",

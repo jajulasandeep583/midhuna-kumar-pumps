@@ -174,10 +174,18 @@ def my_pumps(limit=600):
 	rows = frappe.get_all(
 		"Pump Registration",
 		filters={"dealer": ["in", scope], "docstatus": 1},
-		fields=["serial_no", "pump_model", "end_customer_name", "district",
+		fields=["name", "serial_no", "pump_model", "end_customer_name",
+			"end_customer_mobile", "installation_address", "district",
 			"warranty_expiry_date", "sale_date"],
 		order_by="sale_date desc, creation desc",
 		limit=cint(limit) or 600,
+	)
+
+	# model -> family, so "What I Sold" can filter by product family the way the
+	# portal does. One query for the whole catalogue rather than one per row.
+	categories = dict(
+		frappe.get_all("Pump Model", fields=["name", "pump_category"], as_list=True,
+			limit_page_length=0)
 	)
 
 	from frappe.utils import getdate
@@ -199,12 +207,18 @@ def my_pumps(limit=600):
 			state = "In Warranty"
 		out.append(
 			{
+				"registration": r.name,
 				"serial_no": r.serial_no,
 				"model": r.pump_model or "",
+				"category": categories.get(r.pump_model) or "",
 				"customer": r.end_customer_name or "",
+				"mobile": r.end_customer_mobile or "",
+				"where": r.installation_address or "",
 				"district": r.district or "",
 				"sale_date": r.sale_date,
 				"warranty_expiry_date": r.warranty_expiry_date,
+				"days_left": (getdate(r.warranty_expiry_date) - today).days
+					if r.warranty_expiry_date else None,
 				"state": state,
 			}
 		)
