@@ -226,6 +226,13 @@ const portalRoutes = [
     meta: { public: true, auth: true },
   },
   {
+    // Money decisions, driven through the real Workflow rather than around it.
+    path: "/claims",
+    name: "KumarClaims",
+    component: () => import("@/pages/kumar/Claims.vue"),
+    meta: { auth: true },
+  },
+  {
     // The owner's view: what is going wrong, who for, and what it costs.
     path: "/manage",
     name: "KumarManage",

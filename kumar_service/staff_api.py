@@ -648,3 +648,149 @@ def manager_dashboard(days=30):
 		"network": network,
 		"top_faults": top_faults,
 	}
+
+
+# =================================================================== claims
+#
+# A claim is money, and the decision on it is a manager's rather than an
+# agent's. It moves through a real Workflow - Pending Review, Under
+# Investigation, Approved, Settled - and this deliberately drives that workflow
+# rather than writing workflow_state behind its back: the transitions carry role
+# restrictions, and walking around them would let anyone settle anything.
+
+
+CLAIM_OPEN = ("Pending Review", "Under Investigation", "Approved")
+
+
+@frappe.whitelist()
+def claims_board(state=None, dealer=None, limit=200):
+	"""Every claim that still needs somebody, newest first."""
+	_require_staff()
+	filters = {"docstatus": ["<", 2]}
+	if state:
+		filters["workflow_state"] = state
+	else:
+		filters["workflow_state"] = ["in", CLAIM_OPEN]
+	if dealer:
+		filters["dealer"] = dealer
+
+	rows = frappe.get_all(
+		"Kumar Warranty Claim",
+		filters=filters,
+		fields=["name", "dealer", "serial_no", "pump_model", "claim_type", "root_cause",
+			"claim_amount", "approved_amount", "workflow_state", "claim_date",
+			"technician_report", "heat_no", "winding_batch", "service_request",
+			"settled_on", "creation"],
+		order_by="creation desc",
+		limit=cint(limit) or 200,
+	)
+
+	# what this particular user may do to each one, so the UI offers only the
+	# buttons that will actually work
+	for r in rows:
+		r["actions"] = _claim_actions(r["workflow_state"])
+		r["customer"] = frappe.db.get_value(
+			"Service Request", r["service_request"], "end_customer_name"
+		) if r["service_request"] else None
+
+	totals = {}
+	for s in CLAIM_OPEN + ("Settled", "Rejected"):
+		got = frappe.get_all(
+			"Kumar Warranty Claim",
+			filters={"workflow_state": s, "docstatus": ["<", 2]},
+			fields=["claim_amount", "approved_amount"],
+			limit_page_length=0,
+		)
+		totals[s] = {
+			"count": len(got),
+			"value": sum(flt(g.approved_amount) or flt(g.claim_amount) for g in got),
+		}
+
+	return {"claims": rows, "totals": totals, "states": list(CLAIM_OPEN)}
+
+
+def _claim_actions(state):
+	"""The transitions out of a state that this user's roles allow."""
+	roles = set(frappe.get_roles())
+	out = []
+	for t in frappe.get_all(
+		"Workflow Transition",
+		filters={"parent": "Kumar Warranty Claim Approval", "state": state},
+		fields=["action", "next_state", "allowed"],
+	):
+		if t.allowed in roles or "System Manager" in roles:
+			out.append({"action": t.action, "next_state": t.next_state})
+	return out
+
+
+@frappe.whitelist()
+def claim_action(name, action, approved_amount=None, remarks=None):
+	"""Move a claim through its workflow, and tell the dealer what happened.
+
+	The dealer is told because a claim decided in silence is a dealer ringing to
+	ask - and on a rejection they are owed the reason, not just the outcome.
+	"""
+	_require_staff()
+	if not frappe.db.exists("Kumar Warranty Claim", name):
+		frappe.throw(_("{0} does not exist").format(name), frappe.DoesNotExistError)
+
+	doc = frappe.get_doc("Kumar Warranty Claim", name)
+	allowed = [a["action"] for a in _claim_actions(doc.workflow_state)]
+	if action not in allowed:
+		frappe.throw(
+			_("You cannot {0} a claim that is {1}.").format(action, _(doc.workflow_state)),
+			frappe.PermissionError,
+		)
+
+	# an approval that does not say how much is not an approval
+	if action == "Approve":
+		amount = flt(approved_amount) if approved_amount is not None else flt(doc.claim_amount)
+		if amount <= 0:
+			frappe.throw(_("Approve an amount greater than zero, or reject the claim."))
+		if amount > flt(doc.claim_amount):
+			frappe.throw(
+				_("Approved amount cannot exceed the {0} claimed.").format(
+					frappe.utils.fmt_money(doc.claim_amount, currency="INR")
+				)
+			)
+		doc.approved_amount = amount
+	if remarks:
+		doc.remarks = (doc.remarks + "\n\n" if doc.remarks else "") + str(remarks)
+	if action == "Settle" and doc.meta.get_field("settled_on") and not doc.settled_on:
+		doc.settled_on = nowdate()
+	doc.flags.ignore_permissions = True
+	doc.save(ignore_permissions=True)
+
+	from frappe.model.workflow import apply_workflow
+
+	doc = apply_workflow(doc, action)
+
+	# ------------------------------------------------------------- tell them
+	money = frappe.utils.fmt_money(
+		flt(doc.approved_amount) or flt(doc.claim_amount), currency="INR"
+	)
+	said = {
+		"Review": _("Your claim {0} is being investigated."),
+		"Approve": _("Your claim {0} is approved for {1}."),
+		"Reject": _("Your claim {0} could not be accepted."),
+		"Settle": _("Your claim {0} is settled. {1} has been passed for credit."),
+	}.get(action, _("Your claim {0} has moved to {1}."))
+	message = said.format(name, money if action in ("Approve", "Settle") else _(doc.workflow_state))
+	if remarks:
+		message += "\n\n" + str(remarks)
+
+	from kumar_service.desk_bridge import contact_for
+
+	_c, portal_user = contact_for(doc.dealer)
+	add_reply(
+		"Kumar Warranty Claim", name, message,
+		notify_users={portal_user} if portal_user else None,
+	)
+
+	frappe.db.commit()
+	return {
+		"name": name,
+		"state": doc.workflow_state,
+		"approved_amount": flt(doc.approved_amount),
+		"message": message,
+	}
