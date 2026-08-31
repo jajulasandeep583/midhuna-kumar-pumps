@@ -158,6 +158,21 @@ def get_context(context):
 		"expired": sum(1 for r in context.my_serials if r["warranty_state"] == "Expired"),
 	}
 
+	# The complaint and claim pickers are searched in the browser, so they get one
+	# slim JSON row per pump instead of the full registration record rendered into
+	# the markup twice. Only the fields the dropdown actually shows or matches on.
+	context.picker_pumps = [
+		{
+			"serial_no": r["serial_no"],
+			"model": r["pump_model"] or "",
+			"customer": r["end_customer_name"] or "",
+			"district": r["district"] or "",
+			"state": r["warranty_state"],
+		}
+		for r in context.my_serials
+		if r["serial_no"]
+	]
+
 	# Spare parts a claim can be raised against, priced from the item master.
 	from kumar_service.setup.masters import ITEM_GROUP_COMPONENTS
 

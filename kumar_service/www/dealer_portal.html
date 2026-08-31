@@ -1,3 +1,39 @@
+{# ------------------------------------------------------------------ picker
+   One control, not two. This used to be a <select> listing every pump the
+   dealer had sold PLUS an <input list=...> bound to a <datalist> of the same
+   pumps - so the same 600 rows were rendered into the page twice, the two
+   controls could disagree, and the datalist popup was native chrome we could
+   not style, size or position. This is a single combobox: type to filter on
+   serial, model or customer; arrow keys to move; Enter to take. A barcode
+   scanner still works, because a scanner just types fast and presses Enter. #}
+{% macro pump_picker(prefix) %}
+<div class="kp-combo" data-combo="{{ prefix }}">
+  <label for="{{ prefix }}-serial">{{ _("Which pump?") }}</label>
+  <div class="kp-combo-field">
+    <svg class="kp-combo-ic" aria-hidden="true"><use href="#kp-art-search"></use></svg>
+    <input id="{{ prefix }}-serial" name="serial_no" class="kp-combo-input" required
+           placeholder="{{ _('Type a serial, model or customer - or scan') }}"
+           autocomplete="off" spellcheck="false"
+           role="combobox" aria-expanded="false" aria-autocomplete="list"
+           aria-controls="{{ prefix }}-list" aria-haspopup="listbox">
+    <button type="button" class="kp-combo-clear" hidden
+            aria-label="{{ _('Clear') }}" tabindex="-1">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"
+           fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+    </button>
+    <button type="button" class="kp-combo-toggle" tabindex="-1"
+            aria-label="{{ _('Show the pumps you sold') }}">
+      <svg aria-hidden="true"><use href="#kp-art-chevron"></use></svg>
+    </button>
+  </div>
+  <div class="kp-combo-pop" hidden>
+    <ul class="kp-combo-list" id="{{ prefix }}-list" role="listbox"
+        aria-label="{{ _('Pumps you sold') }}"></ul>
+    <div class="kp-combo-foot"></div>
+  </div>
+</div>
+{% endmacro %}
+
 {% extends "templates/web.html" %}
 
 {% block title %}{{ _("Dealer Portal") }} | KUMAR Pumps{% endblock %}
@@ -32,12 +68,12 @@
      container widened to the screen. The wrap still stops at 1560px, because
      text that runs the full width of a 27" monitor is unreadable - the colour
      goes edge to edge, the content does not. */
+  /* The canvas was three stacked gradients of brand blue, so every white card
+     sat on a coloured wash and the whole page read as a marketing site. A
+     near-neutral ground with a single hairline of brand at the very top does
+     the same job - it separates the cards - without competing with them. */
   body {
-    background:
-      radial-gradient(1200px 420px at 12% -8%, rgba(26,116,196,.20), transparent 70%),
-      radial-gradient(900px 380px at 88% -4%, rgba(11,83,148,.16), transparent 70%),
-      linear-gradient(180deg, #cfe0f2 0%, #e2ecf7 300px, #eaf1f8 720px, #eef4fa 100%)
-      !important;
+    background: #eef1f5 !important;
     background-attachment: fixed !important;
   }
   main.container, .page_content, .page-content-wrapper { background:transparent !important; }
@@ -58,15 +94,19 @@
   #page-dealer_portal .page-header { display:none !important; }
   .web-footer, footer.web-footer { background:transparent; }
 
-  .kp { --blue:#0b5394; --blue-d:#08406f; --blue-l:#1a74c4;
-        --ink:#14212e; --mut:#5f7183; --line:#e2eaf3; --bg:#f6f9fc;
-        --ok:#0f8a4a; --ok-bg:#e7f7ee; --warn:#b06000; --warn-bg:#fff5e0;
-        --bad:#c02616; --bad-bg:#fdeceb; --info:#0b62b5; --info-bg:#e8f2fd;
-        --mute:#5f7183; --mute-bg:#eef2f6;
-        --violet:#6b3fa0; --violet-bg:#f3ecfb; --teal:#0d7a72; --teal-bg:#e3f6f4;
-        --amber:#a86a00; --amber-bg:#fff3d9; --rose:#b02a54; --rose-bg:#fdecf2;
+  /* One brand blue, and semantic colour used only where it carries meaning
+     (warranty state, claim outcome). The decorative violet/teal/amber/rose
+     accents are kept as aliases so nothing that referenced them breaks, but
+     they now resolve to the same restrained slate as everything else. */
+  .kp { --blue:#12569b; --blue-d:#0d3f74; --blue-l:#2a7bc8;
+        --ink:#161d26; --mut:#5a6875; --line:#e3e7ec; --bg:#f7f8fa;
+        --ok:#12734a; --ok-bg:#e8f4ee; --warn:#8a5300; --warn-bg:#fdf3e3;
+        --bad:#a5251a; --bad-bg:#fbeceb; --info:#12569b; --info-bg:#eaf1f9;
+        --mute:#5a6875; --mute-bg:#f0f2f5;
+        --violet:#4a4f63; --violet-bg:#f0f1f5; --teal:#12734a; --teal-bg:#e8f4ee;
+        --amber:#8a5300; --amber-bg:#fdf3e3; --rose:#a5251a; --rose-bg:#fbeceb;
         font-family:"Inter","Segoe UI",Arial,"Noto Sans Telugu","Nirmala UI",sans-serif;
-        color:var(--ink); }
+        color:var(--ink); -webkit-font-smoothing:antialiased; }
   /* colour goes edge to edge; text does not - a line running the full width of a
      27" monitor is unreadable */
   .kp-wrap { max-width:1560px; margin:0 auto; padding:0 0 70px; }
@@ -74,8 +114,8 @@
   /* ---------- top bar ---------- */
   .kp-bar { display:flex; align-items:center; justify-content:space-between; gap:12px;
             flex-wrap:wrap; padding:14px 18px; margin-bottom:14px;
-            background:#fff; border:1px solid var(--line); border-radius:16px;
-            box-shadow:0 2px 8px rgba(11,83,148,.06); }
+            background:#fff; border:1px solid var(--line); border-radius:14px;
+            box-shadow:0 1px 2px rgba(16,24,40,.04); }
   .kp-brand { display:flex; align-items:center; gap:10px; font-size:22px; font-weight:800;
               color:var(--blue); letter-spacing:.4px; }
   .kp-brand small { display:block; font-size:10.5px; font-weight:600; color:var(--mut);
@@ -94,20 +134,22 @@
      Head office talking to the whole network. Mostly computed, so this strip
      tells a dealer what to do TODAY rather than carrying a permanent banner
      nobody reads. Clickable ones jump to the tab that answers them. */
-  .kp-notices { background:linear-gradient(180deg,#ffffff,#f8fbff);
-                border:1px solid #d5e3f2; border-radius:18px;
+  .kp-notices { background:#fff;
+                border:1px solid var(--line); border-radius:14px;
                 padding:0 0 6px; margin-bottom:16px; overflow:hidden;
-                box-shadow:0 4px 18px rgba(11,83,148,.10); }
+                box-shadow:0 1px 2px rgba(16,24,40,.04), 0 1px 3px rgba(16,24,40,.06); }
   .kp-notice-head { display:flex; align-items:center; gap:10px;
-                    padding:13px 18px; background:linear-gradient(90deg,#0b5394,#1a74c4);
-                    color:#fff; font-size:12px; letter-spacing:2.2px; text-transform:uppercase;
+                    padding:12px 18px; background:#f7f8fa; color:var(--ink);
+                    border-bottom:1px solid var(--line);
+                    font-size:11.5px; letter-spacing:1.4px; text-transform:uppercase;
                     font-weight:800; }
+  .kp-notice-head svg { color:var(--blue); }
   .kp-notice-head svg { width:17px; height:17px; }
   .kp-notice-head .count { margin-left:auto; display:flex; align-items:center; gap:8px;
-                           background:rgba(255,255,255,.20); border:1px solid rgba(255,255,255,.38);
+                           background:#fff; border:1px solid var(--line); color:var(--mut);
                            border-radius:20px; padding:3px 12px; font-size:11px;
                            letter-spacing:.6px; cursor:pointer; }
-  .kp-notice-head .count:hover { background:rgba(255,255,255,.30); }
+  .kp-notice-head .count:hover { background:var(--bg); color:var(--ink); }
   .kp-notice-head .caret { transition:transform .18s; font-size:10px; }
   .kp-notices.open .kp-notice-head .caret { transform:rotate(180deg); }
 
@@ -198,18 +240,21 @@
      Sticky, because the tab bar IS the portal's navigation: scrolling a long
      ticket list must never leave the dealer with no way back. */
   .kp-tabs { display:flex; gap:7px; overflow-x:auto; padding:10px 12px; margin-bottom:16px;
-             -webkit-overflow-scrolling:touch; position:sticky; top:0; z-index:20;
-             background:rgba(234,241,248,.94); backdrop-filter:blur(6px);
-             border:1px solid var(--line); border-radius:32px;
-             box-shadow:0 3px 12px rgba(11,83,148,.09); scrollbar-width:none; }
+             -webkit-overflow-scrolling:touch; position:sticky;
+             top:var(--kp-sticky,0px); z-index:20;
+             background:rgba(255,255,255,.92); backdrop-filter:blur(8px);
+             border:1px solid var(--line); border-radius:14px;
+             box-shadow:0 1px 2px rgba(16,24,40,.05); scrollbar-width:none; }
   .kp-tabs::-webkit-scrollbar { display:none; }
   .kp-tab { flex:0 0 auto; display:inline-flex; align-items:center; gap:7px; cursor:pointer;
-            border:1px solid var(--line); background:#fff; color:var(--mut);
-            padding:10px 15px; border-radius:30px; font-size:13.5px; font-weight:700;
+            border:1px solid transparent; background:transparent; color:var(--mut);
+            padding:9px 14px; border-radius:9px; font-size:13.5px; font-weight:600;
             white-space:nowrap; transition:background .12s, color .12s, border-color .12s; }
+  .kp-tab:focus-visible { outline:2px solid var(--blue-l); outline-offset:2px; }
   .kp-tab svg { width:17px; height:17px; }
-  .kp-tab:hover { border-color:#c3d6e9; color:var(--ink); }
-  .kp-tab.on { background:var(--blue); border-color:var(--blue); color:#fff; }
+  .kp-tab:hover { background:var(--bg); color:var(--ink); }
+  .kp-tab.on { background:var(--blue); border-color:var(--blue); color:#fff;
+               font-weight:700; }
   .kp-tab .n { background:var(--bad); color:#fff; border-radius:20px; padding:0 6px;
                font-size:11px; min-width:18px; text-align:center; }
   .kp-tab.on .n { background:rgba(255,255,255,.28); }
@@ -234,18 +279,17 @@
   .kp-act.a6 .ic { background:var(--rose-bg); color:var(--rose); }
 
   /* ---------- sections, forms, tables ---------- */
-  .kp-sec { background:#fff; border:1px solid var(--line); border-radius:18px;
+  .kp-sec { background:#fff; border:1px solid var(--line); border-radius:14px;
             margin-bottom:16px; overflow:hidden;
-            box-shadow:0 3px 14px rgba(11,83,148,.08); }
+            box-shadow:0 1px 2px rgba(16,24,40,.04), 0 1px 3px rgba(16,24,40,.06); }
   /* a tinted header strip per section, so a long page reads as a stack of
      panels rather than one undifferentiated white sheet */
   .kp-sec > .kp-h { margin:0; padding:17px 20px 15px;
-                    background:linear-gradient(180deg,#eaf3fd,#f7fbff);
-                    border-bottom:1px solid #d9e6f3; }
+                    background:#fff; border-bottom:1px solid var(--line); }
   /* a brand rail down the left of every section head, so a long page reads as a
      stack of panels rather than one sheet */
-  .kp-sec > .kp-h::before { content:""; position:absolute; left:0; top:0; bottom:0;
-                            width:4px; background:linear-gradient(180deg,#1a74c4,#0b5394); }
+  .kp-sec > .kp-h::before { content:""; position:absolute; left:0; top:14px; bottom:14px;
+                            width:3px; border-radius:0 3px 3px 0; background:var(--blue); }
   .kp-sec > .kp-h { position:relative; }
   .kp-sec > .kp-hint, .kp-sec > :not(.kp-h) { margin-left:20px; margin-right:20px; }
   .kp-sec > .kp-hint { margin-top:14px; }
@@ -261,11 +305,13 @@
   .kp-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; }
   .kp label { display:block; font-size:12px; font-weight:700; color:var(--mut); margin-bottom:5px; }
   .kp input, .kp select, .kp textarea {
-      width:100%; padding:11px 12px; font-size:15px; border:1px solid #cfdbe8;
-      border-radius:10px; background:#fbfdff; color:var(--ink); font-family:inherit; }
+      width:100%; padding:10px 12px; font-size:15px; border:1px solid #cdd4dd;
+      border-radius:9px; background:#fff; color:var(--ink); font-family:inherit;
+      transition:border-color .12s, box-shadow .12s; }
   .kp input:focus, .kp select:focus, .kp textarea:focus {
       outline:none; border-color:var(--blue-l); background:#fff;
-      box-shadow:0 0 0 3px rgba(26,116,196,.16); }
+      box-shadow:0 0 0 3px rgba(42,123,200,.15); }
+  .kp input::placeholder, .kp textarea::placeholder { color:#98a3ae; }
   .kp textarea { min-height:88px; resize:vertical; }
   /* A native select renders as unstyled grey chrome and was the main reason the
      dropdowns "did not look proper". Suppress the native arrow and draw our own
@@ -279,21 +325,66 @@
       background-position:right 13px center;
       background-size:13px 9px; }
   .kp select:disabled { opacity:.6; cursor:default; }
-  /* an input wired to a datalist gets the same affordance, or nobody knows the
-     suggestions are there */
-  .kp input[list] {
-      background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath d='M1 1.5L7 7.5L13 1.5' fill='none' stroke='%230b5394' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-      background-repeat:no-repeat; background-position:right 13px center;
-      background-size:13px 9px; padding-right:38px; }
+  /* ---------- pump picker (combobox) ----------
+     Replaces a <select> of every pump plus a datalist of the same pumps. The
+     popup is ours, so it can be sized, scrolled and read on a phone; the native
+     datalist popup could do none of those and rendered off to one side. */
+  .kp-combo { position:relative; }
+  .kp-combo-field { position:relative; display:flex; align-items:center; }
+  .kp-combo-ic { position:absolute; left:12px; width:17px; height:17px; color:var(--mut);
+                 pointer-events:none; }
+  .kp .kp-combo-input { padding-left:37px; padding-right:74px; }
+  .kp-combo.on .kp-combo-input { border-color:var(--blue-l); background:#fff;
+                                 border-bottom-left-radius:0; border-bottom-right-radius:0; }
+  .kp-combo-clear, .kp-combo-toggle {
+      position:absolute; display:flex; align-items:center; justify-content:center;
+      border:0; background:none; cursor:pointer; color:var(--mut); padding:0;
+      width:28px; height:28px; border-radius:7px; }
+  .kp-combo-clear { right:38px; }
+  .kp-combo-toggle { right:8px; }
+  .kp-combo-clear svg, .kp-combo-toggle svg { width:15px; height:15px; }
+  .kp-combo-clear:hover, .kp-combo-toggle:hover { background:#eef4fa; color:var(--blue); }
+  .kp-combo-toggle svg { transition:transform .16s; }
+  .kp-combo.on .kp-combo-toggle svg { transform:rotate(180deg); }
+
+  /* The popup is positioned, not in flow, so it never pushes the form around.
+     max-height keeps it inside the viewport on a phone instead of running off
+     the bottom of the screen the way the native one did. */
+  .kp-combo-pop { position:absolute; z-index:60; left:0; right:0; top:100%;
+                  background:#fff; border:1px solid var(--blue-l); border-top:0;
+                  border-radius:0 0 12px 12px; overflow:hidden;
+                  box-shadow:0 14px 34px rgba(11,45,80,.17); }
+  .kp-combo-list { list-style:none; margin:0; padding:4px; max-height:min(46vh,340px);
+                   overflow-y:auto; overscroll-behavior:contain; }
+  .kp-opt { display:flex; align-items:center; gap:10px; padding:9px 11px; cursor:pointer;
+            border-radius:8px; scroll-margin:4px; }
+  .kp-opt:hover, .kp-opt.here { background:#eff6ff; }
+  .kp-opt .t { min-width:0; flex:1; }
+  .kp-opt .s { font-size:13.5px; font-weight:700; color:var(--ink); font-variant-numeric:tabular-nums;
+               white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .kp-opt .m { font-size:12px; color:var(--mut); margin-top:2px;
+               white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .kp-opt mark { background:#fde68a; color:inherit; padding:0 1px; border-radius:2px; }
+  .kp-opt .w { flex:0 0 auto; font-size:10px; font-weight:800; letter-spacing:.4px;
+               text-transform:uppercase; padding:3px 8px; border-radius:20px; }
+  .kp-opt .w.ok { background:var(--ok-bg); color:var(--ok); }
+  .kp-opt .w.warn { background:var(--warn-bg); color:var(--warn); }
+  .kp-opt .w.bad { background:var(--mute-bg); color:var(--mut); }
+  .kp-combo-foot { padding:8px 12px; font-size:11.5px; color:var(--mut);
+                   border-top:1px solid var(--line); background:#f8fbfe; }
+  .kp-combo-none { padding:16px 13px; font-size:13.5px; color:var(--mut); text-align:center; }
+  .kp-combo-none b { color:var(--ink); }
   .kp-btn { display:inline-flex; align-items:center; justify-content:center; gap:8px;
-            border:0; cursor:pointer; padding:13px 22px; border-radius:11px;
-            font-size:15px; font-weight:700; background:var(--blue); color:#fff;
-            text-decoration:none; font-family:inherit; }
+            border:0; cursor:pointer; padding:12px 20px; border-radius:9px;
+            font-size:15px; font-weight:600; background:var(--blue); color:#fff;
+            text-decoration:none; font-family:inherit;
+            transition:background .12s; }
+  .kp-btn:focus-visible { outline:2px solid var(--blue-l); outline-offset:2px; }
   .kp-btn:hover { background:var(--blue-d); color:#fff; text-decoration:none; }
   .kp-btn[disabled] { opacity:.55; cursor:default; }
   .kp-btn.wide { width:100%; margin-top:18px; padding:15px; font-size:16px; }
-  .kp-btn.sec { background:#eff5fb; color:var(--blue); border:1px solid #cfdbe8; }
-  .kp-btn.sec:hover { background:#e2edf8; color:var(--blue-d); }
+  .kp-btn.sec { background:#fff; color:var(--ink); border:1px solid #cdd4dd; font-weight:600; }
+  .kp-btn.sec:hover { background:var(--bg); color:var(--ink); }
   .kp-btn.sm { padding:8px 14px; font-size:13px; border-radius:9px; }
   .kp-find { display:grid; grid-template-columns:1fr auto; gap:10px; align-items:end; }
   .kp-hide { display:none; }
@@ -784,28 +875,7 @@
       </div>
       <form id="kc-form" autocomplete="off">
         <div class="kp-step">{{ _("1. Which pump?") }}</div>
-        {# A real dropdown of the dealer's own pumps is the primary control: for a
-           complaint the pump is always one they sold, so making them remember a
-           serial number was the wrong question. The text box stays for a barcode
-           scanner and for a serial that is not in the visible list. #}
-        <div class="kp-row">
-          <div>
-            <label for="kc-pick">{{ _("Pick the pump you sold") }}</label>
-            <select id="kc-pick">
-              <option value="">{{ _("Choose from your pumps") }}</option>
-              {% for s in my_serials %}
-                <option value="{{ s.serial_no }}">
-                  {{ s.serial_no }} &middot; {{ s.end_customer_name or "" }}
-                  {%- if s.pump_model %} ({{ s.pump_model }}){% endif %}
-                </option>
-              {% endfor %}
-            </select>
-          </div>
-          <div>
-            <label for="kc-serial">{{ _("Or type / scan the serial") }}</label>
-            <input id="kc-serial" name="serial_no" list="kp-serials" placeholder="KP-..." required>
-          </div>
-        </div>
+        {{ pump_picker('kc') }}
         <div class="kp-row" style="margin-top:12px">
           <div>
             <label for="kc-cat">{{ _("What is the problem") }}</label>
@@ -847,24 +917,7 @@
       </div>
       <form id="kw-form" autocomplete="off">
         <div class="kp-step">{{ _("1. Which pump?") }}</div>
-        <div class="kp-row">
-          <div>
-            <label for="kw-pick">{{ _("Pick the pump you sold") }}</label>
-            <select id="kw-pick">
-              <option value="">{{ _("Choose from your pumps") }}</option>
-              {% for s in my_serials %}
-                <option value="{{ s.serial_no }}">
-                  {{ s.serial_no }} &middot; {{ s.end_customer_name or "" }}
-                  {%- if s.pump_model %} ({{ s.pump_model }}){% endif %}
-                </option>
-              {% endfor %}
-            </select>
-          </div>
-          <div>
-            <label for="kw-serial">{{ _("Or type / scan the serial") }}</label>
-            <input id="kw-serial" name="serial_no" list="kp-serials" placeholder="KP-..." required>
-          </div>
-        </div>
+        {{ pump_picker('kw') }}
         <div class="kp-row" style="margin-top:12px">
           <div>
             <label for="kw-type">{{ _("Claim Type") }}</label>
@@ -1202,11 +1255,6 @@
 
   {# One shared list of this dealer's serials, so complaint and claim can both
      autocomplete without the dealer remembering a serial number. #}
-  <datalist id="kp-serials">
-    {% for s in my_serials %}
-      <option value="{{ s.serial_no }}">{{ s.pump_model }} &middot; {{ s.end_customer_name }}</option>
-    {% endfor %}
-  </datalist>
 
   {% endif %}
 </div></div>
@@ -1221,23 +1269,118 @@ frappe.ready(function () {
     if (el) el.innerHTML = `<div class="kp-msg ${cls}">${html}</div>`;
   };
 
-  /* ------------------------------------------------------------ tabs */
-  const tabs = document.querySelectorAll(".kp-tab");
-  const panels = document.querySelectorAll(".kp-panel");
-  function show(name) {
-    tabs.forEach((t) => t.classList.toggle("on", t.dataset.tab === name));
+  /* Every open picker registers here so switching tabs can shut them - a popup
+     left open over a hidden panel was one of the ways navigation felt broken.
+     Declared above the router because the router closes them on its first run. */
+  const combos = [];
+  function closeAllCombos() { combos.forEach((c) => c.close()); }
+
+  /* ------------------------------------------------------------ tabs
+     The tab strip is sticky, and frappe's web navbar is sticky above it, so
+     top:0 parked our strip underneath the navbar and the active tab could not
+     be seen. We measure the navbar instead of hard-coding a height, because it
+     changes with the announcement bar and with the mobile breakpoint.
+
+     Navigation is a real router now: every tab switch is a history entry and a
+     hashchange is honoured, so browser Back returns to the previous tab instead
+     of leaving the URL and the visible panel disagreeing. */
+  const tabs = Array.from(document.querySelectorAll(".kp-tab"));
+  const panels = Array.from(document.querySelectorAll(".kp-panel"));
+  const strip = document.querySelector(".kp-tabs");
+  const names = tabs.map((t) => t.dataset.tab);
+  const has = (n) => n && names.indexOf(n) !== -1;
+
+  function fitSticky() {
+    const nav = document.querySelector(".navbar, header.sticky-top, .navbar-expand");
+    const h = nav && getComputedStyle(nav).position !== "static"
+      ? Math.round(nav.getBoundingClientRect().height) : 0;
+    document.documentElement.style.setProperty("--kp-sticky", h + "px");
+  }
+  fitSticky();
+  window.addEventListener("resize", fitSticky);
+
+  /* wire the strip up as a real tablist so a keyboard and a screen reader can
+     both drive it - it was a row of plain buttons before */
+  if (strip) strip.setAttribute("role", "tablist");
+  tabs.forEach((t, i) => {
+    const n = t.dataset.tab;
+    t.setAttribute("role", "tab");
+    t.setAttribute("id", "kp-tab-" + n);
+    t.setAttribute("aria-controls", "kp-panel-" + n);
+    t.type = "button";
+    const p = panels[i];
+    void p;
+  });
+  panels.forEach((p) => {
+    const n = p.dataset.panel;
+    p.setAttribute("role", "tabpanel");
+    p.setAttribute("id", "kp-panel-" + n);
+    p.setAttribute("aria-labelledby", "kp-tab-" + n);
+    p.setAttribute("tabindex", "0");
+  });
+
+  let current = null;
+  function show(name, push) {
+    if (!has(name) || name === current) {
+      if (name === current) return;
+      name = names[0];
+    }
+    current = name;
+    tabs.forEach((t) => {
+      const on = t.dataset.tab === name;
+      t.classList.toggle("on", on);
+      t.setAttribute("aria-selected", on ? "true" : "false");
+      t.tabIndex = on ? 0 : -1;
+    });
     panels.forEach((p) => p.classList.toggle("on", p.dataset.panel === name));
-    // remember the tab across a reload, and make it linkable
-    if (history.replaceState) history.replaceState(null, "", "#" + name);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    closeAllCombos();
+
+    if (push && history.pushState) history.pushState({ kp: name }, "", "#" + name);
+    else if (history.replaceState) history.replaceState({ kp: name }, "", "#" + name);
+
+    /* Only pull the page up when the strip has actually scrolled out of reach.
+       The old code fired a smooth scroll to 0 on every switch, which is what
+       made a tab click feel like the page was jumping around under you. */
+    if (strip) {
+      const top = strip.getBoundingClientRect().top;
+      const pad = parseInt(getComputedStyle(document.documentElement)
+        .getPropertyValue("--kp-sticky") || "0", 10);
+      if (top < pad + 1 || top > window.innerHeight * 0.6) {
+        const y = window.scrollY + top - pad - 8;
+        window.scrollTo({ top: Math.max(y, 0), behavior: "auto" });
+      }
+    }
   }
-  tabs.forEach((t) => t.addEventListener("click", () => show(t.dataset.tab)));
+
+  tabs.forEach((t) => t.addEventListener("click", () => show(t.dataset.tab, true)));
   document.querySelectorAll("[data-goto]").forEach((b) =>
-    b.addEventListener("click", () => show(b.dataset.goto)));
-  if (window.location.hash) {
-    const want = window.location.hash.slice(1);
-    if (document.querySelector(`.kp-panel[data-panel="${want}"]`)) show(want);
+    b.addEventListener("click", () => show(b.dataset.goto, true)));
+
+  /* left/right (and Home/End) move between tabs, which is what a tablist is
+     expected to do once it announces itself as one */
+  if (strip) {
+    strip.addEventListener("keydown", (e) => {
+      const i = tabs.indexOf(document.activeElement);
+      if (i === -1) return;
+      let j = null;
+      if (e.key === "ArrowRight") j = (i + 1) % tabs.length;
+      else if (e.key === "ArrowLeft") j = (i - 1 + tabs.length) % tabs.length;
+      else if (e.key === "Home") j = 0;
+      else if (e.key === "End") j = tabs.length - 1;
+      if (j === null) return;
+      e.preventDefault();
+      tabs[j].focus();
+      show(tabs[j].dataset.tab, true);
+    });
   }
+
+  window.addEventListener("hashchange", () => {
+    const want = decodeURIComponent(location.hash.slice(1));
+    if (has(want)) show(want, false);
+  });
+
+  show(has(decodeURIComponent(location.hash.slice(1)))
+    ? decodeURIComponent(location.hash.slice(1)) : names[0], false);
 
   /* --------------------------------------------- shared serial lookup
      Used by both the complaint and the claim form. Shows the customer and the
@@ -1280,31 +1423,185 @@ frappe.ready(function () {
     });
   }
 
-  /* Wire a "pick from your pumps" dropdown to the serial text box next to it.
-     Either control can drive the lookup: the dropdown for the common case, the
-     text box for a barcode scanner or a serial not in the list. Keeping them in
-     sync matters because the FORM posts the text box, not the dropdown. */
-  function bindPicker(selectId, inputId, intoId) {
-    const sel = $(selectId);
+  /* ------------------------------------------------------- pump picker
+     One searchable control over the dealer's own pumps. Matches on serial,
+     model, customer and district, because a dealer on the phone is far more
+     likely to have the customer's name than the serial off the nameplate.
+
+     A barcode scanner is just a keyboard that types fast and sends Enter, so
+     scanning still works: the exact-match branch takes the value and never
+     opens the list. */
+  const PUMPS = {{ picker_pumps | tojson }};
+  const BY_SERIAL = new Map(PUMPS.map((p) => [p.serial_no.toUpperCase(), p]));
+  const WCLASS = { "In Warranty": "ok", "Expiring Soon": "warn" };
+  const norm = (v) => String(v == null ? "" : v).toLowerCase();
+
+  function hilite(text, q) {
+    const t = String(text == null ? "" : text);
+    if (!q) return esc(t);
+    const i = t.toLowerCase().indexOf(q);
+    if (i === -1) return esc(t);
+    return esc(t.slice(0, i)) + "<mark>" + esc(t.slice(i, i + q.length)) +
+           "</mark>" + esc(t.slice(i + q.length));
+  }
+
+  const LIMIT = 40;   // enough to scroll, few enough to stay fast on a phone
+
+  function makeCombo(root, onPick) {
+    const input = root.querySelector(".kp-combo-input");
+    const pop = root.querySelector(".kp-combo-pop");
+    const list = root.querySelector(".kp-combo-list");
+    const foot = root.querySelector(".kp-combo-foot");
+    const clear = root.querySelector(".kp-combo-clear");
+    const toggle = root.querySelector(".kp-combo-toggle");
+    let rows = [];
+    let at = -1;
+    let open = false;
+
+    function match(q) {
+      if (!q) return PUMPS.slice(0, LIMIT);
+      const out = [];
+      for (let i = 0; i < PUMPS.length && out.length < LIMIT; i++) {
+        const p = PUMPS[i];
+        if (norm(p.serial_no).indexOf(q) !== -1 || norm(p.model).indexOf(q) !== -1 ||
+            norm(p.customer).indexOf(q) !== -1 || norm(p.district).indexOf(q) !== -1) out.push(p);
+      }
+      return out;
+    }
+
+    function render(q) {
+      rows = match(q);
+      at = -1;
+      if (!rows.length) {
+        list.innerHTML = `<li class="kp-combo-none">${
+          __("No pump of yours matches")} <b>${esc(q)}</b><br>${
+          __("You can still type the full serial to raise this against a pump sold elsewhere.")}</li>`;
+        foot.textContent = "";
+        return;
+      }
+      list.innerHTML = rows.map((p, i) => {
+        const cls = WCLASS[p.state] || "bad";
+        const sub = [p.model, p.customer, p.district].filter(Boolean);
+        return `<li class="kp-opt" role="option" id="${root.dataset.combo}-o${i}"
+                    aria-selected="false" data-i="${i}">
+          <span class="t">
+            <span class="s">${hilite(p.serial_no, q)}</span>
+            <span class="m">${sub.map((x) => hilite(x, q)).join(" &middot; ")}</span>
+          </span>
+          <span class="w ${cls}">${esc(__(p.state || ""))}</span>
+        </li>`;
+      }).join("");
+      const shown = rows.length;
+      foot.textContent = shown >= LIMIT
+        ? __("Showing the first {0} - keep typing to narrow it", [String(LIMIT)])
+        : __("{0} of your pumps", [String(shown)]);
+    }
+
+    function openList(q) {
+      render(q === undefined ? norm(input.value.trim()) : q);
+      pop.hidden = false;
+      open = true;
+      root.classList.add("on");
+      input.setAttribute("aria-expanded", "true");
+    }
+    function close() {
+      if (!open) return;
+      pop.hidden = true;
+      open = false;
+      at = -1;
+      root.classList.remove("on");
+      input.setAttribute("aria-expanded", "false");
+      input.removeAttribute("aria-activedescendant");
+    }
+
+    function move(step) {
+      if (!open) { openList(); return; }
+      if (!rows.length) return;
+      const opts = list.querySelectorAll(".kp-opt");
+      if (at >= 0 && opts[at]) {
+        opts[at].classList.remove("here");
+        opts[at].setAttribute("aria-selected", "false");
+      }
+      at = (at + step + rows.length) % rows.length;
+      const el = opts[at];
+      el.classList.add("here");
+      el.setAttribute("aria-selected", "true");
+      el.scrollIntoView({ block: "nearest" });
+      input.setAttribute("aria-activedescendant", el.id);
+    }
+
+    function take(p) {
+      input.value = p.serial_no;
+      clear.hidden = false;
+      close();
+      onPick(p.serial_no);
+    }
+
+    input.addEventListener("input", () => {
+      const raw = input.value.trim();
+      clear.hidden = !raw;
+      // a scanner fires one exact serial: take it and stay closed
+      const exact = BY_SERIAL.get(raw.toUpperCase());
+      if (exact && raw.length >= 6) { close(); onPick(exact.serial_no); return; }
+      openList(norm(raw));
+    });
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowDown") { e.preventDefault(); move(1); }
+      else if (e.key === "ArrowUp") { e.preventDefault(); move(-1); }
+      else if (e.key === "Enter") {
+        // never let the picker submit the form by accident
+        e.preventDefault();
+        if (open && at >= 0 && rows[at]) take(rows[at]);
+        else { close(); onPick(input.value.trim()); }
+      } else if (e.key === "Escape") { if (open) { e.stopPropagation(); close(); } }
+      else if (e.key === "Tab") close();
+    });
+
+    list.addEventListener("mousedown", (e) => {
+      const li = e.target.closest(".kp-opt");
+      if (!li) return;
+      e.preventDefault();          // keep focus in the input
+      take(rows[+li.dataset.i]);
+    });
+
+    toggle.addEventListener("click", () => {
+      if (open) { close(); return; }
+      input.focus();
+      openList("");
+    });
+    clear.addEventListener("click", () => {
+      input.value = "";
+      clear.hidden = true;
+      input.focus();
+      openList("");
+      onPick("");
+    });
+
+    input.addEventListener("blur", () => setTimeout(close, 120));
+    /* form.reset() empties the input but knows nothing about our clear button
+       or the popup, so after a successful submit the control was left showing a
+       clear affordance over an empty box. reset fires after the values are
+       wiped, hence the deferral. */
+    const form = input.form;
+    if (form) form.addEventListener("reset", () => setTimeout(() => {
+      clear.hidden = true;
+      close();
+    }, 0));
+    root.addEventListener("focusin", () => combos.forEach((c) => { if (c.root !== root) c.close(); }));
+
+    const api = { root: root, close: close, input: input };
+    combos.push(api);
+    return api;
+  }
+
+  /* Bind a picker to the box that describes the pump underneath it. */
+  function bindPicker(inputId, intoId) {
     const input = $(inputId);
     if (!input) return;
-    if (sel) {
-      sel.addEventListener("change", function () {
-        if (!sel.value) return;
-        input.value = sel.value;
-        describePump(sel.value, intoId);
-      });
-    }
-    const fromInput = () => {
-      const v = input.value.trim();
-      // if it was typed rather than picked, drop the dropdown's stale selection
-      if (sel && sel.value !== v) sel.value = "";
-      describePump(v, intoId);
-    };
-    input.addEventListener("change", fromInput);
-    input.addEventListener("keydown", function (e) {
-      if (e.key === "Enter") { e.preventDefault(); fromInput(); }
-    });
+    const root = input.closest(".kp-combo");
+    if (!root) return;
+    makeCombo(root, (serial) => describePump(serial, intoId));
   }
 
   /* ------------------------------------------------ register a sale */
@@ -1395,7 +1692,8 @@ frappe.ready(function () {
               esc(d.name), frappe.datetime.str_to_user(d.warranty_expiry_date)]) +
             ` <a class="kp-btn sm" style="margin-left:10px" target="_blank" rel="noopener"
                  href="${esc(d.certificate_url)}">${__("Print Certificate")}</a>`);
-          setTimeout(() => { window.location.reload(); }, 30000);
+          // no timed reload: it used to fire 30s after a registration and wipe
+          // whatever the dealer had started typing in another tab
         },
         error: function () {
           btn.disabled = false;
@@ -1409,8 +1707,7 @@ frappe.ready(function () {
   (function complaint() {
     const form = $("kc-form");
     if (!form) return;
-    // the dropdown and the text box are two ways into the same field
-    bindPicker("kc-pick", "kc-serial", "kc-pump");
+    bindPicker("kc-serial", "kc-pump");
 
     form.addEventListener("submit", function (e) {
       e.preventDefault();
@@ -1433,7 +1730,9 @@ frappe.ready(function () {
             esc(d.message) +
             `<div style="margin-top:9px"><button class="kp-btn sm" id="kc-goto">${__("My Tickets")}</button></div>`);
           const go = $("kc-goto");
-          if (go) go.addEventListener("click", () => window.location.reload());
+          // switch tabs in place - reloading here used to drop the dealer back
+          // on the complaint form, because the hash still said #complaint
+          if (go) go.addEventListener("click", () => show("tickets", true));
           btn.disabled = false;
           btn.textContent = __("Send to KUMAR");
         },
@@ -1451,7 +1750,7 @@ frappe.ready(function () {
     if (!form) return;
     const parts = [];
 
-    bindPicker("kw-pick", "kw-serial", "kw-pump");
+    bindPicker("kw-serial", "kw-pump");
 
     function drawParts() {
       if (!parts.length) { $("kw-parts").innerHTML = ""; return; }
@@ -1524,9 +1823,12 @@ frappe.ready(function () {
     // "Claim Warranty" on a complaint card jumps here with the pump filled in
     document.querySelectorAll(".kp-mkclaim").forEach((b) =>
       b.addEventListener("click", function () {
-        $("kw-serial").value = b.dataset.serial;
+        const input = $("kw-serial");
+        input.value = b.dataset.serial;
+        const clear = input.parentElement.querySelector(".kp-combo-clear");
+        if (clear) clear.hidden = false;
         form.dataset.sr = b.dataset.sr;
-        show("claim");
+        show("claim", true);
         describePump(b.dataset.serial, "kw-pump");
       }));
   })();
@@ -1582,18 +1884,23 @@ frappe.ready(function () {
       apply();
     });
 
-    // straight from a sold pump into raising its complaint
+    // straight from a sold pump into raising its complaint. The serial has to
+    // land in the picker AND the description has to be fetched, or the dealer
+    // arrives on a form that looks empty and re-picks the pump they just chose.
     table.querySelectorAll(".ks-complain").forEach((b) =>
       b.addEventListener("click", function () {
         const serial = b.dataset.serial;
-        show("complaint");
+        show("complaint", true);
         const input = $("kc-serial");
-        if (input) {
-          input.value = serial;
-          const pick = $("kc-pick");
-          if (pick) pick.value = serial;
-          describePump(serial, "kc-pump");
-        }
+        if (!input) return;
+        input.value = serial;
+        const clear = input.parentElement.querySelector(".kp-combo-clear");
+        if (clear) clear.hidden = false;
+        describePump(serial, "kc-pump");
+        // put the cursor on the next thing they have to answer, not the one
+        // we just filled in for them
+        const cat = $("kc-cat");
+        if (cat) cat.focus();
       }));
 
     // a family tile on Home is a filter: open the full list showing only those
