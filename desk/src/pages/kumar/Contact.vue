@@ -22,13 +22,13 @@
           </p>
           <a
             v-if="c.mobile_no"
-            class="mt-3 block text-sm font-medium tabular-nums text-ink-blue-3"
+            class="mt-3 block text-sm font-medium tabular-nums text-ink-blue-6 hover:underline"
             :href="`tel:${c.mobile_no}`"
             >{{ c.mobile_no }}</a
           >
           <a
             v-if="c.landline"
-            class="mt-0.5 block text-sm tabular-nums text-ink-blue-3"
+            class="mt-0.5 block text-sm tabular-nums text-ink-blue-6 hover:underline"
             :href="`tel:${c.landline}`"
             >{{ c.landline }}</a
           >

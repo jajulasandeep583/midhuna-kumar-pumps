@@ -99,7 +99,7 @@
               </td>
               <td class="px-3 py-2">
                 <div class="text-ink-gray-7">{{ p.customer }}</div>
-                <a v-if="p.mobile" class="text-xs tabular-nums text-ink-blue-3" :href="`tel:${p.mobile}`">
+                <a v-if="p.mobile" class="text-xs tabular-nums text-ink-blue-6 hover:underline" :href="`tel:${p.mobile}`">
                   {{ p.mobile }}
                 </a>
               </td>

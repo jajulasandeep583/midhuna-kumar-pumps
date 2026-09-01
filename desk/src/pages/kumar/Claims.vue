@@ -73,6 +73,93 @@
             <span v-if="c.winding_batch">{{ __("Winding") }}: <b class="tabular-nums text-ink-gray-7">{{ c.winding_batch }}</b></span>
           </div>
 
+          <!-- the conversation, and whatever the dealer photographed ------ -->
+          <div class="mt-3 border-t pt-3">
+            <Button
+              variant="ghost"
+              :label="openThread === c.name ? __('Hide conversation') : __('Conversation')"
+              @click="toggleThread(c)"
+            >
+              <template #suffix>
+                <span v-if="threadCount(c)" class="rounded bg-surface-gray-3 px-1.5 text-xs tabular-nums">
+                  {{ threadCount(c) }}
+                </span>
+              </template>
+            </Button>
+
+            <div v-if="openThread === c.name" class="mt-3">
+              <div v-if="thread.loading" class="py-3 text-sm text-ink-gray-5">{{ __("Loading...") }}</div>
+              <div v-else-if="!messages.length" class="py-3 text-sm text-ink-gray-5">
+                {{ __("Nothing said yet.") }}
+              </div>
+
+              <div v-else class="space-y-2">
+                <div
+                  v-for="m in messages"
+                  :key="m.name"
+                  class="flex"
+                  :class="m.from_dealer ? 'justify-start' : 'justify-end'"
+                >
+                  <div
+                    class="max-w-[85%] rounded-lg px-3 py-2 text-sm"
+                    :class="m.from_dealer
+                      ? 'bg-surface-gray-2 text-ink-gray-8'
+                      : 'bg-blue-600 text-white'"
+                  >
+                    <div class="mb-0.5 text-[11px] opacity-80">{{ m.who }} · {{ m.on }}</div>
+                    <div class="whitespace-pre-wrap">{{ m.message }}</div>
+
+                    <!-- photographs are the evidence; show them, do not link to them -->
+                    <div v-if="m.attachments?.length" class="mt-2 flex flex-wrap gap-2">
+                      <a
+                        v-for="f in m.attachments"
+                        :key="f.url || f.file_url"
+                        :href="f.url || f.file_url"
+                        target="_blank"
+                        rel="noopener"
+                        class="block"
+                      >
+                        <img
+                          v-if="isImage(f)"
+                          :src="f.url || f.file_url"
+                          :alt="f.name || f.file_name"
+                          class="size-20 rounded border border-white/30 object-cover"
+                        />
+                        <span
+                          v-else
+                          class="flex items-center gap-1 rounded border px-2 py-1 text-xs"
+                          :class="m.from_dealer ? 'border-outline-gray-2' : 'border-white/40'"
+                        >
+                          <LucidePaperclip class="size-3" />
+                          {{ f.name || f.file_name }}
+                        </span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-3 flex items-end gap-2">
+                <FormControl
+                  class="flex-1"
+                  v-model="reply"
+                  type="textarea"
+                  :rows="2"
+                  :placeholder="__('Write to the dealer - they read this on a phone')"
+                />
+                <Button
+                  variant="solid"
+                  theme="blue"
+                  :loading="send.loading"
+                  :disabled="!reply.trim()"
+                  :label="__('Send')"
+                  @click="send.submit()"
+                />
+              </div>
+              <ErrorMessage v-if="send.error" class="mt-2" :message="send.error" />
+            </div>
+          </div>
+
           <div v-if="c.actions.length" class="mt-4 flex flex-wrap gap-2 border-t pt-3">
             <Button
               v-for="a in c.actions"
@@ -136,6 +223,7 @@
 import { computed, ref } from "vue";
 import { Badge, Button, Dialog, ErrorMessage, FormControl, createResource, toast } from "frappe-ui";
 import { LayoutHeader } from "@/components";
+import LucidePaperclip from "~icons/lucide/paperclip";
 import { __ } from "@/translation";
 
 const board = createResource({ url: "kumar_service.staff_api.claims_board", auto: true });
@@ -145,6 +233,56 @@ const target = ref<any>(null);
 const pending = ref<any>(null);
 const amount = ref<number | null>(null);
 const remarks = ref("");
+const openThread = ref("");
+const reply = ref("");
+const counts = ref<Record<string, number>>({});
+
+const thread = createResource({
+  url: "kumar_service.staff_api.conversation",
+  onSuccess: (d: any) => {
+    counts.value[d.name] = (d.thread || []).length;
+  },
+});
+const messages = computed(() => thread.data?.thread || []);
+
+function threadCount(c: any) {
+  return counts.value[c.name];
+}
+
+function toggleThread(c: any) {
+  if (openThread.value === c.name) {
+    openThread.value = "";
+    return;
+  }
+  openThread.value = c.name;
+  reply.value = "";
+  thread.submit({ kind: "claim", name: c.name });
+}
+
+function isImage(f: any) {
+  // the server already decided this; the extension check is only a fallback for
+  // a row that predates the flag
+  if (f.is_image !== undefined) return !!f.is_image;
+  const n = String(f.file_name || f.file_url || "").toLowerCase();
+  return /\.(jpe?g|png|gif|webp|heic|bmp)$/.test(n);
+}
+
+// mark_responded stops the SLA response clock, which is the whole reason a
+// reply goes through this endpoint rather than into a comment box
+const send = createResource({
+  url: "kumar_service.staff_api.reply_to_dealer",
+  makeParams: () => ({
+    kind: "claim",
+    name: openThread.value,
+    message: reply.value,
+    mark_responded: 1,
+  }),
+  onSuccess: () => {
+    reply.value = "";
+    thread.submit({ kind: "claim", name: openThread.value });
+    toast.success(__("Sent to the dealer."));
+  },
+});
 
 function money(v: number) {
   return "₹" + Math.round(v || 0).toLocaleString("en-IN");

@@ -94,7 +94,7 @@
         </div>
         <a
           v-if="done.certificate_url"
-          class="mt-2 inline-block text-sm font-medium text-ink-blue-3"
+          class="mt-2 inline-block text-sm font-medium text-ink-blue-5"
           :href="done.certificate_url"
           target="_blank"
           rel="noopener"

@@ -100,7 +100,7 @@
                     <div class="font-medium text-ink-gray-8">{{ n.label }}</div>
                     <div class="text-xs text-ink-gray-5">
                       {{ [n.city, n.state].filter(Boolean).join(", ") }}
-                      <span v-if="n.own" class="ml-1 text-ink-blue-3">{{ __("KUMAR branch") }}</span>
+                      <span v-if="n.own" class="ml-1 text-ink-blue-5">{{ __("KUMAR branch") }}</span>
                     </div>
                   </td>
                   <td class="px-3 py-2 text-right tabular-nums text-ink-gray-7">{{ n.pumps }}</td>
@@ -169,7 +169,7 @@
           <div class="rounded-lg border bg-surface-white p-4 text-sm">
             <div v-if="!d.data.visits.length" class="text-ink-gray-5">
               {{ __("Nothing booked.") }}
-              <router-link class="text-ink-blue-3" :to="{ name: 'KumarVisits' }">
+              <router-link class="text-ink-blue-5" :to="{ name: 'KumarVisits' }">
                 {{ __("Schedule one") }}
               </router-link>
             </div>
