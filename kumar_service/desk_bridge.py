@@ -106,6 +106,29 @@ def customer_for(dealer):
 	return doc.name
 
 
+def link_contact_to_customer(customer, contact):
+	"""Make the contact a member of this customer, if it is not already.
+
+	HD Ticket refuses a customer that is not among the contact's own customers.
+	That rule is right for a helpdesk where one contact belongs to one company,
+	and wrong for a dealer tree: a sub-dealer with no login of its own is handled
+	by its parent, so the ticket carries the sub-dealer as the customer - which
+	is true, they sold the pump - and the parent's login as the contact.
+
+	The membership is the honest fix rather than lying about either field: a
+	parent dealer really does cover its sub-dealers, so its contact really is a
+	member of that outlet.
+	"""
+	if not (customer and contact):
+		return
+	cust = frappe.get_doc("HD Customer", customer)
+	if any(m.contact_name == contact for m in (cust.get("contacts") or [])):
+		return
+	cust.append("contacts", {"contact_name": contact, "is_manager": 1})
+	cust.flags.ignore_permissions = True
+	cust.save(ignore_permissions=True)
+
+
 # -------------------------------------------------------------------- mirror
 
 def _subject(sr):
@@ -156,6 +179,10 @@ def _mirror(sr):
 	desk_status = STATUS_TO_DESK.get(sr.get("status"), "Open")
 
 	contact, portal_user = contact_for(sr.get("dealer"))
+	customer = customer_for(sr.get("dealer"))
+	# the contact answering for this outlet has to be a member of it, or
+	# HD Ticket rejects the pair - see link_contact_to_customer
+	link_contact_to_customer(customer, contact)
 	values = {
 		"subject": _subject(sr),
 		"status": desk_status,
@@ -180,7 +207,7 @@ def _mirror(sr):
 		dict(
 			doctype="HD Ticket",
 			description=_description(sr),
-			customer=customer_for(sr.get("dealer")),
+			customer=customer,
 			ticket_type=_ticket_type(sr),
 			**values,
 		)

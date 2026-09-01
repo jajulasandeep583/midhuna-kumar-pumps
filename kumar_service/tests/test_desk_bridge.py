@@ -73,6 +73,45 @@ class TestDeskBridge(IntegrationTestCase):
 			frappe.db.count("HD Ticket", {"custom_service_request": self.sr.name}), 1
 		)
 
+	def test_a_sub_dealers_request_still_mirrors(self):
+		"""The mirror silently stopped working for sub-dealers.
+
+		HD Ticket refuses a customer that is not among the ticket contact's own
+		customers. In a dealer tree that pair is legitimately mismatched: a
+		sub-dealer with no login of its own is handled by its parent, so the
+		ticket carries the sub-dealer as customer - true, they sold the pump -
+		and the parent's login as contact. Every request from such an outlet
+		failed to mirror, and because the bridge logs rather than raises, it
+		failed quietly.
+		"""
+		missing = []
+		for name in frappe.get_all(
+			"Service Request", filters={"docstatus": ["<", 2]}, pluck="name"
+		):
+			if not frappe.db.exists("HD Ticket", {"custom_service_request": name}):
+				missing.append(name)
+		self.assertEqual(
+			missing, [], f"{len(missing)} requests never reached the desk: {missing[:5]}"
+		)
+
+	def test_the_contact_is_a_member_of_the_outlet_on_every_ticket(self):
+		"""The condition HD Ticket actually enforces, asserted directly."""
+		from kumar_service.hd.utils import get_customers
+
+		for t in frappe.get_all(
+			"HD Ticket",
+			filters={"custom_service_request": ["is", "set"]},
+			fields=["name", "customer", "contact"],
+			limit=40,
+		):
+			if not (t.customer and t.contact):
+				continue
+			self.assertIn(
+				t.customer,
+				get_customers(contact=t.contact),
+				f"{t.name}: contact {t.contact} is not a member of {t.customer}",
+			)
+
 	# --------------------------------------------------------- status upward
 
 	def test_resolving_in_the_desk_resolves_the_request(self):

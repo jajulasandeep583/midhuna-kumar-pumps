@@ -259,6 +259,14 @@ def staff_permissions():
 			add_permission(doctype, role, 0)
 			for prop in ("write", "create", "delete", "submit", "cancel", "amend"):
 				update_permission_property(doctype, role, 0, prop, 0)
+			# `report` is a separate permission from `read`, and a report query
+			# checks it specifically - so granting read alone left Serial
+			# Genealogy and the stock reconciliation failing with "you don't have
+			# permission to get a report on: Serial No" for the very roles the
+			# reports are addressed to. Rows stay scoped either way: a report
+			# query honours permission_query_conditions like any other.
+			for prop in ("report", "export"):
+				update_permission_property(doctype, role, 0, prop, 1)
 			granted.append(f"{doctype} -> {role}")
 	if granted:
 		frappe.clear_cache()
