@@ -35,6 +35,17 @@ def get_pump_snapshot(serial_no):
 	if not sn:
 		frappe.throw(_("Serial number {0} not found").format(serial_no), frappe.DoesNotExistError)
 
+	# The doctype check above says "may this user read serials at all"; it does
+	# NOT say "may they read THIS one". Everything below is fetched with
+	# frappe.db, which applies no row scoping whatever - so a dealer granted the
+	# doctype could otherwise read any pump in the network through this endpoint.
+	# The document check is what confines them to their own tree; staff roles
+	# have full access and pass it unchanged.
+	if not frappe.has_permission("Serial No", doc=serial_no, ptype="read"):
+		frappe.throw(
+			_("{0} was not sold by your outlet.").format(serial_no), frappe.PermissionError
+		)
+
 	model = {}
 	if sn.get("custom_pump_model"):
 		model = frappe.db.get_value(

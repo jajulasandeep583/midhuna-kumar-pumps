@@ -689,9 +689,24 @@ def claims_board(state=None, dealer=None, limit=200):
 	# buttons that will actually work
 	for r in rows:
 		r["actions"] = _claim_actions(r["workflow_state"])
-		r["customer"] = frappe.db.get_value(
-			"Service Request", r["service_request"], "end_customer_name"
-		) if r["service_request"] else None
+		# who raised it, and who it is for. A claim names a dealer, but the pump
+		# belongs to a customer and that is who the visit is about - reading the
+		# name off the registration rather than the claim, because a claim can be
+		# raised without a request behind it.
+		reg = frappe.db.get_value(
+			"Pump Registration",
+			{"serial_no": r["serial_no"], "docstatus": 1},
+			["end_customer_name", "end_customer_mobile", "installation_address", "district"],
+			as_dict=True,
+		) or {}
+		r["customer"] = reg.get("end_customer_name") or (
+			frappe.db.get_value("Service Request", r["service_request"], "end_customer_name")
+			if r["service_request"] else None
+		)
+		r["customer_mobile"] = reg.get("end_customer_mobile")
+		r["where"] = reg.get("installation_address")
+		r["district"] = reg.get("district")
+		r["raised_by"] = frappe.db.get_value("Dealer", r["dealer"], "dealer_name") or r["dealer"]
 
 	totals = {}
 	for s in CLAIM_OPEN + ("Settled", "Rejected"):

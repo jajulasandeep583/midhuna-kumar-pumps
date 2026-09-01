@@ -187,6 +187,39 @@ class TestDealerIsolation(IntegrationTestCase):
 			"a dealer can write a Serial No",
 		)
 
+	def test_the_staff_snapshot_endpoint_is_scoped_for_a_dealer(self):
+		"""api.get_pump_snapshot checks the DOCTYPE and then reads with frappe.db.
+
+		Granting the Dealer role that doctype - which the desk needed - therefore
+		opened every pump in the network through this one endpoint until the
+		document check was added. The endpoint is shared with staff, who pass it
+		unchanged, so the test has to prove both halves.
+		"""
+		from kumar_service.api import get_pump_snapshot
+
+		frappe.set_user("Administrator")
+		mine = set(dealer_and_descendants(self.me))
+		foreign = own = None
+		for sn in frappe.get_all(
+			"Serial No", fields=["name", "custom_dealer"], limit_page_length=0
+		):
+			if not sn.custom_dealer:
+				continue
+			if sn.custom_dealer in mine and not own:
+				own = sn.name
+			elif sn.custom_dealer not in mine and not foreign:
+				foreign = sn.name
+			if own and foreign:
+				break
+		frappe.set_user(self.user)
+
+		if own:
+			self.assertEqual(get_pump_snapshot(own)["serial_no"], own)
+		if not foreign:
+			self.skipTest("every sold serial belongs to this dealer's tree")
+		with self.assertRaises(frappe.PermissionError):
+			get_pump_snapshot(foreign)
+
 	# ----------------------------------------------------------- the portal API
 
 	def test_portal_refuses_a_pump_this_dealer_did_not_sell(self):

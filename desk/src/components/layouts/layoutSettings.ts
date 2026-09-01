@@ -1,3 +1,4 @@
+import LucideSearchCheck from "~icons/lucide/search-check";
 import LucideIndianRupee from "~icons/lucide/indian-rupee";
 import LucideGauge from "~icons/lucide/gauge";
 import LucideCalendarCheck from "~icons/lucide/calendar-check";
@@ -28,6 +29,11 @@ export const agentPortalSidebarOptions = [
     label: __("Command Centre"),
     icon: LucideGauge,
     to: "KumarManage",
+  },
+  {
+    label: __("Pump Lookup"),
+    icon: LucideSearchCheck,
+    to: "KumarLookup",
   },
   {
     label: __("Claims"),

@@ -46,10 +46,21 @@
               <div class="mt-1 text-sm text-ink-gray-7">
                 <span class="tabular-nums">{{ c.serial_no }}</span>
                 <span v-if="c.pump_model"> · {{ c.pump_model }}</span>
-                <span v-if="c.customer"> · {{ c.customer }}</span>
+              </div>
+              <!-- who is asking, and who the pump belongs to -->
+              <div class="mt-1 text-sm">
+                <span class="text-ink-gray-5">{{ __("Raised by") }}</span>
+                <span class="text-ink-gray-8"> {{ c.raised_by || c.dealer }}</span>
+                <template v-if="c.customer">
+                  <span class="text-ink-gray-5"> · {{ __("for") }}</span>
+                  <span class="text-ink-gray-8"> {{ c.customer }}</span>
+                  <a v-if="c.customer_mobile" :href="`tel:${c.customer_mobile}`"
+                     class="ml-1 tabular-nums text-ink-blue-6 hover:underline">{{ c.customer_mobile }}</a>
+                </template>
               </div>
               <div class="mt-0.5 text-xs text-ink-gray-5">
-                {{ c.dealer }} · {{ __("claimed") }} {{ String(c.claim_date || c.creation).slice(0, 10) }}
+                <span v-if="c.where">{{ c.where }}<span v-if="c.district">, {{ c.district }}</span> · </span>
+                {{ __("claimed") }} {{ String(c.claim_date || c.creation).slice(0, 10) }}
               </div>
             </div>
             <div class="text-right">
@@ -106,7 +117,7 @@
                       ? 'bg-surface-gray-2 text-ink-gray-8'
                       : 'bg-blue-600 text-white'"
                   >
-                    <div class="mb-0.5 text-[11px] opacity-80">{{ m.who }} · {{ m.on }}</div>
+                    <div class="mb-0.5 text-[11px] opacity-80">{{ m.who }} · {{ when(m.on) }}</div>
                     <div class="whitespace-pre-wrap">{{ m.message }}</div>
 
                     <!-- photographs are the evidence; show them, do not link to them -->
@@ -139,22 +150,52 @@
                 </div>
               </div>
 
-              <div class="mt-3 flex items-end gap-2">
+              <div class="mt-3">
                 <FormControl
-                  class="flex-1"
                   v-model="reply"
                   type="textarea"
                   :rows="2"
                   :placeholder="__('Write to the dealer - they read this on a phone')"
                 />
-                <Button
-                  variant="solid"
-                  theme="blue"
-                  :loading="send.loading"
-                  :disabled="!reply.trim()"
-                  :label="__('Send')"
-                  @click="send.submit()"
-                />
+
+                <ul v-if="outFiles.length" class="mt-2 flex flex-wrap gap-2">
+                  <li
+                    v-for="(f, i) in outFiles"
+                    :key="f.filename + i"
+                    class="flex items-center gap-2 rounded border bg-surface-white px-2 py-1 text-xs"
+                  >
+                    <img v-if="f.preview" :src="f.preview" alt="" class="size-8 rounded object-cover" />
+                    <LucidePaperclip v-else class="size-3 text-ink-gray-5" />
+                    <span class="max-w-40 truncate text-ink-gray-7">{{ f.filename }}</span>
+                    <span class="tabular-nums text-ink-gray-5">{{ f.size }}</span>
+                    <button class="text-ink-gray-5 hover:text-ink-red-3" @click="outFiles.splice(i, 1)">×</button>
+                  </li>
+                </ul>
+                <ErrorMessage v-if="outError" class="mt-2" :message="outError" />
+
+                <div class="mt-2 flex items-center justify-between gap-2">
+                  <!-- KUMAR sends evidence back too: a marked-up photo, a credit
+                       note, the bench test sheet -->
+                  <label class="flex cursor-pointer items-center gap-1.5 text-sm text-ink-gray-6 hover:text-ink-gray-8">
+                    <LucidePaperclip class="size-4" />
+                    {{ __("Attach a photo or file") }}
+                    <input
+                      type="file"
+                      class="hidden"
+                      multiple
+                      accept="image/*,video/*,application/pdf"
+                      @change="addOutFiles"
+                    />
+                  </label>
+                  <Button
+                    variant="solid"
+                    theme="blue"
+                    :loading="send.loading"
+                    :disabled="!reply.trim() && !outFiles.length"
+                    :label="__('Send')"
+                    @click="send.submit()"
+                  />
+                </div>
               </div>
               <ErrorMessage v-if="send.error" class="mt-2" :message="send.error" />
             </div>
@@ -237,6 +278,51 @@ const openThread = ref("");
 const reply = ref("");
 const counts = ref<Record<string, number>>({});
 
+// Matches MAX_ATTACHMENT_MB on the server. Checked here too so nobody uploads
+// for a minute to be refused at the end of it.
+const MAX_MB = 8;
+const outFiles = ref<any[]>([]);
+const outError = ref("");
+
+function human(bytes: number) {
+  return bytes > 1024 * 1024
+    ? (bytes / 1024 / 1024).toFixed(1) + " MB"
+    : Math.max(1, Math.round(bytes / 1024)) + " KB";
+}
+
+async function addOutFiles(e: Event) {
+  outError.value = "";
+  const picked = Array.from((e.target as HTMLInputElement).files || []);
+  for (const file of picked) {
+    if (file.size > MAX_MB * 1024 * 1024) {
+      outError.value = __("{0} is too large. The limit is {1} MB.", [file.name, String(MAX_MB)]);
+      continue;
+    }
+    const content = await new Promise<string>((resolve) => {
+      const r = new FileReader();
+      r.onload = () => resolve(String(r.result).split(",")[1] || "");
+      r.readAsDataURL(file);
+    });
+    outFiles.value.push({
+      filename: file.name,
+      content,
+      size: human(file.size),
+      preview: file.type.startsWith("image/") ? URL.createObjectURL(file) : "",
+    });
+  }
+  (e.target as HTMLInputElement).value = "";
+}
+
+// the server sends a full timestamp with microseconds; nobody reads that
+function when(v: string) {
+  if (!v) return "";
+  const d = new Date(String(v).replace(" ", "T"));
+  if (isNaN(d.getTime())) return String(v).slice(0, 16);
+  return d.toLocaleString("en-IN", {
+    day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit", hour12: true,
+  });
+}
+
 const thread = createResource({
   url: "kumar_service.staff_api.conversation",
   onSuccess: (d: any) => {
@@ -274,11 +360,15 @@ const send = createResource({
   makeParams: () => ({
     kind: "claim",
     name: openThread.value,
-    message: reply.value,
+    message: reply.value || __("(photo attached)"),
     mark_responded: 1,
+    attachments: outFiles.value.map((f) => ({ filename: f.filename, content: f.content })),
   }),
   onSuccess: () => {
     reply.value = "";
+    outFiles.value.forEach((f) => f.preview && URL.revokeObjectURL(f.preview));
+    outFiles.value = [];
+    outError.value = "";
     thread.submit({ kind: "claim", name: openThread.value });
     toast.success(__("Sent to the dealer."));
   },

@@ -233,6 +233,37 @@ def ticket_types():
 # widens which doctypes they may touch, never which rows.
 DEALER_READ = ("Serial No",)
 
+# The same doctype, for the people answering the dealer. A service manager on
+# the phone needs to check a serial - which pump, whose, still in warranty - and
+# could not: Serial No read belonged to the stock roles and nobody else, so the
+# lookup failed for the very people whose job is answering that question.
+# has_full_access already covers these roles at document level; this is only the
+# doctype permission that was never granted.
+STAFF_READ_ROLES = ("Service Manager", "Warranty Approver", "Quality Engineer",
+	"Dealer Manager", "Service Technician")
+
+
+def staff_permissions():
+	from frappe.permissions import add_permission, update_permission_property
+
+	granted = []
+	for doctype in ("Serial No",):
+		if not frappe.db.exists("DocType", doctype):
+			continue
+		for role in STAFF_READ_ROLES:
+			if not frappe.db.exists("Role", role):
+				continue
+			if frappe.db.exists("Custom DocPerm", {"parent": doctype, "role": role}) or \
+				frappe.db.exists("DocPerm", {"parent": doctype, "role": role}):
+				continue
+			add_permission(doctype, role, 0)
+			for prop in ("write", "create", "delete", "submit", "cancel", "amend"):
+				update_permission_property(doctype, role, 0, prop, 0)
+			granted.append(f"{doctype} -> {role}")
+	if granted:
+		frappe.clear_cache()
+	return granted
+
 
 def dealer_permissions():
 	"""Grant the Dealer role read on what the desk pages actually open.
@@ -402,6 +433,7 @@ def build_all():
 		"ticket_fields": ticket_fields(),
 		"request_type_field": request_type_field(),
 		"dealer_permissions": dealer_permissions(),
+		"staff_permissions": staff_permissions(),
 		"dealers": dealers(),
 		"retired": retire_superseded(),
 	}

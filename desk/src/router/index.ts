@@ -226,6 +226,13 @@ const portalRoutes = [
     meta: { public: true, auth: true },
   },
   {
+    // Any serial, for whoever is on the phone: whose pump, how long is left.
+    path: "/lookup",
+    name: "KumarLookup",
+    component: () => import("@/pages/kumar/Lookup.vue"),
+    meta: { auth: true },
+  },
+  {
     // Money decisions, driven through the real Workflow rather than around it.
     path: "/claims",
     name: "KumarClaims",
