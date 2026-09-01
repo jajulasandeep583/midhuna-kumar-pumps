@@ -2,7 +2,10 @@
   <div>
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-semibold text-ink-gray-9">{{ __("Warranty Claim") }}</div>
+        <div class="flex items-center gap-2">
+          <Button variant="ghost" :label="__('Back')" @click="router.push({ name: 'KumarClaim' })" />
+          <div class="text-lg font-semibold text-ink-gray-9">{{ __("Warranty Claim") }}</div>
+        </div>
       </template>
     </LayoutHeader>
 
@@ -145,7 +148,9 @@ import ScanButton from "./ScanButton.vue";
 import LucidePaperclip from "~icons/lucide/paperclip";
 import LucideFile from "~icons/lucide/file";
 import { __ } from "@/translation";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const selected = ref<any>(null);
 const picked = ref<any>(null);
 const snapshot = ref<any>(null);

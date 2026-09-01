@@ -238,6 +238,6 @@ function printCertificate(p: any) {
 }
 
 function complain(p: any) {
-  router.push({ name: "KumarComplaint", query: { serial: p.serial_no } });
+  router.push({ name: "KumarComplaintNew", query: { serial: p.serial_no } });
 }
 </script>

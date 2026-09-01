@@ -2,8 +2,11 @@
   <div>
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-semibold text-ink-gray-9">
+        <div class="flex items-center gap-2">
+          <Button variant="ghost" :label="__('Back')" @click="router.push({ name: 'KumarComplaint' })" />
+          <div class="text-lg font-semibold text-ink-gray-9">
           {{ __("Raise a Request") }}
+        </div>
         </div>
       </template>
     </LayoutHeader>

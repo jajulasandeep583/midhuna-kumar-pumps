@@ -121,14 +121,14 @@ const actions = [
     tint: "bg-blue-50 text-blue-700",
   },
   {
-    name: "KumarComplaint",
+    name: "KumarComplaintNew",
     label: __("Raise a Request"),
     hint: __("A fault, an installation, a part"),
     icon: LucideMessageSquare,
     tint: "bg-amber-50 text-amber-700",
   },
   {
-    name: "KumarClaim",
+    name: "KumarClaimNew",
     label: __("Warranty Claim"),
     hint: __("Ask KUMAR to settle a failure"),
     icon: LucideShieldCheck,

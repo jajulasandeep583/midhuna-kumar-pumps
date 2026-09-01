@@ -207,15 +207,30 @@ const portalRoutes = [
     component: () => import("@/pages/kumar/MyPumps.vue"),
     meta: { public: true, auth: true },
   },
+  // List first, form behind an Add button. A dealer opening "Warranty Claim"
+  // wants to see what they have already claimed and how it went, not a blank
+  // form - and landing straight on a form gives them no way back to the list.
   {
     path: "/dealer/complaint",
     name: "KumarComplaint",
+    component: () => import("@/pages/kumar/MyRequests.vue"),
+    meta: { public: true, auth: true },
+  },
+  {
+    path: "/dealer/complaint/new",
+    name: "KumarComplaintNew",
     component: () => import("@/pages/kumar/RaiseComplaint.vue"),
     meta: { public: true, auth: true },
   },
   {
     path: "/dealer/claim",
     name: "KumarClaim",
+    component: () => import("@/pages/kumar/MyClaims.vue"),
+    meta: { public: true, auth: true },
+  },
+  {
+    path: "/dealer/claim/new",
+    name: "KumarClaimNew",
     component: () => import("@/pages/kumar/Claim.vue"),
     meta: { public: true, auth: true },
   },
