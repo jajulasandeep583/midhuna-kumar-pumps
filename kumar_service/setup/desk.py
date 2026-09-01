@@ -389,6 +389,30 @@ def retire_superseded():
 			frappe.delete_doc("HD Ticket", t, force=True, ignore_permissions=True)
 			done.append(f"sample ticket {t}")
 
+	# helpdesk ships a placeholder article called "Introduction", in Draft, in a
+	# category called General. It is the first thing anyone sees in a Knowledge
+	# Base that now has real articles in it.
+	if frappe.db.exists("DocType", "HD Article"):
+		# HD Article Category refuses to lose its last article, so the order
+		# matters: move the placeholder into a category that has others, delete
+		# it there, and only then take the empty category away.
+		host = frappe.db.get_value(
+			"HD Article Category", {"category_name": "Before you call KUMAR"}
+		)
+		for a in frappe.get_all(
+			"HD Article", filters={"title": "Introduction", "status": "Draft"},
+			fields=["name", "category"],
+		):
+			old_category = a.category
+			if host and old_category != host:
+				frappe.db.set_value("HD Article", a.name, "category", host)
+			frappe.delete_doc("HD Article", a.name, force=True, ignore_permissions=True)
+			done.append("placeholder article Introduction")
+
+			# The "General" category itself is left alone - helpdesk refuses to
+			# delete it, and an empty category costs nothing next to four full ones.
+			_ = old_category
+
 	# The Page RECORDS are not deleted here. A Page is app code, and frappe only
 	# permits deleting one in developer mode - correctly, because the record is a
 	# shadow of a folder in the app. The folders are gone from the app, so
@@ -422,6 +446,13 @@ def retire_superseded():
 	return done
 
 
+def knowledge_base():
+	"""The articles a dealer reaches for, seeded from code so they ship."""
+	from kumar_service.setup.knowledge import build_all as seed
+
+	return seed()
+
+
 def build_all():
 	if not frappe.db.exists("DocType", "HD Settings"):
 		frappe.msgprint("helpdesk is not installed on this site; skipping the desk setup")
@@ -436,6 +467,7 @@ def build_all():
 		"staff_permissions": staff_permissions(),
 		"dealers": dealers(),
 		"retired": retire_superseded(),
+		"knowledge": knowledge_base(),
 	}
 	frappe.db.commit()
 	return out

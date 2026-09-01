@@ -11,11 +11,10 @@
           v-if="isFCSite && !isCustomerPortal"
           :isSidebarCollapsed="isCollapsed"
         />
-        <GettingStartedBanner
-          v-if="showOnboardingBanner"
-          :isSidebarCollapsed="isCollapsed"
-          appName="helpdesk"
-        />
+        <!-- Frappe's own getting-started tour is off. It teaches helpdesk's
+             concepts - agents, teams, canned replies - not KUMAR's, and it sat
+             on the sidebar reading "0/10 steps" to people who were already
+             using the thing. -->
         <CustomerPortalPermissionBanner
           v-if="showPermissionNoticeBanner"
           :isSidebarCollapsed="isCollapsed"
@@ -42,7 +41,7 @@
     v-model="showHelpModal"
     v-model:articles="articles"
     appName="helpdesk"
-    title="Frappe Helpdesk"
+    title="KUMAR Pumps Desk"
     :logo="logo"
     docsLink="https://docs.frappe.io/helpdesk"
     :afterSkip="(step: string) => capture('onboarding_step_skipped_' + step)"

@@ -1003,12 +1003,28 @@ def add_reply(doctype, name, message, notify_users=None, attachments=None, attac
 	if saved:
 		_write_attachment_block(comment.name, saved)
 
+	# A Notification Log is both the in-app alert and, where the recipient has
+	# email notifications on AND an outgoing Email Account is configured, the
+	# email frappe sends from it. Complaints and warranty claims go through this
+	# same path, so they behave identically - which is the point: a dealer should
+	# not have to learn that one kind of message reaches them and another does not.
+	subject = _("KUMAR replied on {0}").format(name)
+	if doctype == "Kumar Warranty Claim":
+		subject = _("Warranty claim {0} - an update from KUMAR").format(name)
+	elif doctype == "Service Request":
+		what = frappe.db.get_value(doctype, name, "serial_no")
+		subject = _("Service request {0}{1} - an update from KUMAR").format(
+			name, f" ({what})" if what else ""
+		)
+
 	for user in {u for u in (notify_users or []) if u and u != frappe.session.user}:
 		try:
 			frappe.get_doc(
 				{
 					"doctype": "Notification Log",
-					"subject": _("New message on {0}").format(name),
+					# the subject is what lands in an inbox, so it says which pump
+					# and which kind of thing rather than only a document id
+					"subject": subject,
 					"email_content": message[:500],
 					"for_user": user,
 					"type": "Alert",
