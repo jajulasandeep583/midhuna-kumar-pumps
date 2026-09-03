@@ -1,279 +1,204 @@
 {% extends "frappe/www/login.html" %}
 
 {#
-  The KUMAR login page.
+  The sign-in screen for KUMAR Pumps Desk.
 
   It EXTENDS frappe's own login template rather than replacing it. `super()` in
-  the page_content block below emits frappe's complete set of login sections -
-  login, signup, forgot password, email-link login, LDAP, OAuth buttons - which
-  keeps every one of those flows working. All this file does is put the company
-  around them.
+  the right-hand column renders frappe's login, forgot-password, email-link and
+  signup sections untouched, so every one of those flows keeps working exactly
+  as it does out of the box - including OAuth and LDAP if they are ever switched
+  on. Everything this file adds is the frame around that form.
 
-  Everything on the left comes from the 2025 brochure or from the live catalogue;
-  nothing on this page is a number somebody typed in.
+  It used to be a brochure: a notices strip, a company hero, five statistic
+  tiles, three pillars, the product range and a footer with the postal address.
+  That was the front door of a dealer portal that no longer exists. This is the
+  front door of a product, and a product's sign-in says what it is, who it is
+  for, and where the form is.
 #}
 
-{% block title %}{{ _("KUMAR Pumps & Motors") }}{% endblock %}
+{% block title %}{{ _("KUMAR Pumps Desk") }}{% endblock %}
 
 {% block page_content %}
-{% include "templates/includes/portal_art.svg" %}
-
 <style>
-  /* ---------- canvas ----------
-     frappe's login page is a small card centred on white. We keep the card - it
-     is frappe's and it works - and build the company around it, which needs the
-     container unbounded and the page coloured. */
-  body {
-    background:
-      radial-gradient(1100px 460px at 8% -10%, rgba(26,116,196,.30), transparent 68%),
-      radial-gradient(900px 420px at 92% 4%, rgba(11,83,148,.24), transparent 70%),
-      linear-gradient(160deg, #0b3f70 0%, #0b5394 34%, #14669f 62%, #1a74c4 100%)
-      !important;
-    background-attachment: fixed !important;
-    min-height: 100vh;
-  }
-  main.container, .page_content, .page-content-wrapper, .web-footer {
-    background: transparent !important;
-  }
-  main.container { max-width: none !important; padding: 0 26px !important; }
+  /* the web shell paints a white reading column; the sign-in owns the page */
+  main.container, .page_content, .page-content-wrapper { background:transparent !important;
+    max-width:none !important; padding:0 !important; }
+  #page-login .page-header-wrapper, #page-login .page-breadcrumbs,
+  #page-login .page-header { display:none !important; }
+  .web-footer, footer.web-footer { display:none !important; }
 
-  .kl { --ink:#14212e; --mut:#5f7183; --line:#e2eaf3; --blue:#0b5394;
-        font-family:"Inter","Segoe UI",Arial,"Noto Sans Telugu","Nirmala UI",sans-serif;
-        color:#fff; max-width:1500px; margin:0 auto; padding:14px 0 50px; }
+  .kl { --blue:#12569b; --blue-deep:#0d3f74; --blue-lift:#2f7dc9;
+        --ink:#141a21; --ink-2:#3d4956; --ink-3:#63707e;
+        --ground:#f5f7f9; --line:#dde3ea;
+        --r:10px; --r-lg:16px;
+        font-family:"Inter","IBM Plex Sans","Segoe UI",Arial,"Noto Sans Telugu","Nirmala UI",sans-serif;
+        color:var(--ink); -webkit-font-smoothing:antialiased;
+        display:grid; grid-template-columns:minmax(0,11fr) minmax(0,9fr);
+        min-height:calc(100vh - 60px); }
+  @media (max-width:900px) { .kl { grid-template-columns:1fr; min-height:0; } }
 
-  /* ---------- announcements, the way a distributor portal carries them ---- */
-  .kl-notices { display:flex; flex-wrap:wrap; gap:8px 22px; align-items:center;
-                background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.22);
-                border-radius:14px; padding:11px 18px; margin-bottom:20px;
-                font-size:13.5px; }
-  .kl-notices b { font-size:11px; letter-spacing:2px; text-transform:uppercase;
-                  color:#a8d4f7; }
-  .kl-notice { display:flex; gap:9px; align-items:flex-start; color:#e7f1fb;
-               line-height:1.5; }
-  .kl-notice::before { content:"\2022"; color:#7fc4ff; font-weight:800; }
+  /* ---------- the product, on the left ---------- */
+  .kl-brand { position:relative; overflow:hidden; color:#fff;
+              background:linear-gradient(160deg,#0d3f74 0%,#12569b 62%,#1a63ad 100%);
+              padding:56px 64px; display:flex; flex-direction:column; justify-content:space-between; }
+  @media (max-width:900px) { .kl-brand { padding:28px 24px 26px; } }
+  .kl-brand::after { content:""; position:absolute; inset:auto -120px -160px auto;
+                     width:440px; height:440px; border-radius:50%;
+                     background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.10), transparent 62%);
+                     pointer-events:none; }
+  .kl-mark { display:flex; align-items:center; gap:14px; }
+  .kl-mark img { width:44px; height:44px; border-radius:11px; background:#fff; padding:5px;
+                 box-sizing:border-box; }
+  .kl-mark b { display:block; font-size:22px; font-weight:800; letter-spacing:-.01em; line-height:1.1; }
+  .kl-mark small { display:block; font-size:11px; letter-spacing:.16em; text-transform:uppercase;
+                   color:#a9cbee; margin-top:3px; }
+  .kl-thesis { margin:48px 0 0; max-width:30ch; font-size:clamp(26px,3vw,36px); font-weight:700;
+               line-height:1.15; letter-spacing:-.02em; text-wrap:balance; }
+  @media (max-width:900px) { .kl-thesis { margin-top:22px; font-size:22px; } }
+  .kl-thesis span { color:#a9cbee; }
+  .kl-proof { list-style:none; padding:0; margin:36px 0 0; display:grid; gap:14px; max-width:46ch; }
+  @media (max-width:900px) { .kl-proof { display:none; } }
+  .kl-proof li { display:flex; gap:14px; align-items:flex-start; }
+  .kl-proof i { flex:0 0 34px; height:34px; border-radius:9px; display:grid; place-items:center;
+                background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.18); }
+  .kl-proof svg { width:17px; height:17px; }
+  .kl-proof b { display:block; font-size:15px; font-weight:600; }
+  .kl-proof span { font-size:13.5px; color:#cfe0f2; line-height:1.5; }
+  .kl-corp { margin-top:48px; font-size:12.5px; color:#a9cbee; line-height:1.6; }
+  @media (max-width:900px) { .kl-corp { display:none; } }
+  .kl-corp b { color:#fff; font-weight:600; }
 
-  /* ---------- the two columns ---------- */
-  .kl-grid { display:grid; grid-template-columns:minmax(0,1.55fr) minmax(340px,.85fr);
-             gap:26px; align-items:start; }
-  @media (max-width:1000px) { .kl-grid { grid-template-columns:1fr; } }
+  /* ---------- the form, on the right ---------- */
+  .kl-side { background:var(--ground); display:grid; place-items:center; padding:48px 28px; }
+  @media (max-width:900px) { .kl-side { padding:28px 16px 40px; } }
+  .kl-card { width:100%; max-width:420px; }
+  .kl-panel { background:#fff; border:1px solid var(--line); border-radius:var(--r-lg);
+              padding:8px 10px 12px; box-shadow:0 1px 2px rgba(16,24,40,.05), 0 8px 24px rgba(16,24,40,.06); }
+  .kl-welcome { padding:18px 20px 2px; }
+  .kl-welcome .t { font-size:22px; font-weight:700; letter-spacing:-.015em; color:var(--ink); }
+  .kl-welcome .s { font-size:13.5px; color:var(--ink-3); margin-top:5px; line-height:1.55; }
 
-  /* ---------- brand head ---------- */
-  .kl-head { display:flex; align-items:center; gap:16px; margin-bottom:20px; }
-  .kl-head img { width:64px; height:64px; }
-  .kl-brand { font-size:40px; font-weight:800; letter-spacing:2px; line-height:1; }
-  .kl-sub { font-size:12.5px; letter-spacing:2.4px; text-transform:uppercase;
-            color:#a8d4f7; font-weight:700; margin-top:6px; }
-
-  .kl-script { font-size:25px; font-weight:700; line-height:1.4; max-width:760px;
-               margin:0 0 8px; letter-spacing:-.2px; }
-  .kl-script span { color:#8fd0ff; }
-  .kl-lede { font-size:15px; line-height:1.7; color:#d6e9fb; max-width:760px;
-             margin-bottom:22px; }
-
-  /* ---------- stat chips ---------- */
-  .kl-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(132px,1fr));
-              gap:12px; margin-bottom:22px; }
-  .kl-stat { background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.24);
-             border-radius:14px; padding:14px 16px; backdrop-filter:blur(3px); }
-  .kl-stat b { display:block; font-size:29px; font-weight:800; line-height:1.05;
-               font-variant-numeric:tabular-nums; }
-  .kl-stat span { font-size:11.5px; color:#bcdcf7; font-weight:700;
-                  letter-spacing:.4px; }
-
-  /* ---------- the three pillars ---------- */
-  .kl-pillars { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
-                gap:14px; margin-bottom:22px; }
-  .kl-pillar { background:rgba(255,255,255,.96); color:var(--ink); border-radius:16px;
-               padding:18px; box-shadow:0 8px 26px rgba(4,32,58,.22); }
-  .kl-pillar .ic { width:38px; height:38px; border-radius:11px; display:grid;
-                   place-items:center; margin-bottom:11px; }
-  .kl-pillar .ic svg { width:21px; height:21px; }
-  .kl-pillar:nth-child(1) .ic { background:#e7f7ee; color:#0f8a4a; }
-  .kl-pillar:nth-child(2) .ic { background:#e8f2fd; color:#0b62b5; }
-  .kl-pillar:nth-child(3) .ic { background:#fff3d9; color:#a86a00; }
-  .kl-pillar h4 { font-size:15.5px; font-weight:800; margin:0 0 6px; }
-  .kl-pillar p { font-size:13px; color:var(--mut); line-height:1.6; margin:0; }
-
-  /* ---------- product range strip ---------- */
-  .kl-range { background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.22);
-              border-radius:16px; padding:16px 18px; }
-  .kl-range-h { font-size:11px; letter-spacing:2px; text-transform:uppercase;
-                font-weight:800; color:#a8d4f7; margin-bottom:12px; }
-  .kl-fam { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; }
-  .kl-fam div { background:rgba(255,255,255,.13); border-radius:12px; padding:12px 10px;
-                text-align:center; }
-  .kl-fam svg { width:30px; height:30px; color:#cfe6fb; }
-  .kl-fam b { display:block; font-size:19px; font-weight:800; margin-top:3px; }
-  .kl-fam span { font-size:10.5px; color:#bcdcf7; font-weight:600; line-height:1.35;
-                 display:block; }
-
-  .kl-awards { margin-top:20px; font-size:12.5px; color:#bcdcf7; line-height:1.7; }
-  .kl-awards b { color:#fff; }
-
-  /* ---------- the login column ----------
-     frappe's own card comes through `super()`; these rules dress it rather than
+  /* frappe's own card comes through `super()`; these rules dress it rather than
      replace it, so nothing about the login flow changes. */
-  .kl-login { position:sticky; top:16px; }
-  .kl-panel { background:#fff; border-radius:20px; padding:6px 8px 10px;
-              box-shadow:0 18px 46px rgba(4,32,58,.30); }
   .kl-panel .page-card,
   .kl-panel .login-content { box-shadow:none !important; border:0 !important;
                              padding:14px 18px !important; margin:0 !important;
                              max-width:none !important; background:transparent !important; }
   .kl-panel section { width:auto !important; max-width:none !important; }
-  /* frappe repeats its own logo and app name inside the card; ours is already
-     four inches to the left */
+  /* frappe repeats its logo and app name inside the card; ours is on the left */
   .kl-panel .page-card-head img,
   .kl-panel .web-form-header,
   .kl-panel .logo-section img { display:none !important; }
   .kl-panel .page-card-head h4,
-  .kl-panel .page-card-head .h4 { font-size:20px !important; font-weight:800 !important;
+  .kl-panel .page-card-head .h4 { font-size:18px !important; font-weight:700 !important;
                                   color:var(--ink) !important; }
   /* The sign-in sections carry frappe's own "Sign In / Welcome! Please sign in
-     to continue." and .kl-welcome above already says it, in our words - so the
-     card was stacking two headings. Only these two are suppressed: the forgot
-     password, email-link and signup sections keep theirs, because there the
-     heading is the only thing telling you which mode you are in. */
+     to continue." and .kl-welcome already says it, in our words - so the card
+     was stacking two headings. Only these two are suppressed: forgot password,
+     email-link and signup keep theirs, because there the heading is the only
+     thing telling you which mode you are in. */
   .kl-panel .for-login .page-card-head,
   .kl-panel .for-email-login .page-card-head { display:none !important; }
-  .kl-panel input.form-control { padding:12px 13px !important; font-size:15px !important;
-                                 border-radius:10px !important; border:1px solid #cfdbe8 !important;
-                                 background:#fbfdff !important; }
-  .kl-panel input.form-control:focus { border-color:#1a74c4 !important; background:#fff !important;
-                                       box-shadow:0 0 0 3px rgba(26,116,196,.16) !important; }
+  .kl-panel label { font-size:12.5px !important; font-weight:600 !important; color:var(--ink-2) !important; }
+  .kl-panel input.form-control { padding:11px 12px !important; font-size:15px !important;
+                                 border-radius:var(--r) !important; border:1px solid #cdd4dd !important;
+                                 background:#fff !important; }
+  .kl-panel input.form-control:focus { border-color:var(--blue-lift) !important;
+                                       box-shadow:0 0 0 3px rgba(42,123,200,.15) !important; }
   .kl-panel .btn-primary { background:var(--blue) !important; border-color:var(--blue) !important;
-                           padding:12px !important; font-size:15px !important;
-                           font-weight:700 !important; border-radius:10px !important; }
-  .kl-panel .btn-primary:hover { background:#08406f !important; border-color:#08406f !important; }
+                           padding:11px !important; font-size:15px !important; font-weight:600 !important;
+                           border-radius:var(--r) !important; }
+  .kl-panel .btn-primary:hover { background:var(--blue-deep) !important; border-color:var(--blue-deep) !important; }
+  .kl-panel .btn-default, .kl-panel .btn-light { border-radius:var(--r) !important; font-weight:600 !important; }
   .kl-panel a { color:var(--blue); font-weight:600; }
+  .kl-panel .form-control:focus-visible, .kl-panel .btn:focus-visible {
+      outline:2px solid var(--blue-lift); outline-offset:2px; }
 
-  .kl-welcome { padding:16px 20px 4px; }
-  .kl-welcome .t { font-size:20px; font-weight:800; color:var(--ink); }
-  .kl-welcome .s { font-size:13px; color:var(--mut); margin-top:4px; line-height:1.55; }
-
-  /* ---------- guidance under the form ---------- */
-  .kl-help { margin-top:14px; background:rgba(255,255,255,.10);
-             border:1px solid rgba(255,255,255,.22); border-radius:16px; padding:16px 18px; }
-  .kl-help-h { font-size:11px; letter-spacing:2px; text-transform:uppercase;
-               font-weight:800; color:#a8d4f7; margin-bottom:11px; }
-  .kl-help-row { display:flex; gap:11px; padding:9px 0; border-top:1px solid rgba(255,255,255,.14); }
-  .kl-help-row:first-of-type { border-top:0; }
-  .kl-help-row .dot { flex:0 0 8px; width:8px; height:8px; border-radius:50%;
-                      background:#7fc4ff; margin-top:6px; }
-  .kl-help-row b { display:block; font-size:13.5px; color:#fff; }
-  .kl-help-row p { margin:2px 0 0; font-size:12.5px; color:#cfe4f8; line-height:1.55; }
-  .kl-help .kl-cta { display:inline-block; margin-top:12px; background:#fff; color:var(--blue);
-                     font-weight:800; font-size:13.5px; text-decoration:none;
-                     padding:10px 16px; border-radius:10px; }
-  .kl-help .kl-cta:hover { background:#e8f2fd; text-decoration:none; }
-
-  .kl-foot { margin-top:26px; padding-top:16px; border-top:1px solid rgba(255,255,255,.18);
-             font-size:12px; color:#a8c8e6; line-height:1.7; }
+  /* who signs in here - three lines, not a help centre */
+  .kl-who { margin-top:18px; padding:0 4px; }
+  .kl-who-h { font-size:10.5px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+              color:var(--ink-3); margin-bottom:8px; }
+  .kl-who-row { display:flex; gap:10px; align-items:flex-start; padding:7px 0;
+                border-top:1px solid var(--line); font-size:13px; line-height:1.5; }
+  .kl-who-row:first-of-type { border-top:0; }
+  .kl-who-row .dot { flex:0 0 8px; height:8px; border-radius:50%; margin-top:6px; background:var(--blue); }
+  .kl-who-row.staff .dot { background:#126b46; }
+  .kl-who-row.guest .dot { background:#8a5a00; }
+  .kl-who-row b { color:var(--ink); font-weight:600; }
+  .kl-who-row span { color:var(--ink-2); }
+  .kl-who-row a { color:var(--blue); font-weight:600; text-decoration:none; }
+  .kl-who-row a:hover { text-decoration:underline; }
+  @media (prefers-reduced-motion:reduce) { .kl * { transition:none !important; } }
 </style>
 
 <div class="kl">
 
-  {% if kumar_notices %}
-  <div class="kl-notices">
-    <b>{{ _("Notices") }}</b>
-    {% for tone, text in kumar_notices %}
-      <span class="kl-notice">{{ _(text) }}</span>
-    {% endfor %}
-  </div>
-  {% endif %}
-
-  <div class="kl-grid">
-
-    {# ------------------------------------------------ the company ------- #}
+  <div class="kl-brand">
     <div>
-      <div class="kl-head">
-        <img src="/assets/kumar_service/images/kumar-mark.svg" alt="KUMAR">
+      <div class="kl-mark">
+        <img src="/assets/kumar_service/images/kumar-mark.svg" alt="">
         <div>
-          <div class="kl-brand">KUMAR</div>
-          <div class="kl-sub">{{ _("Pumps &amp; Motors") }} &middot; {{ _("Tenali") }}</div>
+          <b>KUMAR Pumps Desk</b>
+          <small>{{ _("Dealer service &middot; Warranty &middot; Traceability") }}</small>
         </div>
       </div>
 
-      <p class="kl-script">
-        {{ _("Since 1971, a pump that leaves Tenali carries its whole history with it") }} &mdash;
-        <span>{{ _("and now so does the paperwork.") }}</span>
-      </p>
-      <p class="kl-lede">
-        {{ _("Sri Lakshmi Ganapathi Engineering Works has manufactured pumpsets and electric motors under the KUMAR brand since 1973. This is where our dealers register the pumps they sell, raise a complaint for a customer, claim warranty and follow it through - and where the plant answers them.") }}
-      </p>
+      <h1 class="kl-thesis">
+        {{ _("Every pump that leaves Tenali carries its history.") }}
+        <span>{{ _("This is where it is read.") }}</span>
+      </h1>
 
-      <div class="kl-stats">
-        <div class="kl-stat"><b>{{ kumar_years }}</b><span>{{ _("YEARS OF MANUFACTURING") }}</span></div>
-        <div class="kl-stat"><b>{{ kumar_models }}</b><span>{{ _("CATALOGUE MODELS") }}</span></div>
-        <div class="kl-stat"><b>{{ kumar_families }}</b><span>{{ _("PRODUCT FAMILIES") }}</span></div>
-        <div class="kl-stat"><b>{{ kumar_states }}</b><span>{{ _("STATES SERVED") }}</span></div>
-        <div class="kl-stat"><b>ISO 9001</b><span>{{ _("QUALITY SYSTEM") }}</span></div>
-      </div>
-
-      <div class="kl-pillars">
-        {% for key, title, body in kumar_pillars %}
-        <div class="kl-pillar">
-          <div class="ic">
-            <svg><use href="#kp-art-{{ 'certificate' if key == 'quality'
-                                       else 'ticket' if key == 'trace' else 'phone' }}"></use></svg>
-          </div>
-          <h4>{{ _(title) }}</h4>
-          <p>{{ _(body) }}</p>
-        </div>
-        {% endfor %}
-      </div>
-
-      {% if kumar_range %}
-      <div class="kl-range">
-        <div class="kl-range-h">{{ _("What we build") }}</div>
-        <div class="kl-fam">
-          {% for r in kumar_range %}
-          <div>
-            <svg><use href="#kp-art-{{ 'borewell' if 'Submersible' in r.category and 'Openwell' not in r.category
-                                       else 'openwell' if 'Openwell' in r.category
-                                       else 'jet' if 'Jet' in r.category else 'monobloc' }}"></use></svg>
-            <b>{{ r.models }}</b><span>{{ _(r.category) }}</span>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-      {% endif %}
-
-      <div class="kl-awards">
-        <b>{{ _("MSME National Award 2010") }}</b> {{ _("for Outstanding Entrepreneurship") }} &middot;
-        <b>{{ _("MSME National Quality Award 2010") }}</b> {{ _("for submersible pumps") }}<br>
-        {{ _("Automated DISA foundry &middot; induction furnace with its own metallurgical lab &middot; CNC, VMC and HMC machining") }}
-      </div>
+      <ul class="kl-proof">
+        <li>
+          <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><path d="M12 2l7 4v6c0 5-3.5 8-7 10-3.5-2-7-5-7-10V6z"/></svg></i>
+          <div><b>{{ _("Warranty from the day it is sold") }}</b>
+               <span>{{ _("A dealer registers the sale and the cover starts; the certificate prints itself.") }}</span></div>
+        </li>
+        <li>
+          <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/><path d="M12 7v5l3 2"/></svg></i>
+          <div><b>{{ _("Raised, answered, and on a clock") }}</b>
+               <span>{{ _("Complaints, installations and claims, with the response time measured from the moment they are sent.") }}</span></div>
+        </li>
+        <li>
+          <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg></i>
+          <div><b>{{ _("Traced to the batch") }}</b>
+               <span>{{ _("Heat number, winding batch and test certificate on every serial - so a failure points at its cause.") }}</span></div>
+        </li>
+      </ul>
     </div>
 
-    {# --------------------------------------- frappe's login, dressed ----- #}
-    <div class="kl-login">
+    <div class="kl-corp">
+      <b>{{ _("Sri Lakshmi Ganapathi Engineering Works") }}</b> &middot; {{ _("Tenali, Andhra Pradesh") }}<br>
+      {{ _("Pumpsets and electric motors under the KUMAR brand since 1973") }}
+    </div>
+  </div>
+
+  <div class="kl-side">
+    <div class="kl-card">
       <div class="kl-panel">
         <div class="kl-welcome">
           <div class="t">{{ _("Sign in") }}</div>
-          <div class="s">{{ _("Dealer, distributor or KUMAR staff - one login, and you land on the screen built for your job.") }}</div>
+          <div class="s">{{ _("One login. A dealer lands on their outlet; KUMAR staff land on the desk.") }}</div>
         </div>
-        {# frappe's own login / signup / forgot / email-link sections, untouched #}
+        {# frappe's own login / forgot / email-link / signup sections, untouched #}
         {{ super() }}
       </div>
 
-      <div class="kl-help">
-        <div class="kl-help-h">{{ _("Which login do I use?") }}</div>
-        {% for key, title, body in kumar_guidance %}
-          <div class="kl-help-row">
+      <div class="kl-who">
+        <div class="kl-who-h">{{ _("Who signs in here") }}</div>
+        {% for key, title, body, href in kumar_guidance %}
+          <div class="kl-who-row {{ key }}">
             <span class="dot"></span>
-            <div><b>{{ _(title) }}</b><p>{{ _(body) }}</p></div>
+            <div>
+              <b>{{ _(title) }}</b>
+              <span>&nbsp;{{ _(body) }}</span>
+              {% if href %}<br><a href="{{ href }}">{{ _("Check a warranty without signing in") }} &rarr;</a>{% endif %}
+            </div>
           </div>
         {% endfor %}
-        <a class="kl-cta" href="/warranty-check">{{ _("Check a warranty without logging in") }}</a>
       </div>
     </div>
   </div>
 
-  <div class="kl-foot">
-    <b style="color:#fff">{{ _("Sri Lakshmi Ganapathi Engineering Works") }}</b> &middot;
-    {{ _("Kumar Building, Wahab Road, Tenali - 522 201, Guntur Dist., Andhra Pradesh") }}<br>
-    {{ _("KUMAR brand since 1973") }} &middot; {{ _("Andhra Pradesh, Telangana, Tamil Nadu, Kerala, Karnataka and beyond") }}
-  </div>
 </div>
 {% endblock %}
