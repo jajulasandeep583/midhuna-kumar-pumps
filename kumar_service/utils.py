@@ -73,6 +73,12 @@ def warranty_dates(sale_date, manufacturing_date, months):
 	return getdate(basis), add_months(getdate(basis), cint(months))
 
 
+#: The one place "expiring soon" is defined. The nightly status task, the portal
+#: lists, the dealer home, the manager dashboard and the lookup screen all read
+#: this - they used to carry their own copies, and two of them said 45.
+EXPIRING_SOON_DAYS = 30
+
+
 def warranty_status_for(expiry, registered=True):
 	if not registered or not expiry:
 		return "Not Registered"
@@ -80,7 +86,7 @@ def warranty_status_for(expiry, registered=True):
 	today = getdate(nowdate())
 	if expiry < today:
 		return "Expired"
-	if (expiry - today).days <= 30:
+	if (expiry - today).days <= EXPIRING_SOON_DAYS:
 		return "Expiring Soon"
 	return "In Warranty"
 

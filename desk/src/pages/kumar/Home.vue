@@ -90,7 +90,7 @@ const stats = computed(() => [
     muted: "text-green-700",
   },
   {
-    label: __("Expiring in 45 days"),
+    label: __("Expiring in {0} days", [String(summary.data?.expiring_soon_days ?? 30)]),
     value: summary.data?.expiring ?? "-",
     // the one number on this screen that is a to-do list
     hint: __("Worth a phone call"),

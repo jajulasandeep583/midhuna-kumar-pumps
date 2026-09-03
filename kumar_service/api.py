@@ -13,6 +13,7 @@ from frappe.utils import add_days, cint, flt, getdate, now_datetime, nowdate
 from kumar_service.permissions import has_full_access
 from kumar_service.traceability import trace_backward, trace_forward  # noqa: F401 (re-exported)
 from kumar_service.utils import (
+	EXPIRING_SOON_DAYS,
 	CH_DIRECT,
 	dealer_and_descendants,
 	qr_base64,
@@ -111,6 +112,7 @@ def get_pump_snapshot(serial_no):
 		"is_under_warranty": status in ("In Warranty", "Expiring Soon"),
 		"is_registered": registered,
 		"days_remaining": days_left,
+		"expiring_soon_days": EXPIRING_SOON_DAYS,
 		"service_history": history,
 		"open_complaints": sum(
 			1 for h in history if h.status in ("Open", "Assigned", "In Progress", "Awaiting Parts")

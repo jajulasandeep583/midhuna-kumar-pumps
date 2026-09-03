@@ -13,6 +13,7 @@ posting somebody else's serial number gets a permission error, not their data.
 
 import frappe
 from frappe import _
+from kumar_service.utils import EXPIRING_SOON_DAYS
 from frappe.utils import add_days, cint, flt, getdate, now_datetime, nowdate
 
 from kumar_service.utils import dealer_and_descendants, user_dealer
@@ -103,6 +104,7 @@ def portal_options():
 		"claim_types": options("Kumar Warranty Claim", "claim_type"),
 		"root_causes": options("Kumar Warranty Claim", "root_cause"),
 		"applications": options("Pump Registration", "application_type"),
+		"expiring_soon_days": EXPIRING_SOON_DAYS,
 		"request_types": options("Service Request", "custom_request_type")
 			or ["Complaint", "Installation", "Paid Service", "Spare Part", "Enquiry"],
 	}
@@ -119,7 +121,7 @@ def my_summary():
 	me = _me()
 	scope = _my_scope()
 	today = getdate(nowdate())
-	soon = add_days(today, 45)
+	soon = add_days(today, EXPIRING_SOON_DAYS)
 
 	pumps = frappe.get_all(
 		"Pump Registration",
@@ -160,6 +162,7 @@ def my_summary():
 		"open_tickets": open_requests + open_claims,
 		"open_requests": open_requests,
 		"open_claims": open_claims,
+		"expiring_soon_days": EXPIRING_SOON_DAYS,
 	}
 
 
@@ -195,7 +198,7 @@ def my_pumps(limit=600):
 	from frappe.utils import getdate
 
 	today = getdate(nowdate())
-	soon = add_days(today, 45)
+	soon = add_days(today, EXPIRING_SOON_DAYS)
 	out = []
 	for r in rows:
 		if not r.serial_no:

@@ -1,0 +1,538 @@
+<title>KUMAR Pumps Desk Handbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+
+<style>
+  :root {
+    --blue:#12569b; --blue-deep:#0d3f74; --blue-lift:#2f7dc9;
+    --ink:#141a21; --ink-2:#3d4956; --ink-3:#63707e;
+    --ground:#f5f7f9; --surface:#ffffff; --sunk:#eef1f5;
+    --line:#dde3ea; --line-soft:#e9edf2;
+    --amber:#8a5a00; --amber-bg:#fdf4e3; --amber-line:#efdcb6;
+    --green:#126b46; --green-bg:#e9f4ee; --green-line:#c4e2d2;
+    --red:#a3241c; --red-bg:#fbeceb; --red-line:#efc8c4;
+    --display:"Archivo","Helvetica Neue",Arial,sans-serif;
+    --body:"IBM Plex Sans","Segoe UI",Arial,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+    --wrap:1180px; --read:68ch; --r:10px; --r-lg:14px;
+    --shadow:0 1px 2px rgba(16,24,40,.05), 0 1px 3px rgba(16,24,40,.05);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --blue:#6ba7e8; --blue-deep:#8fbef0; --blue-lift:#4d8fd6;
+      --ink:#e6ebf1; --ink-2:#b3bfcc; --ink-3:#8593a3;
+      --ground:#0e1319; --surface:#161c24; --sunk:#1b222b;
+      --line:#2a333e; --line-soft:#222a34;
+      --amber:#e8b765; --amber-bg:#2a2113; --amber-line:#4a3a1c;
+      --green:#68c79a; --green-bg:#122620; --green-line:#1f4435;
+      --red:#e9938c; --red-bg:#2a1717; --red-line:#4a2523;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 1px 3px rgba(0,0,0,.3);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --blue:#6ba7e8; --blue-deep:#8fbef0; --blue-lift:#4d8fd6;
+    --ink:#e6ebf1; --ink-2:#b3bfcc; --ink-3:#8593a3;
+    --ground:#0e1319; --surface:#161c24; --sunk:#1b222b;
+    --line:#2a333e; --line-soft:#222a34;
+    --amber:#e8b765; --amber-bg:#2a2113; --amber-line:#4a3a1c;
+    --green:#68c79a; --green-bg:#122620; --green-line:#1f4435;
+    --red:#e9938c; --red-bg:#2a1717; --red-line:#4a2523;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 1px 3px rgba(0,0,0,.3);
+    color-scheme: dark;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--ground); color:var(--ink); font-family:var(--body);
+         font-size:16px; line-height:1.62; -webkit-font-smoothing:antialiased; }
+  .masthead { background:#0b1a2b; color:#fff; border-bottom:3px solid var(--blue); }
+  .masthead-in { max-width:var(--wrap); margin:0 auto; padding:44px 28px 40px; display:flex;
+                 flex-wrap:wrap; gap:28px; align-items:flex-end; justify-content:space-between; }
+  .brandline { font-family:var(--mono); font-size:11.5px; letter-spacing:.16em; text-transform:uppercase;
+               color:#9dc4ea; margin-bottom:12px; }
+  .masthead h1 { font-family:var(--display); font-weight:700; font-size:clamp(30px,4.4vw,46px);
+                 line-height:1.06; letter-spacing:-.02em; margin:0; text-wrap:balance; color:#fff; }
+  .masthead p { margin:14px 0 0; max-width:52ch; color:#cfe0f2; font-size:15.5px; }
+  .stamp { font-family:var(--mono); font-size:12px; line-height:1.9; color:#9dc4ea;
+           border-left:2px solid rgba(157,196,234,.35); padding-left:16px; }
+  .stamp b { color:#fff; font-weight:500; }
+  .shell { max-width:var(--wrap); margin:0 auto; padding:0 28px 96px; display:grid; gap:44px;
+           grid-template-columns:212px minmax(0,1fr); align-items:start; }
+  @media (max-width:900px) { .shell { grid-template-columns:1fr; gap:0; } }
+  nav.index { position:sticky; top:24px; padding-top:40px; }
+  @media (max-width:900px) { nav.index { position:static; padding:28px 0 0; } }
+  nav.index .grp { font-family:var(--mono); font-size:10.5px; letter-spacing:.14em; text-transform:uppercase;
+                   color:var(--ink-3); margin:22px 0 8px; padding-bottom:6px; border-bottom:1px solid var(--line); }
+  nav.index .grp:first-child { margin-top:0; }
+  nav.index a { display:block; padding:5px 0; color:var(--ink-2); text-decoration:none; font-size:14px;
+                border-left:2px solid transparent; padding-left:10px; margin-left:-12px; }
+  nav.index a:hover { color:var(--blue); border-left-color:var(--blue); }
+  nav.index a:focus-visible { outline:2px solid var(--blue-lift); outline-offset:2px; }
+  main { padding-top:40px; min-width:0; }
+  section { scroll-margin-top:24px; margin-bottom:56px; }
+  section > p, section > ul, section > ol { max-width:var(--read); }
+  h2 { font-family:var(--display); font-weight:700; font-size:26px; letter-spacing:-.015em; margin:0 0 6px;
+       color:var(--ink); text-wrap:balance; }
+  h2 + .deck { margin:0 0 24px; color:var(--ink-3); font-size:15px; max-width:var(--read); }
+  h3 { font-family:var(--display); font-weight:600; font-size:17.5px; letter-spacing:-.01em; margin:32px 0 8px; color:var(--ink); }
+  p { margin:0 0 14px; }  a { color:var(--blue); }
+  .who { display:inline-block; font-family:var(--mono); font-size:10.5px; letter-spacing:.13em; text-transform:uppercase;
+         padding:3px 9px; border-radius:4px; margin-bottom:12px; background:var(--sunk); color:var(--ink-3); border:1px solid var(--line); }
+  .who.dealer { background:var(--blue); color:#fff; border-color:var(--blue); }
+  .who.staff  { background:var(--green-bg); color:var(--green); border-color:var(--green-line); }
+  .who.admin  { background:var(--amber-bg); color:var(--amber); border-color:var(--amber-line); }
+  code, .route, kbd { font-family:var(--mono); font-size:.875em; background:var(--sunk); border:1px solid var(--line-soft);
+                      border-radius:5px; padding:1px 6px; color:var(--ink-2); overflow-wrap:anywhere; }
+  .route { color:var(--blue); font-weight:500; }
+  pre { font-family:var(--mono); font-size:13px; line-height:1.7; background:var(--sunk); border:1px solid var(--line);
+        border-radius:var(--r); padding:14px 16px; overflow-x:auto; margin:0 0 16px; color:var(--ink-2); }
+  pre code { background:none; border:0; padding:0; font-size:inherit; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:var(--r-lg); padding:20px 22px;
+          box-shadow:var(--shadow); margin-bottom:14px; }
+  .card h3 { margin-top:0; }  .card > :last-child { margin-bottom:0; }
+  .grid2 { display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); }
+  .step { display:flex; gap:14px; padding:12px 0; border-top:1px solid var(--line-soft); }
+  .step:first-of-type { border-top:0; padding-top:0; }
+  .step .n { flex:0 0 26px; height:26px; border-radius:50%; display:grid; place-items:center; background:var(--blue);
+             color:#fff; font-family:var(--mono); font-size:12px; font-weight:500; }
+  .step .t { min-width:0; }  .step .t b { display:block; font-weight:600; color:var(--ink); }
+  .step .t span { color:var(--ink-2); font-size:15px; }
+  .tablewrap { overflow-x:auto; border:1px solid var(--line); border-radius:var(--r-lg); background:var(--surface);
+               box-shadow:var(--shadow); margin-bottom:16px; }
+  table { width:100%; border-collapse:collapse; font-size:14.5px; }
+  th { text-align:left; font-family:var(--mono); font-size:10.5px; font-weight:500; letter-spacing:.1em; text-transform:uppercase;
+       color:var(--ink-3); background:var(--sunk); padding:10px 14px; white-space:nowrap; border-bottom:1px solid var(--line); }
+  td { padding:11px 14px; border-bottom:1px solid var(--line-soft); vertical-align:top; color:var(--ink-2); }
+  tr:last-child td { border-bottom:0; }  td b { color:var(--ink); font-weight:600; }
+  .note { border-left:3px solid var(--blue); background:var(--surface); border-radius:0 var(--r) var(--r) 0; padding:14px 18px;
+          margin:0 0 16px; max-width:var(--read); box-shadow:var(--shadow); }
+  .note.warn { border-left-color:var(--amber); }  .note.warn b { color:var(--amber); }
+  .note b { display:block; margin-bottom:3px; color:var(--blue); font-size:14px; font-family:var(--display); font-weight:600; }
+  .note p { margin:0; font-size:15px; color:var(--ink-2); }
+  .pill { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; padding:2px 9px; border-radius:20px;
+          font-weight:500; white-space:nowrap; }
+  .pill::before { content:""; width:6px; height:6px; border-radius:50%; background:currentColor; }
+  .pill.ok { background:var(--green-bg); color:var(--green); }  .pill.warn { background:var(--amber-bg); color:var(--amber); }
+  .pill.bad { background:var(--red-bg); color:var(--red); }
+  ul, ol { padding-left:22px; margin:0 0 16px; }  li { margin-bottom:7px; color:var(--ink-2); }  li b { color:var(--ink); }
+  footer { border-top:1px solid var(--line); margin-top:20px; padding:26px 0 0; color:var(--ink-3); font-size:13.5px; max-width:var(--read); }
+  @media (prefers-reduced-motion:reduce) { * { transition:none !important; } }
+</style>
+
+<header class="masthead">
+  <div class="masthead-in">
+    <div>
+      <div class="brandline">Sri Lakshmi Ganapathi Engineering Works &middot; Tenali</div>
+      <h1>KUMAR Pumps Desk Handbook</h1>
+      <p>
+        One app for the whole chain: a dealer registers a pump, raises a request and
+        follows it; KUMAR answers, schedules the visit, decides the claim, and sees the
+        whole network on one screen. This is how each part of it is used.
+      </p>
+    </div>
+    <div class="stamp">
+      App <b>kumar_service</b><br>
+      Desk <b>/kumar-desk</b><br>
+      Site <b>kumarpumps.localhost :8003</b><br>
+      Built on <b>Frappe v16 &middot; ERPNext</b>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="index">
+    <div class="grp">Start</div>
+    <a href="#what">What this is</a>
+    <a href="#signin">Signing in</a>
+    <div class="grp">Dealers</div>
+    <a href="#home">Home</a>
+    <a href="#register">Register a Sale</a>
+    <a href="#sold">What I Sold</a>
+    <a href="#request">Raise a Request</a>
+    <a href="#claim">Warranty Claims</a>
+    <a href="#tickets">My Tickets</a>
+    <a href="#kb">Knowledge Base</a>
+    <div class="grp">KUMAR team</div>
+    <a href="#command">Command Centre</a>
+    <a href="#queue">Tickets</a>
+    <a href="#claimsdesk">Claims desk</a>
+    <a href="#visits">Visits</a>
+    <a href="#lookup">Pump Lookup</a>
+    <div class="grp">Admin</div>
+    <a href="#running">Running it</a>
+    <a href="#demo">The demo data</a>
+    <a href="#setup">Setup &amp; commands</a>
+    <a href="#who-sees">Who sees what</a>
+    <a href="#reports">Reports</a>
+    <a href="#traps">Traps worth knowing</a>
+  </nav>
+
+  <main>
+    <section id="what">
+      <h2>What this is</h2>
+      <p class="deck">One app, one repo, one install.</p>
+      <p>
+        <code>kumar_service</code> holds three things that used to be separate: the pump
+        traceability and warranty engine, the dealer's own screens, and a helpdesk. Frappe
+        Helpdesk is vendored inside the app rather than installed beside it, so there is a
+        single product to deploy and a single place to change.
+      </p>
+      <div class="grid2">
+        <div class="card"><h3>The record</h3>
+          <p>A <b>Service Request</b> is the record of a job. It knows the serial number, the
+          pump model, the warranty position, the heat and winding batches, the SLA clocks and
+          which dealer it belongs to.</p></div>
+        <div class="card"><h3>The queue</h3>
+          <p>An <b>HD Ticket</b> mirrors each request into the desk so agents work a queue. It
+          carries the pump facts and a link home. The request stays the record; the ticket
+          is how it is worked.</p></div>
+      </div>
+      <div class="note"><b>Two things in, one queue out</b>
+        <p>A dealer creates a <b>Request</b> (typed: complaint, installation, paid service,
+        spare part, enquiry) or a <b>Warranty Claim</b>. Nothing else. Every request mirrors
+        into a ticket automatically; nobody creates a ticket by hand. A claim is separate
+        only because it is money and needs a different person's approval.</p></div>
+    </section>
+
+    <section id="signin">
+      <h2>Signing in</h2>
+      <p class="deck">One login per person. Where you land depends on who you are.</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>You are</th><th>You land on</th><th>You can see</th></tr></thead>
+        <tbody>
+          <tr><td><b>A dealer or distributor</b></td><td><span class="route">/kumar-desk/dealer</span></td>
+              <td>Your own outlet and every sub-dealer beneath it. Nothing from another outlet.</td></tr>
+          <tr><td><b>KUMAR service staff</b></td><td><span class="route">/kumar-desk/manage</span></td>
+              <td>Every dealer's tickets, the visit board, the claims desk, any serial.</td></tr>
+          <tr><td><b>Admin / manager</b></td><td><span class="route">/app</span> and the desk</td>
+              <td>Everything, plus the ERPNext side and the reports.</td></tr>
+        </tbody></table></div>
+      <p>Old links still work. <span class="route">/dealer_portal</span> and
+        <span class="route">/helpdesk</span> both redirect into the desk.</p>
+    </section>
+
+    <section id="home">
+      <span class="who dealer">Dealer</span>
+      <h2>Home</h2>
+      <p class="deck">Four numbers and the three things you came to do.</p>
+      <p>The tiles are colour-coded because the colour carries meaning, and each is a link into
+        the list behind it.</p>
+      <ul>
+        <li><span class="pill ok">In warranty</span> pumps still covered — nothing to pay on a visit.</li>
+        <li><span class="pill warn">Expiring in 30 days</span> the only number here that is a to-do
+            list. These are customers worth ringing.</li>
+        <li><span class="pill bad">Open with KUMAR</span> your requests and claims still being worked.</li>
+      </ul>
+    </section>
+
+    <section id="register">
+      <span class="who dealer">Dealer</span>
+      <h2>Register a Sale</h2>
+      <p class="deck">Do this on the day you sell. The warranty starts from the registration.</p>
+      <div class="card">
+        <div class="step"><span class="n">1</span><span class="t"><b>Scan or type the serial</b>
+          <span>Press <b>Scan</b> to use the phone camera on the nameplate barcode. A USB scanner
+          works too — it types into the box and presses Enter.</span></span></div>
+        <div class="step"><span class="n">2</span><span class="t"><b>Your invoice number and sale date</b>
+          <span>Your bill to the customer, not KUMAR's bill to you.</span></span></div>
+        <div class="step"><span class="n">3</span><span class="t"><b>Who bought it</b>
+          <span>Name and mobile. This is who gets rung when the warranty is running out.</span></span></div>
+        <div class="step"><span class="n">4</span><span class="t"><b>Where it is installed</b>
+          <span>Village, district, application. This is the address a technician is sent to — a
+          request has no address of its own.</span></span></div>
+      </div>
+      <div class="note"><b>The certificate</b>
+        <p>Registering produces the warranty certificate the customer keeps. Print it here, or
+        later from any row in What I Sold.</p></div>
+    </section>
+
+    <section id="sold">
+      <span class="who dealer">Dealer</span>
+      <h2>What I Sold</h2>
+      <p class="deck">Every pump you have sold, searched in the browser.</p>
+      <p>Six filters combine — search, warranty state, product family, model, district, and a
+        sold-between range — and each list is built from what you have actually sold, so you are
+        never offered a filter that returns nothing.</p>
+      <h3>The scan box</h3>
+      <p>When you are standing next to a pump you have the barcode, not the customer's name.
+        Scanning <b>clears the filters first</b>, so a dropdown left set half an hour ago cannot
+        hide the pump you just scanned, and it tells you which customer it landed on.</p>
+      <h3>Two actions per row</h3>
+      <ul><li><b>Print</b> — the warranty certificate for that customer.</li>
+          <li><b>Complaint</b> — opens a request with the pump already filled in.</li></ul>
+    </section>
+
+    <section id="request">
+      <span class="who dealer">Dealer</span>
+      <h2>Raise a Request</h2>
+      <p class="deck">A list of everything you have raised, with the form behind <b>New Request</b>.</p>
+      <p>Each row shows what was raised, which pump, when, the status, and whether KUMAR has
+        replied — because that last one is what you are actually checking for. Filter by
+        status, search by number, serial or model.</p>
+      <h3>The form</h3>
+      <p>The first question is what you need, not what is broken:</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Type</th><th>Use it for</th></tr></thead>
+        <tbody>
+          <tr><td><b>Complaint</b></td><td>A pump that is not working. Asks you which fault.</td></tr>
+          <tr><td><b>Installation</b></td><td>A new set to be fitted.</td></tr>
+          <tr><td><b>Paid Service</b></td><td>A visit outside warranty. Everyone knows it is chargeable from the start.</td></tr>
+          <tr><td><b>Spare Part</b></td><td>A part you need sent.</td></tr>
+          <tr><td><b>Enquiry</b></td><td>Anything else.</td></tr>
+        </tbody></table></div>
+      <p>Pick the pump — type a serial, model or customer, or press <b>Scan</b> — and the warranty
+        position appears <b>before you write anything</b>, so you can tell the customer on the
+        phone whether the visit is free.</p>
+      <div class="note"><b>Add photos or a video</b>
+        <p>This is most of what you have to offer. A picture of a burnt winding or a leaking seal
+        decides whether a technician is sent. Up to 8&nbsp;MB each, and they land on the same
+        thread KUMAR reads.</p></div>
+      <p>Submitting starts the response clock. A reply from you on a request already marked
+        resolved <b>reopens it</b> — you never write into a thread nobody reads.</p>
+    </section>
+
+    <section id="claim">
+      <span class="who dealer">Dealer</span>
+      <h2>Warranty Claims</h2>
+      <p class="deck">Your claims and how each went, with the form behind <b>New Claim</b>.</p>
+      <p>Name the claim type, the root cause, and what the technician found. Attach photographs
+        of the failed part — a claim is money, and a claim with evidence is settled faster than
+        one without.</p>
+      <p>A claim moves through <b>Pending Review → Under Investigation → Approved → Settled</b>.
+        You see each step on the claim, KUMAR writes to you at each one, and you can ask a
+        question on it at any point. Settled and Rejected are final by design.</p>
+    </section>
+
+    <section id="tickets">
+      <span class="who dealer">Dealer</span>
+      <h2>My Tickets</h2>
+      <p class="deck">Every request and claim, and the conversation on each.</p>
+      <p>Whatever KUMAR writes here you see, and whatever you write KUMAR sees — including the
+        photographs. When a visit is booked, the date, the technician, and whether there is
+        anything to pay arrive on this thread.</p>
+    </section>
+
+    <section id="kb">
+      <span class="who dealer">Dealer</span>
+      <h2>Knowledge Base</h2>
+      <p class="deck">Ten articles written from the counter's side, not the plant's.</p>
+      <ul>
+        <li><b>Before you call KUMAR</b> — no water, trips on start, noise and a hot body: the
+            checks that resolve most calls without a visit, and the readings to write down.</li>
+        <li><b>Warranty</b> — what is covered, how to tell a customer theirs has run out, how to
+            raise a claim that settles quickly.</li>
+        <li><b>Installation</b> — submersible practice, and the suction limit that makes a bigger
+            monobloc the wrong answer to a deep well.</li>
+        <li><b>Using this desk</b> — registering a sale, which request type to pick.</li>
+      </ul>
+      <p>Edit them in the desk; the seed only ever creates what is missing and never overwrites.</p>
+    </section>
+
+    <section id="command">
+      <span class="who staff">KUMAR team</span>
+      <h2>Command Centre</h2>
+      <p class="deck"><span class="route">/kumar-desk/manage</span> — what is going wrong, who for, and what it costs.</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Tile</th><th>What it means</th></tr></thead>
+        <tbody>
+          <tr><td><span class="pill bad">Past due</span></td><td>Resolution time already gone. Click through to schedule.</td></tr>
+          <tr><td><b>Open with KUMAR</b></td><td>Across the whole network.</td></tr>
+          <tr><td><span class="pill warn">Claims to decide</span></td><td>With the rupees attached, because a claim is money.</td></tr>
+          <tr><td><b>Visits booked</b></td><td>And how many are today.</td></tr>
+        </tbody></table></div>
+      <p><b>Needs you</b> lists the oldest breached work first, with the warranty on the row so
+        whether the visit is free is known before anyone rings. <b>The dealer network</b> is one
+        row per outlet — pumps sold, open, past due, claims and their value — sorted so the outlet
+        in most trouble is at the top. An outlet with pumps but no requests is shown rather than
+        hidden: silence usually means they are not using the portal.</p>
+      <p>The side column carries money owed by stage, warranty cover as a proportion bar, and what
+        keeps breaking — which is a manufacturing answer as often as a service one.</p>
+    </section>
+
+    <section id="queue">
+      <span class="who staff">KUMAR team</span>
+      <h2>Tickets</h2>
+      <p class="deck">Every request appears as a ticket, with the pump on it.</p>
+      <p>Each ticket carries the serial, the model, the dealer, and whether the visit is
+        chargeable — the first thing a dealer asks — plus a link to the Service Request itself.</p>
+      <div class="note warn"><b>Reply in the desk, not the comment box</b>
+        <p>A reply typed into a document's plain comment box skips the notification and the SLA
+        first-response stamp — the dealer never hears about it. The comment box is hidden on
+        these documents for exactly that reason.</p></div>
+    </section>
+
+    <section id="claimsdesk">
+      <span class="who staff">KUMAR team</span>
+      <h2>Claims desk</h2>
+      <p class="deck"><span class="route">/kumar-desk/claims</span> — decide a claim without leaving the desk.</p>
+      <p>Money by stage across the top; under it every claim with the evidence the decision rests
+        on — the technician's report, the root cause, and the heat and winding batch, because
+        "is this a manufacturing defect" is answered by the batch as often as the report. Each
+        card says <b>who raised it and who it is for</b>, with the customer's number.</p>
+      <p>Open the <b>conversation</b> on any claim to see what the dealer sent — photographs
+        shown as photographs — and reply, with your own attachments.</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>From</th><th>Action</th><th>Who may</th></tr></thead>
+        <tbody>
+          <tr><td>Pending Review</td><td>Send for investigation / Reject</td><td>Service Manager</td></tr>
+          <tr><td>Under Investigation</td><td>Approve (with an amount) / Reject</td><td>Quality Engineer</td></tr>
+          <tr><td>Approved</td><td>Mark settled</td><td>Accounts</td></tr>
+        </tbody></table></div>
+      <p>Buttons appear only for actions your role can complete, and the server refuses the rest.
+        An approval cannot exceed the amount claimed. Every decision tells the dealer; on a
+        rejection they are owed the reason, so the box asks for it.</p>
+    </section>
+
+    <section id="visits">
+      <span class="who staff">KUMAR team</span>
+      <h2>Visits</h2>
+      <p class="deck"><span class="route">/kumar-desk/visits</span> — who is waiting, who is booked, who can go.</p>
+      <p>KUMAR schedules on behalf of whoever owns the pump, including customers who bought direct
+        and have no login. Every waiting row shows the customer, the site address, how long it has
+        been open, and whether it is under warranty.</p>
+      <div class="card">
+        <div class="step"><span class="n">1</span><span class="t"><b>Press Schedule on the row</b>
+          <span>The warranty position is shown again in the dialog, so chargeability is decided
+          before a technician is sent rather than argued about afterwards.</span></span></div>
+        <div class="step"><span class="n">2</span><span class="t"><b>Pick the technician and the date</b>
+          <span>Chargeable defaults from the warranty, not from whoever is filling the form.</span></span></div>
+        <div class="step"><span class="n">3</span><span class="t"><b>Book it</b>
+          <span>The dealer is told on their own thread — date, technician, and whether there is
+          anything to pay. The request moves to In&nbsp;Progress.</span></span></div>
+      </div>
+    </section>
+
+    <section id="lookup">
+      <span class="who staff">KUMAR team</span>
+      <h2>Pump Lookup</h2>
+      <p class="deck"><span class="route">/kumar-desk/lookup</span> — any serial, for whoever is on the phone.</p>
+      <p>Leads with the verdict: <span class="pill ok">In warranty</span>
+        <span class="pill warn">Expiring soon</span> <span class="pill bad">Out of warranty</span> or
+        Not registered, with the days left and whether the visit is chargeable said in words, and a
+        bar showing how much cover is spent. Under it: whose pump, which heat and winding batch it
+        came from, and everything that has already gone wrong with it. A repeat failure is called one.</p>
+    </section>
+
+    <section id="running">
+      <span class="who admin">Admin</span>
+      <h2>Running it</h2>
+      <p class="deck">One command brings the whole thing up, or back up.</p>
+      <pre><code>/home/frappe/frappe-bench/start-kumar.sh          # start whatever is down
+/home/frappe/frappe-bench/start-kumar.sh status   # just report</code></pre>
+      <p>It starts Redis, the web server on :8003, the worker and the scheduler, only where each
+        is not already running, and switches the scheduler on — a restored site comes back with
+        it off, and the scheduler is what sends warranty reminders and flags SLA breaches.</p>
+      <div class="note warn"><b>Run this before any demo</b>
+        <p>The bench's Redis instances have died on a SIGTERM before. When they do, every page
+        returns 500 and nothing in the app looks wrong except that none of it works.</p></div>
+    </section>
+
+    <section id="demo">
+      <span class="who admin">Admin</span>
+      <h2>The demo data</h2>
+      <p class="deck">Make it tell the story of a working desk, relative to today.</p>
+      <pre><code>bench --site kumarpumps.localhost execute \
+  kumar_service.setup.demo_story.build_all</code></pre>
+      <p>The seed left forty-six requests of which none had ever been resolved and forty-three had
+        blown their SLA — the data of a company whose service desk does not work. This reshapes it
+        into a healthy month: most requests resolved inside SLA, a handful open and answered on
+        time, two or three genuinely late so the alerting is seen to work, visits booked for the
+        coming week, some warranties about to lapse, claims at every stage.</p>
+      <p>It is seeded and idempotent — run it the morning of a demo, as often as you like, and the
+        same picture comes back dated to today. It marks what it creates so it can take it back,
+        and touches nothing on a site the demo seed did not build.</p>
+    </section>
+
+    <section id="setup">
+      <span class="who admin">Admin</span>
+      <h2>Setup &amp; commands</h2>
+      <p class="deck">Everything the app configures, it configures from code.</p>
+      <pre><code>bench --site kumarpumps.localhost execute kumar_service.setup.desk.build_all</code></pre>
+      <p>Brand, agents from the staff roles, ticket and request types, the pump fields on HD
+        Ticket, read access for dealers and staff, each dealer's customer link, the knowledge
+        base, and the removal of Helpdesk's own furniture. Safe to run again.</p>
+      <pre><code>bench --site kumarpumps.localhost execute kumar_service.desk_bridge.backfill</code></pre>
+      <p>Mirrors any request that has no ticket.</p>
+      <pre><code>NODE_OPTIONS="--max-old-space-size=6144" yarn --cwd apps/kumar_service/desk build
+bench build --app kumar_service
+bench --site kumarpumps.localhost run-tests --app kumar_service</code></pre>
+      <p>176 tests, including suites that prove one dealer cannot read another's data, that every
+        request reaches the desk, and that a dealer's reply reopens a closed request.</p>
+    </section>
+
+    <section id="who-sees">
+      <span class="who admin">Admin</span>
+      <h2>Who sees what</h2>
+      <p class="deck">Scoping is enforced in two places, and both are needed.</p>
+      <p>A <b>permission query condition</b> scopes a list. A <b>has_permission hook</b> scopes
+        reading one document by name. A doctype with only the first leaks the second way.</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Doctype</th><th>A dealer sees</th></tr></thead>
+        <tbody>
+          <tr><td><b>Dealer</b></td><td>Their own outlet and its sub-dealers.</td></tr>
+          <tr><td><b>Serial No</b></td><td>Serials their tree sold. Read only — a pump is created in the plant.</td></tr>
+          <tr><td><b>Service Request</b> / <b>Warranty Claim</b></td><td>Their tree's own.</td></tr>
+          <tr><td><b>Service Visit</b></td><td>Visits on their own tickets.</td></tr>
+          <tr><td><b>Pump Test Certificate</b></td><td>Certificates for pumps their tree sold.</td></tr>
+          <tr><td><b>HD Ticket</b></td><td>Tickets they raised or are the contact on, plus their outlet's.</td></tr>
+        </tbody></table></div>
+      <div class="note warn"><b>Widening a doctype means checking every path that reads it</b>
+        <p>Three separate leaks in this project came from granting a role a doctype without
+        checking the endpoints that read it with <code>frappe.db</code>, which applies no row
+        scoping. <code>frappe.get_all</code> ignores permissions too; use
+        <code>frappe.get_list</code> wherever a user's own scope should apply.</p></div>
+    </section>
+
+    <section id="reports">
+      <span class="who admin">Admin</span>
+      <h2>Reports</h2>
+      <p class="deck">Twelve, all file-based and version-controlled.</p>
+      <ul>
+        <li><b>Stock vs Registration Reconciliation</b> — pumps shipped but never registered.</li>
+        <li><b>Dealer Requests and Claims</b> — everything raised, by dealer and channel.</li>
+        <li><b>Model Reliability</b> — failures per thousand sold, by model.</li>
+        <li><b>Batch Defect Analysis</b> — failures traced back to a heat or winding batch.</li>
+        <li><b>Warranty Cost Analysis</b>, <b>Dealer Performance</b>, <b>Serial Genealogy</b>,
+            <b>SLA Compliance</b>, <b>Technician Productivity</b>, <b>Warranty Expiring Soon</b>,
+            <b>Unregistered Stock</b>, <b>Heat Chemistry Log</b>.</li>
+      </ul>
+      <p>Each is addressed to specific roles; a Service Manager sees the service reports and not
+        the foundry's. They need no <code>server_script_enabled</code> switch.</p>
+    </section>
+
+    <section id="traps">
+      <span class="who admin">Admin</span>
+      <h2>Traps worth knowing</h2>
+      <p class="deck">Things that will cost an afternoon if nobody wrote them down.</p>
+      <div class="grid2">
+        <div class="card"><h3>Email is wired, not configured</h3>
+          <p>Requests and claims notify through the same path and will email the moment an
+          outgoing <b>Email Account</b> exists. Until then the Notification Log fills with
+          "setup default outgoing" errors and nothing is sent.</p></div>
+        <div class="card"><h3>HSN codes are mandatory</h3>
+          <p>India Compliance requires a 6- or 8-digit <code>gst_hsn_code</code> on every Item.
+          Pumps <code>841370</code>, parts <code>84139190</code>, motors <code>850152</code> —
+          have the accountant confirm before the first return. 143 pre-existing items still have none.</p></div>
+        <div class="card"><h3>Restart after installing an app</h3>
+          <p>The dev server holds stale hooks. A 500 on every page straight after an install is
+          almost always this.</p></div>
+        <div class="card"><h3>The site needs its own port</h3>
+          <p><code>serve_default_site</code> is true bench-wide, so the port decides the site,
+          not the Host header. The start script handles it.</p></div>
+        <div class="card"><h3>Camera scanning is not universal</h3>
+          <p>It uses <code>BarcodeDetector</code> — Chrome and Edge on Android have it, Firefox
+          and iOS Safari do not. The text box and a USB scanner always work.</p></div>
+        <div class="card"><h3>Expiring soon is 30 days</h3>
+          <p>Defined once, in <code>kumar_service.utils.EXPIRING_SOON_DAYS</code>. Every screen
+          reads it; two of them used to say 45.</p></div>
+      </div>
+    </section>
+
+    <footer>
+      KUMAR Pumps Desk &middot; <code>kumar_service</code> &middot; built on Frappe v16, ERPNext,
+      HRMS and India Compliance, with Frappe Helpdesk vendored in. Sri Lakshmi Ganapathi
+      Engineering Works, Tenali — manufacturing pumpsets under the KUMAR brand since 1973.
+    </footer>
+  </main>
+</div>

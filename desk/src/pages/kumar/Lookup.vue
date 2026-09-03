@@ -156,7 +156,7 @@ const verdict = computed(() => {
   }
   const days = d.days_remaining;
   if (d.is_under_warranty) {
-    const soon = days !== null && days <= 45;
+    const soon = days !== null && days <= (d.expiring_soon_days ?? 30);
     return {
       headline: soon ? __("Expiring soon") : __("In warranty"),
       detail: days !== null

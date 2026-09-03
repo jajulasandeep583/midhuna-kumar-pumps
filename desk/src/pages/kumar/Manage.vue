@@ -272,7 +272,7 @@ const warrantyRows = computed(() => {
   const w = d.data?.warranty || {};
   return [
     { label: __("In warranty"), value: w.in_warranty, dot: "bg-green-500" },
-    { label: __("Expiring in 45 days"), value: w.expiring, dot: "bg-amber-400" },
+    { label: __("Expiring in {0} days", [String(d.data?.warranty?.expiring_soon_days ?? 30)]), value: w.expiring, dot: "bg-amber-400" },
     { label: __("Expired"), value: w.expired, dot: "bg-surface-gray-5" },
   ];
 });

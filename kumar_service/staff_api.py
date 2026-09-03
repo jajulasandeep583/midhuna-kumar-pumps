@@ -16,6 +16,7 @@ import frappe
 from frappe import _
 from frappe.utils import add_days, cint, flt, now_datetime, nowdate
 
+from kumar_service.utils import EXPIRING_SOON_DAYS
 from kumar_service.portal_api import TICKET_DOCTYPES, add_reply, thread_for
 
 #: Who may answer a dealer. A Dealer role must never reach these - a dealer
@@ -534,7 +535,7 @@ def manager_dashboard(days=30):
 		fields=["dealer", "warranty_expiry_date"],
 		limit_page_length=0,
 	)
-	soon = add_days(today, 45)
+	soon = add_days(today, EXPIRING_SOON_DAYS)
 	in_warranty = expiring = expired = 0
 	for r in regs:
 		e = r.warranty_expiry_date
@@ -638,7 +639,7 @@ def manager_dashboard(days=30):
 		},
 		"warranty": {
 			"in_warranty": in_warranty, "expiring": expiring, "expired": expired,
-			"total": len(regs),
+			"total": len(regs), "expiring_soon_days": EXPIRING_SOON_DAYS,
 		},
 		"needs_you": {
 			"breached": slim(breached),
