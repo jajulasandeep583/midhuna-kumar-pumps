@@ -25,6 +25,10 @@
     max-width:none !important; padding:0 !important; }
   #page-login .page-header-wrapper, #page-login .page-breadcrumbs,
   #page-login .page-header { display:none !important; }
+  #page-login .row, #page-login .page_content > .row, main.container > .row { margin-left:0 !important;
+    margin-right:0 !important; }
+  #page-login .row > [class*="col-"], #page-login .page_content > .row > div { padding-left:0 !important;
+    padding-right:0 !important; }
   .web-footer, footer.web-footer { display:none !important; }
 
   .kl { --blue:#12569b; --blue-deep:#0d3f74; --blue-lift:#2f7dc9;
@@ -34,7 +38,7 @@
         font-family:"Inter","IBM Plex Sans","Segoe UI",Arial,"Noto Sans Telugu","Nirmala UI",sans-serif;
         color:var(--ink); -webkit-font-smoothing:antialiased;
         display:grid; grid-template-columns:minmax(0,11fr) minmax(0,9fr);
-        min-height:calc(100vh - 60px); }
+        width:100%; margin:0; min-height:calc(100vh - 60px); }
   @media (max-width:900px) { .kl { grid-template-columns:1fr; min-height:0; } }
 
   /* ---------- the product, on the left ---------- */
@@ -73,7 +77,8 @@
   @media (max-width:900px) { .kl-side { padding:28px 16px 40px; } }
   .kl-card { width:100%; max-width:420px; }
   .kl-panel { background:#fff; border:1px solid var(--line); border-radius:var(--r-lg);
-              padding:8px 10px 12px; box-shadow:0 1px 2px rgba(16,24,40,.05), 0 8px 24px rgba(16,24,40,.06); }
+              padding:8px 10px 14px; box-shadow:0 1px 2px rgba(16,24,40,.05), 0 8px 24px rgba(16,24,40,.06);
+              border-top:3px solid var(--blue); }
   .kl-welcome { padding:18px 20px 2px; }
   .kl-welcome .t { font-size:22px; font-weight:700; letter-spacing:-.015em; color:var(--ink); }
   .kl-welcome .s { font-size:13.5px; color:var(--ink-3); margin-top:5px; line-height:1.55; }
@@ -99,17 +104,44 @@
      thing telling you which mode you are in. */
   .kl-panel .for-login .page-card-head,
   .kl-panel .for-email-login .page-card-head { display:none !important; }
-  .kl-panel label { font-size:12.5px !important; font-weight:600 !important; color:var(--ink-2) !important; }
-  .kl-panel input.form-control { padding:11px 12px !important; font-size:15px !important;
-                                 border-radius:var(--r) !important; border:1px solid #cdd4dd !important;
-                                 background:#fff !important; }
+  .kl-panel label { font-size:12.5px !important; font-weight:600 !important; color:var(--ink-2) !important;
+                    margin-bottom:6px !important; }
+  /* frappe draws an envelope and a padlock INSIDE the field and reserves room
+     for them with padding; a flat 12px override put the caret on top of the
+     icon. Room on the left for the icon, on the right for the eye. */
+  .kl-panel .form-group { margin-bottom:14px !important; }
+  .kl-panel input.form-control { height:46px !important; padding:11px 42px 11px 42px !important;
+                                 font-size:15px !important; border-radius:var(--r) !important;
+                                 border:1px solid #cdd4dd !important; background:#fff !important;
+                                 box-shadow:none !important; transition:border-color .12s, box-shadow .12s; }
   .kl-panel input.form-control:focus { border-color:var(--blue-lift) !important;
                                        box-shadow:0 0 0 3px rgba(42,123,200,.15) !important; }
-  .kl-panel .btn-primary { background:var(--blue) !important; border-color:var(--blue) !important;
-                           padding:11px !important; font-size:15px !important; font-weight:600 !important;
-                           border-radius:var(--r) !important; }
-  .kl-panel .btn-primary:hover { background:var(--blue-deep) !important; border-color:var(--blue-deep) !important; }
-  .kl-panel .btn-default, .kl-panel .btn-light { border-radius:var(--r) !important; font-weight:600 !important; }
+  .kl-panel .field-icon, .kl-panel .field-icon svg { color:var(--ink-3) !important; opacity:1 !important; }
+  .kl-panel .field-icon { left:14px !important; top:50% !important; transform:translateY(-50%) !important;
+                          width:18px !important; height:18px !important; }
+  .kl-panel .toggle-password { right:14px !important; top:50% !important; transform:translateY(-50%) !important; }
+  .kl-panel .forgot-password-message, .kl-panel .forgot-password { text-align:right; font-size:13px; }
+  /* Frappe's classes are the wrong way round for our purposes: the real
+     sign-in button is `btn-default btn-login`, the email-link alternative is
+     `btn-primary btn-login btn-login-with-email-link`. So the rule keys on
+     which button it IS, and the later, more specific rule wins. */
+  .kl-panel .btn { height:46px !important; padding:0 16px !important; font-size:15px !important;
+                   font-weight:600 !important; border-radius:var(--r) !important;
+                   box-shadow:none !important; transition:background .12s, border-color .12s; }
+  .kl-panel .btn-primary,
+  .kl-panel .btn-login { background:var(--blue) !important; border:1px solid var(--blue) !important;
+                         color:#fff !important; }
+  .kl-panel .btn-primary:hover,
+  .kl-panel .btn-login:hover { background:var(--blue-deep) !important; border-color:var(--blue-deep) !important; }
+  /* the alternative is a quieter second choice, not a second blue slab */
+  .kl-panel .btn-login.btn-login-with-email-link,
+  .kl-panel .btn-default:not(.btn-login) {
+      background:#fff !important; color:var(--ink-2) !important; border:1px solid var(--line) !important;
+      height:44px !important; }
+  .kl-panel .btn-login.btn-login-with-email-link:hover,
+  .kl-panel .btn-default:not(.btn-login):hover { background:var(--ground) !important; color:var(--ink) !important; }
+  .kl-panel .btn + .btn, .kl-panel form + div .btn { margin-top:10px !important; }
+  .kl-panel .login-content > form, .kl-panel .login-content > div { margin-top:0 !important; }
   .kl-panel a { color:var(--blue); font-weight:600; }
   .kl-panel .form-control:focus-visible, .kl-panel .btn:focus-visible {
       outline:2px solid var(--blue-lift); outline-offset:2px; }

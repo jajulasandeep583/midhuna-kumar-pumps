@@ -158,3 +158,166 @@ class TestDeskBridge(IntegrationTestCase):
 			doc.save(ignore_permissions=True)   # must not raise
 		finally:
 			bridge._mirror = original
+
+
+class TestOneThread(IntegrationTestCase):
+	"""The request's thread and the ticket's thread are the same thread.
+
+	A dealer writes through the portal, a visit gets booked, a claim gets
+	decided: all of that used to live as Comments on the request, invisible on
+	the ticket page. And an agent typing on the ticket page used to leave no
+	trace on the request. Now each side mirrors onto the other, exactly once.
+	"""
+
+	def setUp(self):
+		if not desk_installed():
+			self.skipTest("helpdesk is not installed on this site")
+		self.sr = _a_request()
+		if not self.sr:
+			self.skipTest("no service request on this site")
+		self.ticket = frappe.db.get_value("HD Ticket", {"custom_service_request": self.sr.name}, "name")
+		if not self.ticket:
+			self.skipTest("this request has not been mirrored")
+		self.saved = frappe.db.get_value(
+			"Service Request", self.sr.name, ["status", "first_response_on", "resolved_on"], as_dict=True
+		)
+		self.tk_status = frappe.db.get_value("HD Ticket", self.ticket, "status")
+		self.made = []  # (doctype, name) to delete
+		frappe.set_user("Administrator")
+
+	def tearDown(self):
+		frappe.set_user("Administrator")
+		for doctype, name in reversed(self.made):
+			frappe.delete_doc(doctype, name, force=True, ignore_permissions=True)
+		frappe.db.set_value("Service Request", self.sr.name, dict(self.saved), update_modified=False)
+		frappe.db.set_value("HD Ticket", self.ticket, "status", self.tk_status, update_modified=False)
+
+	def _ticket_comms(self):
+		return frappe.get_all(
+			"Communication",
+			filters={"reference_doctype": "HD Ticket", "reference_name": self.ticket},
+			fields=["name", "content", "message_id", "sent_or_received", "communication_medium"],
+			order_by="creation desc",
+		)
+
+	def _sr_comments(self):
+		return frappe.get_all(
+			"Comment",
+			filters={"reference_doctype": "Service Request", "reference_name": self.sr.name,
+				"comment_type": "Comment"},
+			fields=["name", "content"], order_by="creation desc",
+		)
+
+	# ---------------------------------------------------- request -> ticket
+
+	def test_a_message_on_the_request_appears_on_the_ticket(self):
+		from kumar_service.portal_api import add_reply
+
+		text = f"one-thread test {frappe.generate_hash(length=6)}"
+		before = len(self._ticket_comms())
+		comment = add_reply("Service Request", self.sr.name, text)
+		self.made.append(("Comment", comment))
+		comms = self._ticket_comms()
+		self.assertEqual(len(comms), before + 1, "the message did not reach the ticket")
+		top = comms[0]
+		self.made.append(("Communication", top.name))
+		self.assertIn(text, top.content)
+		self.assertEqual(top.message_id, f"kumar-comment:{comment}", "not marked as a mirror")
+		# a re-run of the backfill must not mirror it a second time
+		from kumar_service.desk_bridge import backfill_thread
+		backfill_thread()
+		self.assertEqual(len(self._ticket_comms()), before + 1, "mirrored twice")
+
+	# ---------------------------------------------------- ticket -> request
+
+	def _agent_writes_on_ticket(self, sent_or_received, sender, text):
+		doc = frappe.get_doc({
+			"doctype": "Communication", "communication_type": "Communication",
+			"communication_medium": "Email", "sent_or_received": sent_or_received,
+			"subject": "Re: ticket", "content": f"<p>{text}</p>", "sender": sender,
+			"reference_doctype": "HD Ticket", "reference_name": self.ticket,
+		}).insert(ignore_permissions=True)
+		self.made.append(("Communication", doc.name))
+		return doc
+
+	def test_an_agent_reply_on_the_ticket_lands_on_the_request_and_stamps_the_sla(self):
+		frappe.db.set_value("Service Request", self.sr.name, "first_response_on", None, update_modified=False)
+		before = len(self._sr_comments())
+		text = f"agent from the ticket page {frappe.generate_hash(length=6)}"
+		frappe.set_user("service.manager@kumarpumps.local")
+		doc = self._agent_writes_on_ticket("Sent", "service.manager@kumarpumps.local", text)
+		frappe.set_user("Administrator")
+
+		comments = self._sr_comments()
+		self.assertEqual(len(comments), before + 1, "the agent's words never reached the request")
+		self.made.append(("Comment", comments[0].name))
+		self.assertIn(text, comments[0].content)
+		self.assertTrue(
+			frappe.db.get_value("Service Request", self.sr.name, "first_response_on"),
+			"an agent's first reply on the ticket must stamp the SLA",
+		)
+		# the original row is marked, and nothing bounced back as a second row
+		self.assertTrue(frappe.db.get_value("Communication", doc.name, "message_id").startswith("kumar-comment:"))
+		echoes = [c for c in self._ticket_comms() if c.communication_medium == "Chat" and text in (c.content or "")]
+		self.assertEqual(echoes, [], "the agent's reply was echoed back onto the ticket")
+
+	def test_a_dealer_reply_on_the_ticket_reopens_a_settled_request(self):
+		from kumar_service.tests.test_reopen import _a_dealer_with_a_request
+
+		dealer, sr = _a_dealer_with_a_request()
+		if not dealer:
+			self.skipTest("no dealer with a portal user and a request")
+		ticket = frappe.db.get_value("HD Ticket", {"custom_service_request": sr.name}, "name")
+		if not ticket:
+			self.skipTest("the dealer's request has not been mirrored")
+		saved = frappe.db.get_value("Service Request", sr.name, ["status", "resolved_on"], as_dict=True)
+		tk_saved = frappe.db.get_value("HD Ticket", ticket, "status")
+		try:
+			frappe.db.set_value("Service Request", sr.name, "status", "Resolved", update_modified=False)
+			frappe.db.set_value("HD Ticket", ticket, "status", "Resolved", update_modified=False)
+			frappe.set_user(dealer.portal_user)
+			doc = frappe.get_doc({
+				"doctype": "Communication", "communication_type": "Communication",
+				"communication_medium": "Email", "sent_or_received": "Received",
+				"subject": "Re", "content": "<p>Still leaking after the visit.</p>",
+				"sender": dealer.portal_user, "reference_doctype": "HD Ticket", "reference_name": ticket,
+			}).insert(ignore_permissions=True)
+			frappe.set_user("Administrator")
+			self.made.append(("Communication", doc.name))
+			c = frappe.db.get_value("Communication", doc.name, "message_id") or ""
+			if c.startswith("kumar-comment:"):
+				self.made.append(("Comment", c.split(":", 1)[1]))
+			self.assertEqual(frappe.db.get_value("Service Request", sr.name, "status"), "Open",
+				"a dealer writing on a settled ticket must reopen the request")
+		finally:
+			frappe.set_user("Administrator")
+			frappe.db.set_value("Service Request", sr.name, dict(saved), update_modified=False)
+			frappe.db.set_value("HD Ticket", ticket, "status", tk_saved, update_modified=False)
+
+	# ---------------------------------------------------- claims
+
+	def test_every_claim_has_a_ticket_of_its_own(self):
+		missing, wrong_type = [], []
+		for name in frappe.get_all("Kumar Warranty Claim", filters={"docstatus": ["<", 2]}, pluck="name"):
+			t = frappe.db.get_value("HD Ticket", {"custom_warranty_claim": name}, ["name", "ticket_type"], as_dict=True)
+			if not t:
+				missing.append(name)
+			elif t.ticket_type != "Warranty Claim":
+				wrong_type.append(name)
+		self.assertEqual(missing, [], f"{len(missing)} claims have no ticket")
+		self.assertEqual(wrong_type, [], "claim tickets must be typed Warranty Claim")
+
+	def test_a_claims_thread_is_on_its_ticket(self):
+		"""Every Comment on a claim - the dealer's, the decision, the visit - is on its ticket."""
+		short = []
+		for name in frappe.get_all("Kumar Warranty Claim", filters={"docstatus": ["<", 2]}, pluck="name"):
+			ticket = frappe.db.get_value("HD Ticket", {"custom_warranty_claim": name}, "name")
+			if not ticket:
+				continue
+			n_comments = frappe.db.count("Comment", {"reference_doctype": "Kumar Warranty Claim",
+				"reference_name": name, "comment_type": "Comment"})
+			n_mirrored = frappe.db.count("Communication", {"reference_doctype": "HD Ticket",
+				"reference_name": ticket, "message_id": ["like", "kumar-comment:%"]})
+			if n_mirrored < n_comments:
+				short.append((name, n_comments, n_mirrored))
+		self.assertEqual(short, [], "claim comments missing from their ticket")

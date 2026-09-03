@@ -1039,6 +1039,21 @@ def add_reply(doctype, name, message, notify_users=None, attachments=None, attac
 		except Exception:  # noqa: BLE001 - a failed alert must not lose the reply
 			frappe.clear_last_message()
 
+
+	# the same message onto the desk ticket, so the agent's ticket page and the
+	# dealer's My Tickets both carry it - see desk_bridge.mirror_message
+	try:
+		from kumar_service.desk_bridge import mirror_message
+
+		mirror_message(
+			doctype, name, comment.name, message,
+			from_dealer=frappe.session.user in _portal_users(),
+			file_urls=[u for u in (attach_urls or [])]
+			+ [f.get("file_url") for f in (_parse_attachments(comment.content or "") or [])],
+		)
+	except Exception:  # noqa: BLE001 - the mirror must never lose the reply
+		frappe.log_error(title="KUMAR Pumps Desk bridge", message=frappe.get_traceback())
+
 	return comment.name
 
 
@@ -1083,8 +1098,9 @@ def post_reply(kind, name, message, attachments=None):
 	doctype, dealer = _my_ticket(kind, name)
 	notify = _staff_to_notify(doctype, name)
 
+	before = frappe.db.get_value(doctype, name, "status")
 	add_reply(doctype, name, message, notify_users=notify, attachments=attachments)
-	reopened = _reopen_if_settled(doctype, name)
+	reopened = _reopen_if_settled(doctype, name, previous=before)
 	return {
 		"thread": thread_for(doctype, name),
 		"reopened": reopened,
@@ -1111,11 +1127,20 @@ def post_reply(kind, name, message, attachments=None):
 _SETTLED = {"Service Request": ("Resolved", "Closed")}
 
 
-def _reopen_if_settled(doctype, name):
+def _reopen_if_settled(doctype, name, previous=None):
+	"""Reopen a settled request because the dealer wrote on it.
+
+	`previous` is the status as it was before the reply landed. It matters
+	because the reply is mirrored onto the desk ticket first, the desk marks
+	the ticket Open on a customer message, and the status sync carries that
+	back - so by the time this runs the request may already read Open. That
+	is the right outcome, but the dealer still deserves the trail note, and
+	the caller still deserves to be told it happened.
+	"""
 	settled = _SETTLED.get(doctype) or ()
 	if not settled:
 		return False
-	status = frappe.db.get_value(doctype, name, "status")
+	status = previous if previous is not None else frappe.db.get_value(doctype, name, "status")
 	if status not in settled:
 		return False
 

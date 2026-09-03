@@ -84,121 +84,26 @@
             <span v-if="c.winding_batch">{{ __("Winding") }}: <b class="tabular-nums text-ink-gray-7">{{ c.winding_batch }}</b></span>
           </div>
 
-          <!-- the conversation, and whatever the dealer photographed ------ -->
-          <div class="mt-3 border-t pt-3">
+          <!-- The conversation is the same full ticket screen every request
+               uses - dealer on one side, KUMAR on the other, photographs
+               shown as photographs. A chat box inside this card was a second
+               thread nobody could find afterwards. -->
+          <div class="mt-3 flex flex-wrap gap-2 border-t pt-3">
             <Button
-              variant="ghost"
-              :label="openThread === c.name ? __('Hide conversation') : __('Conversation')"
-              @click="toggleThread(c)"
+              variant="subtle"
+              :label="__('Open conversation')"
+              :disabled="!c.ticket"
+              @click="c.ticket && router.push({ name: 'TicketAgent', params: { ticketId: c.ticket } })"
             >
-              <template #suffix>
-                <span v-if="threadCount(c)" class="rounded bg-surface-gray-3 px-1.5 text-xs tabular-nums">
-                  {{ threadCount(c) }}
-                </span>
-              </template>
+              <template #prefix><LucideMessageSquare class="size-4" /></template>
             </Button>
-
-            <div v-if="openThread === c.name" class="mt-3">
-              <div v-if="thread.loading" class="py-3 text-sm text-ink-gray-5">{{ __("Loading...") }}</div>
-              <div v-else-if="!messages.length" class="py-3 text-sm text-ink-gray-5">
-                {{ __("Nothing said yet.") }}
-              </div>
-
-              <div v-else class="space-y-2">
-                <div
-                  v-for="m in messages"
-                  :key="m.name"
-                  class="flex"
-                  :class="m.from_dealer ? 'justify-start' : 'justify-end'"
-                >
-                  <div
-                    class="max-w-[85%] rounded-lg px-3 py-2 text-sm"
-                    :class="m.from_dealer
-                      ? 'bg-surface-gray-2 text-ink-gray-8'
-                      : 'bg-blue-600 text-white'"
-                  >
-                    <div class="mb-0.5 text-[11px] opacity-80">{{ m.who }} · {{ when(m.on) }}</div>
-                    <div class="whitespace-pre-wrap">{{ m.message }}</div>
-
-                    <!-- photographs are the evidence; show them, do not link to them -->
-                    <div v-if="m.attachments?.length" class="mt-2 flex flex-wrap gap-2">
-                      <a
-                        v-for="f in m.attachments"
-                        :key="f.url || f.file_url"
-                        :href="f.url || f.file_url"
-                        target="_blank"
-                        rel="noopener"
-                        class="block"
-                      >
-                        <img
-                          v-if="isImage(f)"
-                          :src="f.url || f.file_url"
-                          :alt="f.name || f.file_name"
-                          class="size-20 rounded border border-white/30 object-cover"
-                        />
-                        <span
-                          v-else
-                          class="flex items-center gap-1 rounded border px-2 py-1 text-xs"
-                          :class="m.from_dealer ? 'border-outline-gray-2' : 'border-white/40'"
-                        >
-                          <LucidePaperclip class="size-3" />
-                          {{ f.name || f.file_name }}
-                        </span>
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="mt-3">
-                <FormControl
-                  v-model="reply"
-                  type="textarea"
-                  :rows="2"
-                  :placeholder="__('Write to the dealer - they read this on a phone')"
-                />
-
-                <ul v-if="outFiles.length" class="mt-2 flex flex-wrap gap-2">
-                  <li
-                    v-for="(f, i) in outFiles"
-                    :key="f.filename + i"
-                    class="flex items-center gap-2 rounded border bg-surface-white px-2 py-1 text-xs"
-                  >
-                    <img v-if="f.preview" :src="f.preview" alt="" class="size-8 rounded object-cover" />
-                    <LucidePaperclip v-else class="size-3 text-ink-gray-5" />
-                    <span class="max-w-40 truncate text-ink-gray-7">{{ f.filename }}</span>
-                    <span class="tabular-nums text-ink-gray-5">{{ f.size }}</span>
-                    <button class="text-ink-gray-5 hover:text-ink-red-3" @click="outFiles.splice(i, 1)">×</button>
-                  </li>
-                </ul>
-                <ErrorMessage v-if="outError" class="mt-2" :message="outError" />
-
-                <div class="mt-2 flex items-center justify-between gap-2">
-                  <!-- KUMAR sends evidence back too: a marked-up photo, a credit
-                       note, the bench test sheet -->
-                  <label class="flex cursor-pointer items-center gap-1.5 text-sm text-ink-gray-6 hover:text-ink-gray-8">
-                    <LucidePaperclip class="size-4" />
-                    {{ __("Attach a photo or file") }}
-                    <input
-                      type="file"
-                      class="hidden"
-                      multiple
-                      accept="image/*,video/*,application/pdf"
-                      @change="addOutFiles"
-                    />
-                  </label>
-                  <Button
-                    variant="solid"
-                    theme="blue"
-                    :loading="send.loading"
-                    :disabled="!reply.trim() && !outFiles.length"
-                    :label="__('Send')"
-                    @click="send.submit()"
-                  />
-                </div>
-              </div>
-              <ErrorMessage v-if="send.error" class="mt-2" :message="send.error" />
-            </div>
+            <Button
+              variant="subtle"
+              :label="__('Schedule a visit')"
+              @click="openVisit(c)"
+            >
+              <template #prefix><LucideCalendarCheck class="size-4" /></template>
+            </Button>
           </div>
 
           <div v-if="c.actions.length" class="mt-4 flex flex-wrap gap-2 border-t pt-3">
@@ -217,6 +122,25 @@
         </div>
       </div>
     </div>
+
+    <Dialog v-model="visiting" :options="{ title: __('Schedule a visit') }">
+      <template #body-content>
+        <div v-if="visitFor" class="mb-4 rounded-lg border bg-surface-gray-1 p-3 text-sm">
+          <div class="font-medium text-ink-gray-8">{{ visitFor.name }} · {{ visitFor.serial_no }}</div>
+          <div class="text-ink-gray-6">{{ [visitFor.customer, visitFor.where].filter(Boolean).join(" · ") }}</div>
+        </div>
+        <FormControl v-model="visit.technician" type="select" :label="__('Technician')" :options="technicianOptions" />
+        <FormControl class="mt-3" v-model="visit.visit_date" type="date" :label="__('Date')" />
+        <FormControl class="mt-3" v-model="visit.note" type="textarea" :rows="2"
+                     :label="__('Anything to tell the dealer')" />
+        <ErrorMessage v-if="book.error" class="mt-3" :message="book.error" />
+      </template>
+      <template #actions>
+        <Button class="w-full" variant="solid" theme="blue" :loading="book.loading"
+                :disabled="!visit.technician || !visit.visit_date"
+                :label="__('Book it and tell the dealer')" @click="book.submit()" />
+      </template>
+    </Dialog>
 
     <Dialog v-model="showing" :options="{ title: dialogTitle }">
       <template #body-content>
@@ -261,118 +185,56 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, reactive, ref } from "vue";
 import { Badge, Button, Dialog, ErrorMessage, FormControl, createResource, toast } from "frappe-ui";
 import { LayoutHeader } from "@/components";
-import LucidePaperclip from "~icons/lucide/paperclip";
+import LucideMessageSquare from "~icons/lucide/message-square";
+import LucideCalendarCheck from "~icons/lucide/calendar-check";
 import { __ } from "@/translation";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const board = createResource({ url: "kumar_service.staff_api.claims_board", auto: true });
+
+// technicians come from the visit board, which already knows who can go
+const visitBoard = createResource({ url: "kumar_service.staff_api.visit_board", auto: true });
+const technicianOptions = computed(() => [
+  { label: __("Choose a technician"), value: "" },
+  ...(visitBoard.data?.technicians || []).map((t: any) => ({
+    label: [t.technician_name || t.name, t.dealer].filter(Boolean).join(" · "),
+    value: t.name,
+  })),
+]);
+const visiting = ref(false);
+const visitFor = ref<any>(null);
+const visit = reactive({ technician: "", visit_date: "", note: "" });
+function openVisit(c: any) {
+  visitFor.value = c;
+  visit.technician = "";
+  visit.visit_date = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+  visit.note = "";
+  visiting.value = true;
+}
+const book = createResource({
+  url: "kumar_service.staff_api.schedule_visit_for_claim",
+  makeParams: () => ({
+    claim: visitFor.value?.name,
+    technician: visit.technician,
+    visit_date: visit.visit_date,
+    note: visit.note,
+  }),
+  onSuccess: (d: any) => {
+    visiting.value = false;
+    toast.success(d.message);
+    board.reload();
+  },
+});
 const filter = ref("");
 const showing = ref(false);
 const target = ref<any>(null);
 const pending = ref<any>(null);
 const amount = ref<number | null>(null);
 const remarks = ref("");
-const openThread = ref("");
-const reply = ref("");
-const counts = ref<Record<string, number>>({});
-
-// Matches MAX_ATTACHMENT_MB on the server. Checked here too so nobody uploads
-// for a minute to be refused at the end of it.
-const MAX_MB = 8;
-const outFiles = ref<any[]>([]);
-const outError = ref("");
-
-function human(bytes: number) {
-  return bytes > 1024 * 1024
-    ? (bytes / 1024 / 1024).toFixed(1) + " MB"
-    : Math.max(1, Math.round(bytes / 1024)) + " KB";
-}
-
-async function addOutFiles(e: Event) {
-  outError.value = "";
-  const picked = Array.from((e.target as HTMLInputElement).files || []);
-  for (const file of picked) {
-    if (file.size > MAX_MB * 1024 * 1024) {
-      outError.value = __("{0} is too large. The limit is {1} MB.", [file.name, String(MAX_MB)]);
-      continue;
-    }
-    const content = await new Promise<string>((resolve) => {
-      const r = new FileReader();
-      r.onload = () => resolve(String(r.result).split(",")[1] || "");
-      r.readAsDataURL(file);
-    });
-    outFiles.value.push({
-      filename: file.name,
-      content,
-      size: human(file.size),
-      preview: file.type.startsWith("image/") ? URL.createObjectURL(file) : "",
-    });
-  }
-  (e.target as HTMLInputElement).value = "";
-}
-
-// the server sends a full timestamp with microseconds; nobody reads that
-function when(v: string) {
-  if (!v) return "";
-  const d = new Date(String(v).replace(" ", "T"));
-  if (isNaN(d.getTime())) return String(v).slice(0, 16);
-  return d.toLocaleString("en-IN", {
-    day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit", hour12: true,
-  });
-}
-
-const thread = createResource({
-  url: "kumar_service.staff_api.conversation",
-  onSuccess: (d: any) => {
-    counts.value[d.name] = (d.thread || []).length;
-  },
-});
-const messages = computed(() => thread.data?.thread || []);
-
-function threadCount(c: any) {
-  return counts.value[c.name];
-}
-
-function toggleThread(c: any) {
-  if (openThread.value === c.name) {
-    openThread.value = "";
-    return;
-  }
-  openThread.value = c.name;
-  reply.value = "";
-  thread.submit({ kind: "claim", name: c.name });
-}
-
-function isImage(f: any) {
-  // the server already decided this; the extension check is only a fallback for
-  // a row that predates the flag
-  if (f.is_image !== undefined) return !!f.is_image;
-  const n = String(f.file_name || f.file_url || "").toLowerCase();
-  return /\.(jpe?g|png|gif|webp|heic|bmp)$/.test(n);
-}
-
-// mark_responded stops the SLA response clock, which is the whole reason a
-// reply goes through this endpoint rather than into a comment box
-const send = createResource({
-  url: "kumar_service.staff_api.reply_to_dealer",
-  makeParams: () => ({
-    kind: "claim",
-    name: openThread.value,
-    message: reply.value || __("(photo attached)"),
-    mark_responded: 1,
-    attachments: outFiles.value.map((f) => ({ filename: f.filename, content: f.content })),
-  }),
-  onSuccess: () => {
-    reply.value = "";
-    outFiles.value.forEach((f) => f.preview && URL.revokeObjectURL(f.preview));
-    outFiles.value = [];
-    outError.value = "";
-    thread.submit({ kind: "claim", name: openThread.value });
-    toast.success(__("Sent to the dealer."));
-  },
-});
 
 function money(v: number) {
   return "₹" + Math.round(v || 0).toLocaleString("en-IN");

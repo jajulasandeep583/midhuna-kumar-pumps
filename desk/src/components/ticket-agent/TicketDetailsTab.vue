@@ -15,6 +15,8 @@
       @scroll.passive="trimScrollSpacer"
     >
       <div ref="scrollContentRef" class="divide-y-[1px]">
+        <!-- The job behind the ticket: pump, warranty, request, claim, visits -->
+        <div><KumarPanel /></div>
         <!-- Feedback, only once the contact has rated the ticket -->
         <div v-if="ticket.doc?.feedback_rating">
           <TicketFeedback
@@ -170,6 +172,7 @@ import Section from "../Section.vue";
 import Tags from "../tag/Tags.vue";
 import TicketField from "../TicketField.vue";
 import AssignTo from "./AssignTo.vue";
+import KumarPanel from "./KumarPanel.vue";
 import TicketContact from "./TicketContact.vue";
 import TicketFeedback from "./TicketFeedback.vue";
 import TicketSLA from "./TicketSLA.vue";
@@ -186,6 +189,10 @@ const dateFormat = window.date_format;
 const { getStatus, colorMap } = useTicketStatusStore();
 
 const CORE_FIELDS = ["priority", "ticket_type", "customer", "agent_group"];
+const KUMAR_FIELDS = new Set([
+  "custom_kumar_section", "custom_kumar_col", "custom_service_request", "custom_warranty_claim",
+  "custom_serial_no", "custom_pump_model", "custom_dealer", "custom_warranty",
+]);
 
 const coreFields = computed(() => {
   const fieldsMeta = getFields();
@@ -214,7 +221,10 @@ const customFields = computed(() => {
   let customFields = customizations.value.data?.custom_fields || [];
   const excludedFields = [...CORE_FIELDS, "subject", "status"];
   customFields = customFields.filter(
-    (f) => !excludedFields.includes(f.fieldname)
+    (f) =>
+      !excludedFields.includes(f.fieldname) &&
+      // the KUMAR panel above shows these properly; a bare link here would repeat them
+      !KUMAR_FIELDS.has(f.fieldname)
   );
   let _customFields = customFields
     .map((f) => {

@@ -24,7 +24,7 @@ Two rules this module must never break:
 """
 
 import frappe
-from frappe.utils import cint
+from frappe.utils import cint, flt
 
 # Service Request has seven states and the desk has four. Anything a dealer is
 # still waiting on is Open to an agent - "Awaiting Parts" is a detail of how
@@ -175,7 +175,7 @@ def mirror(doc, method=None):
 
 
 def _mirror(sr):
-	existing = frappe.db.get_value("HD Ticket", {"custom_service_request": sr.name}, "name")
+	existing = frappe.db.get_value("HD Ticket", {"custom_service_request": sr.name, "custom_warranty_claim": ["is", "not set"]}, "name")
 	desk_status = STATUS_TO_DESK.get(sr.get("status"), "Open")
 
 	contact, portal_user = contact_for(sr.get("dealer"))
@@ -250,6 +250,250 @@ def _set_status(ticket):
 	frappe.db.set_value("Service Request", sr, "status", want)
 
 
+# ------------------------------------------------------------- claims
+#
+# A warranty claim gets a ticket of its own, for the same reason a request does:
+# the desk's ticket page is the one conversation screen everybody uses, and a
+# claim decided in a side panel with its own little chat box was a claim
+# nobody could find the thread on afterwards.
+
+CLAIM_STATE_TO_DESK = {
+	"Draft": "Open",
+	"Pending Review": "Open",
+	"Under Investigation": "Open",
+	"Approved": "Open",       # still needs settling; it has not left the queue
+	"Settled": "Resolved",
+	"Rejected": "Closed",
+}
+
+
+def mirror_claim(doc, method=None):
+	if not desk_installed():
+		return
+	_quietly(_mirror_claim, doc)
+
+
+def _warranty_label(serial):
+	"""'In Warranty' / 'Out of Warranty' for the ticket column, or '' if unknown."""
+	if not serial:
+		return ""
+	# warranty_status_for wants the expiry date, which lives on the registration
+	expiry = frappe.db.get_value(
+		"Pump Registration", {"serial_no": serial, "docstatus": 1}, "warranty_expiry_date"
+	)
+	if not expiry:
+		return ""
+	from kumar_service.utils import warranty_status_for
+	st = warranty_status_for(expiry)
+	# the column is the same two words every request ticket uses
+	return "Out of Warranty" if st == "Expired" else "In Warranty"
+
+
+def _mirror_claim(claim):
+	if claim.get("docstatus") == 2:
+		return None
+	existing = frappe.db.get_value("HD Ticket", {"custom_warranty_claim": claim.name}, "name")
+	contact, portal_user = contact_for(claim.get("dealer"))
+	customer = customer_for(claim.get("dealer"))
+	link_contact_to_customer(customer, contact)
+	amount = flt(claim.get("approved_amount")) or flt(claim.get("claim_amount"))
+	values = {
+		"subject": f"Warranty claim {claim.name} - {claim.get('serial_no') or ''}".strip(" -"),
+		"status": CLAIM_STATE_TO_DESK.get(claim.get("workflow_state"), "Open"),
+		"contact": contact,
+		"raised_by": portal_user,
+		"custom_warranty_claim": claim.name,
+		# NOT custom_service_request. A claim ticket is linked to its request
+		# through the claim (ticket_context walks it); if it also carried the
+		# request's field, the request would have two tickets and everything
+		# that finds "the ticket for this request" could land on the wrong one.
+		"custom_serial_no": claim.get("serial_no"),
+		"custom_dealer": claim.get("dealer"),
+		"custom_pump_model": claim.get("pump_model"),
+		"custom_warranty": _warranty_label(claim.get("serial_no")),
+	}
+	if existing:
+		for field, value in values.items():
+			if frappe.db.get_value("HD Ticket", existing, field) != value:
+				frappe.db.set_value("HD Ticket", existing, field, value)
+		return existing
+
+	rows = [
+		("Claim type", claim.get("claim_type")),
+		("Root cause", claim.get("root_cause")),
+		("Amount claimed", frappe.utils.fmt_money(flt(claim.get("claim_amount")), currency="INR")),
+		("Dealer", claim.get("dealer")),
+		("Heat", claim.get("heat_no")),
+		("Winding batch", claim.get("winding_batch")),
+	]
+	table = "".join(
+		f"<tr><td><b>{frappe.utils.escape_html(str(k))}</b></td>"
+		f"<td>{frappe.utils.escape_html(str(v))}</td></tr>" for k, v in rows if v
+	)
+	report = frappe.utils.escape_html(claim.get("technician_report") or "")
+	ticket = frappe.get_doc(
+		dict(
+			doctype="HD Ticket",
+			description=f"<p>{report}</p><table>{table}</table>",
+			customer=customer,
+			ticket_type="Warranty Claim" if frappe.db.exists("HD Ticket Type", "Warranty Claim") else None,
+			**values,
+		)
+	)
+	ticket.flags.ignore_permissions = True
+	ticket.insert(ignore_permissions=True)
+	return ticket.name
+
+
+# ------------------------------------------------------ one conversation
+#
+# The desk's ticket page renders Communication rows on the HD Ticket. The
+# portal, the claim decisions, the visit notices and the photo uploads all
+# write Comments on the Service Request or the claim through add_reply. Those
+# were two threads: an agent opening a ticket saw none of the dealer's
+# messages, a dealer in My Tickets saw none of KUMAR's, and "Visit scheduled"
+# existed nowhere either of them looked.
+#
+# Now every message written through add_reply is ALSO a Communication on the
+# mirrored ticket, and every Communication written on the ticket page flows
+# back onto the request. Bridge-written rows carry communication_medium "Chat"
+# and a message_id naming the Comment they came from - the first stops the
+# reverse hook echoing them back, the second makes the backfill idempotent.
+
+BRIDGE_MEDIUM = "Chat"
+
+
+def ticket_for(doctype, name):
+	field = {"Service Request": "custom_service_request",
+		"Kumar Warranty Claim": "custom_warranty_claim"}.get(doctype)
+	if not field:
+		return None
+	return frappe.db.get_value("HD Ticket", {field: name}, "name")
+
+
+def mirror_message(doctype, name, comment_name, message, from_dealer, file_urls=None):
+	"""A Comment on the request/claim -> a Communication on its ticket."""
+	if not desk_installed():
+		return None
+	return _quietly(_mirror_message, doctype, name, comment_name, message, from_dealer,
+		file_urls or [])
+
+
+def _mirror_message(doctype, name, comment_name, message, from_dealer, file_urls):
+	ticket = ticket_for(doctype, name)
+	if not ticket:
+		return None
+	message_id = f"kumar-comment:{comment_name}"
+	if frappe.db.exists("Communication", {"message_id": message_id}):
+		return None
+	subject = frappe.db.get_value("HD Ticket", ticket, "subject") or name
+	c = frappe.get_doc(
+		{
+			"doctype": "Communication",
+			"communication_type": "Communication",
+			"communication_medium": BRIDGE_MEDIUM,
+			"sent_or_received": "Received" if from_dealer else "Sent",
+			"email_status": "Open",
+			"subject": f"Re: {subject}",
+			"sender": frappe.session.user,
+			"user": frappe.session.user,
+			"content": frappe.utils.escape_html(message or "").replace("\n", "<br>"),
+			"status": "Linked",
+			"reference_doctype": "HD Ticket",
+			"reference_name": ticket,
+			"message_id": message_id,
+		}
+	)
+	c.flags.ignore_permissions = True
+	c.flags.ignore_mandatory = True
+	c.insert(ignore_permissions=True)
+
+	# the photographs travel too: a File row on the Communication is what the
+	# ticket page shows as an attachment. Copied, not moved - the request keeps
+	# its own copy for the certificate, the claim and the portal.
+	for url in file_urls:
+		if not url:
+			continue
+		src = frappe.db.get_value(
+			"File", {"file_url": url}, ["file_name", "is_private", "file_size"], as_dict=True
+		) or {}
+		f = frappe.get_doc(
+			{
+				"doctype": "File",
+				"file_url": url,
+				"file_name": src.get("file_name") or url.rsplit("/", 1)[-1],
+				"is_private": src.get("is_private", 1),
+				"attached_to_doctype": "Communication",
+				"attached_to_name": c.name,
+			}
+		)
+		f.flags.ignore_permissions = True
+		try:
+			f.insert(ignore_permissions=True)
+		except Exception:
+			frappe.clear_last_message()
+	return c.name
+
+
+def on_communication(doc, method=None):
+	"""A message written on the ticket page -> the request it mirrors.
+
+	Sent (an agent) stamps the SLA first response. Received (a dealer) reopens
+	a settled request, the same as a reply through the portal did.
+	"""
+	if doc.get("reference_doctype") != "HD Ticket":
+		return
+	if doc.get("communication_medium") == BRIDGE_MEDIUM:
+		return   # we wrote it; do not echo it back
+	_quietly(_on_communication, doc)
+
+
+def _on_communication(comm):
+	t = frappe.db.get_value(
+		"HD Ticket", comm.reference_name,
+		["custom_service_request", "custom_warranty_claim"], as_dict=True,
+	)
+	if not t:
+		return
+	doctype, name = (("Service Request", t.custom_service_request) if t.custom_service_request
+		else ("Kumar Warranty Claim", t.custom_warranty_claim))
+	if not name or not frappe.db.exists(doctype, name):
+		return
+
+	text = frappe.utils.strip_html(comm.get("content") or "").strip()
+	if text:
+		comment = frappe.get_doc(
+			{
+				"doctype": "Comment",
+				"comment_type": "Comment",
+				"reference_doctype": doctype,
+				"reference_name": name,
+				"content": frappe.utils.escape_html(text),
+				"comment_by": comm.get("sender") or frappe.session.user,
+				"comment_email": comm.get("sender") or frappe.session.user,
+			}
+		)
+		comment.flags.ignore_permissions = True
+		comment.insert(ignore_permissions=True)
+		# the desk row is the original; mark it so a re-run never mirrors twice
+		frappe.db.set_value("Communication", comm.name, "message_id",
+			f"kumar-comment:{comment.name}", update_modified=False)
+
+	if doctype != "Service Request":
+		return
+	if comm.get("sent_or_received") == "Sent":
+		# The first response is the first response: a request that was settled
+		# without one and then reopened still carries its old resolved_on, and
+		# the agent's first word on it must count. Only an empty stamp is set,
+		# so nothing ever moves an existing one.
+		if not frappe.db.get_value("Service Request", name, "first_response_on"):
+			frappe.db.set_value("Service Request", name, "first_response_on",
+				frappe.utils.now_datetime(), update_modified=False)
+	else:
+		from kumar_service.portal_api import _reopen_if_settled
+		_reopen_if_settled("Service Request", name)
+
+
 # -------------------------------------------------------------- backfill
 
 def relink(limit=None):
@@ -278,6 +522,63 @@ def relink(limit=None):
 	return {"relinked": done}
 
 
+def backfill_claims(limit=None):
+	"""Tickets for the claims that predate the mirror."""
+	if not desk_installed():
+		return {"mirrored": 0, "skipped": "helpdesk is not installed"}
+	names = frappe.get_all(
+		"Kumar Warranty Claim", filters={"docstatus": ["<", 2]}, pluck="name",
+		order_by="creation asc", limit=cint(limit) or None,
+	)
+	made = 0
+	for name in names:
+		if frappe.db.exists("HD Ticket", {"custom_warranty_claim": name}):
+			continue
+		if _quietly(_mirror_claim, frappe.get_doc("Kumar Warranty Claim", name)):
+			made += 1
+	frappe.db.commit()
+	return {"seen": len(names), "mirrored": made}
+
+
+def backfill_thread(limit=None):
+	"""Every message already on a request or claim, onto its ticket.
+
+	Idempotent: a Communication names the Comment it mirrors in message_id, so
+	one that is already there is skipped.
+	"""
+	if not desk_installed():
+		return {"mirrored": 0, "skipped": "helpdesk is not installed"}
+	from kumar_service.portal_api import _portal_users, _parse_attachments
+
+	portal_users = _portal_users()
+	made = skipped = 0
+	for dt in ("Service Request", "Kumar Warranty Claim"):
+		for c in frappe.get_all(
+			"Comment",
+			filters={"reference_doctype": dt, "comment_type": "Comment"},
+			fields=["name", "reference_name", "content", "comment_email", "owner", "creation"],
+			order_by="creation asc", limit_page_length=cint(limit) or 0,
+		):
+			if frappe.db.exists("Communication", {"message_id": f"kumar-comment:{c.name}"}):
+				skipped += 1
+				continue
+			who = c.comment_email or c.owner
+			files = [a.get("file_url") for a in (_parse_attachments(c.content or "") or [])]
+			text = frappe.utils.strip_html(c.content or "")
+			frappe.set_user(who if frappe.db.exists("User", who) else "Administrator")
+			try:
+				comm = _mirror_message(dt, c.reference_name, c.name, text, who in portal_users, files)
+			finally:
+				frappe.set_user("Administrator")
+			if comm:
+				# keep the thread in its original order on the ticket page
+				frappe.db.set_value("Communication", comm, "creation", c.creation, update_modified=False)
+				frappe.db.set_value("Communication", comm, "communication_date", c.creation, update_modified=False)
+				made += 1
+	frappe.db.commit()
+	return {"mirrored": made, "already": skipped}
+
+
 def backfill(limit=None):
 	"""Mirror the requests that already existed before the desk did."""
 	if not desk_installed():
@@ -291,7 +592,7 @@ def backfill(limit=None):
 	)
 	made = 0
 	for name in names:
-		if frappe.db.exists("HD Ticket", {"custom_service_request": name}):
+		if frappe.db.exists("HD Ticket", {"custom_service_request": name, "custom_warranty_claim": ["is", "not set"]}):
 			continue
 		if _quietly(_mirror, frappe.get_doc("Service Request", name)):
 			made += 1

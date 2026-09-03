@@ -55,6 +55,16 @@ TICKET_FIELDS = [
 		"description": "The request this ticket mirrors. That document, not this one, is the record.",
 	},
 	{
+		"fieldname": "custom_warranty_claim",
+		"fieldtype": "Link",
+		"options": "Kumar Warranty Claim",
+		"label": "Warranty Claim",
+		"read_only": 1,
+		"in_standard_filter": 1,
+		"insert_after": "custom_service_request",
+		"description": "The claim this ticket mirrors, where the ticket is a claim.",
+	},
+	{
 		"fieldname": "custom_serial_no",
 		"fieldtype": "Link",
 		"options": "Serial No",

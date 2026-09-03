@@ -208,6 +208,11 @@
           <tr><td><b>Admin / manager</b></td><td><span class="route">/app</span> and the desk</td>
               <td>Everything, plus the ERPNext side and the reports.</td></tr>
         </tbody></table></div>
+      <p>The sign-in page is the product's own: what it is on the left, the form on the right,
+        and a line each for dealers, staff, and anyone who only wants to check a warranty
+        (<span class="route">/warranty_check</span>, no login). Under the skin it is Frappe's
+        form, so forgot-password, the email-link login and any single sign-on you add later keep
+        working untouched.</p>
       <p>Old links still work. <span class="route">/dealer_portal</span> and
         <span class="route">/helpdesk</span> both redirect into the desk.</p>
     </section>
@@ -310,7 +315,8 @@
       <p class="deck">Every request and claim, and the conversation on each.</p>
       <p>Whatever KUMAR writes here you see, and whatever you write KUMAR sees — including the
         photographs. When a visit is booked, the date, the technician, and whether there is
-        anything to pay arrive on this thread.</p>
+        anything to pay arrive on this thread. A warranty claim has a ticket of its own, typed
+        <b>Warranty Claim</b>, and every decision on it lands there.</p>
     </section>
 
     <section id="kb">
@@ -353,9 +359,26 @@
     <section id="queue">
       <span class="who staff">KUMAR team</span>
       <h2>Tickets</h2>
-      <p class="deck">Every request appears as a ticket, with the pump on it.</p>
-      <p>Each ticket carries the serial, the model, the dealer, and whether the visit is
-        chargeable — the first thing a dealer asks — plus a link to the Service Request itself.</p>
+      <p class="deck">Every request and every claim is a ticket, and the ticket is the one screen.</p>
+      <p>The right-hand panel, <b>KUMAR Pumps</b>, sits above the ticket's own fields and shows
+        the job behind the ticket without leaving the conversation:</p>
+      <ul>
+        <li><b>The pump</b> — serial, model, dealer, where it is installed, and the warranty
+          verdict. The serial opens Pump Lookup.</li>
+        <li><b>The request</b> — type, category, priority, who it is for, the technician, and the
+          two SLA clocks in words: <i>Reply due Thursday</i> turns into <i>Replied Thursday</i>
+          the moment an agent answers.</li>
+        <li><b>The claim</b>, if there is one — stage, amounts, and the workflow buttons your role
+          is allowed. A request's ticket points at the claim's ticket and back.</li>
+        <li><b>Visits</b> — every one booked or done, and a <b>Schedule</b> button that books a
+          technician and tells the dealer on this thread.</li>
+      </ul>
+      <div class="note"><b>One thread, two doors</b>
+        <p>The conversation on the ticket and the conversation on the request are the same
+        conversation. A dealer's message through the portal, a visit booking, a claim decision —
+        each appears on the ticket. An agent's reply typed on the ticket page appears on the
+        request, stamps the SLA first response, and if a dealer replies on a ticket that was
+        already resolved, the request reopens. Each message crosses exactly once.</p></div>
       <div class="note warn"><b>Reply in the desk, not the comment box</b>
         <p>A reply typed into a document's plain comment box skips the notification and the SLA
         first-response stamp — the dealer never hears about it. The comment box is hidden on
@@ -370,8 +393,11 @@
         on — the technician's report, the root cause, and the heat and winding batch, because
         "is this a manufacturing defect" is answered by the batch as often as the report. Each
         card says <b>who raised it and who it is for</b>, with the customer's number.</p>
-      <p>Open the <b>conversation</b> on any claim to see what the dealer sent — photographs
-        shown as photographs — and reply, with your own attachments.</p>
+      <p><b>Open conversation</b> takes you to the claim's ticket: the full ticket screen, with
+        the dealer's photographs and video, your replies and attachments, and the KUMAR panel
+        beside it — not a chat box in a card. <b>Schedule a visit</b> books a technician
+        straight from the claim; a claim that has no service request yet gets one opened and
+        linked, so the visit has somewhere to be recorded.</p>
       <div class="tablewrap"><table>
         <thead><tr><th>From</th><th>Action</th><th>Who may</th></tr></thead>
         <tbody>
@@ -412,6 +438,11 @@
         Not registered, with the days left and whether the visit is chargeable said in words, and a
         bar showing how much cover is spent. Under it: whose pump, which heat and winding batch it
         came from, and everything that has already gone wrong with it. A repeat failure is called one.</p>
+      <p><b>Raise a request for this pump</b> is for the caller on the phone or the email that
+        came in: KUMAR staff open a request on any registered pump, on the dealer's behalf, and
+        land on its ticket ready to write. Individual pump owners never need a login; the team
+        carries their call for them. A ticket's KUMAR panel links here with the serial already
+        looked up.</p>
     </section>
 
     <section id="running">
@@ -452,13 +483,19 @@
       <p>Brand, agents from the staff roles, ticket and request types, the pump fields on HD
         Ticket, read access for dealers and staff, each dealer's customer link, the knowledge
         base, and the removal of Helpdesk's own furniture. Safe to run again.</p>
-      <pre><code>bench --site kumarpumps.localhost execute kumar_service.desk_bridge.backfill</code></pre>
-      <p>Mirrors any request that has no ticket.</p>
+      <pre><code>bench --site kumarpumps.localhost execute kumar_service.desk_bridge.backfill
+bench --site kumarpumps.localhost execute kumar_service.desk_bridge.backfill_claims
+bench --site kumarpumps.localhost execute kumar_service.desk_bridge.backfill_thread</code></pre>
+      <p>Mirror any request that has no ticket, any claim that has no ticket, and any message on
+        a request or claim that is not yet on its ticket. All three are safe to run again: each
+        mirrored message is marked, so nothing crosses twice.</p>
       <pre><code>NODE_OPTIONS="--max-old-space-size=6144" yarn --cwd apps/kumar_service/desk build
 bench build --app kumar_service
 bench --site kumarpumps.localhost run-tests --app kumar_service</code></pre>
-      <p>176 tests, including suites that prove one dealer cannot read another's data, that every
-        request reaches the desk, and that a dealer's reply reopens a closed request.</p>
+      <p>181 tests, including suites that prove one dealer cannot read another's data, that every
+        request and every claim reaches the desk, that a message crosses between request and
+        ticket exactly once in each direction, and that a dealer's reply reopens a closed
+        request.</p>
     </section>
 
     <section id="who-sees">
@@ -527,7 +564,18 @@ bench --site kumarpumps.localhost run-tests --app kumar_service</code></pre>
           <p>Defined once, in <code>kumar_service.utils.EXPIRING_SOON_DAYS</code>. Every screen
           reads it; two of them used to say 45.</p></div>
       </div>
-    </section>
+          <div class="note warn"><b>A claim's ticket does not carry the request's field</b>
+        <p>A claim ticket links to its request only through the claim. If it also carried
+        <span class="route">custom_service_request</span>, the request would have two tickets,
+        and every "find the ticket for this request" — the mirror, status sync, the reply
+        bridge — could land on the wrong one. The mirror leaves it empty on purpose, and the
+        lookups exclude claim tickets as insurance.</p></div>
+      <div class="note"><b>How the bridge tells its own messages apart</b>
+        <p>Messages the bridge writes onto a ticket carry medium <i>Chat</i> and a message id of
+        <span class="route">kumar-comment:&lt;comment&gt;</span>; the reverse hook skips those, so
+        nothing echoes. Moving a claim's ticket status does not move the claim — claims move
+        only through their workflow buttons.</p></div>
+</section>
 
     <footer>
       KUMAR Pumps Desk &middot; <code>kumar_service</code> &middot; built on Frappe v16, ERPNext,

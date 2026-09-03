@@ -77,6 +77,19 @@ doc_events = {
 	"HD Ticket": {
 		"on_update": "kumar_service.desk_bridge.set_status",
 	},
+	# a claim gets a ticket of its own, so its conversation lives on the same
+	# full screen as a request's
+	"Kumar Warranty Claim": {
+		"after_insert": "kumar_service.desk_bridge.mirror_claim",
+		"on_update": "kumar_service.desk_bridge.mirror_claim",
+		"on_submit": "kumar_service.desk_bridge.mirror_claim",
+		"on_update_after_submit": "kumar_service.desk_bridge.mirror_claim",
+	},
+	# a message written on the ticket page flows back onto the request:
+	# an agent's reply stamps the SLA, a dealer's reopens a settled one
+	"Communication": {
+		"after_insert": "kumar_service.desk_bridge.on_communication",
+	},
 }
 
 # -------------------------------------------------------------- permissions

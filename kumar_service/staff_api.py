@@ -708,6 +708,8 @@ def claims_board(state=None, dealer=None, limit=200):
 		r["where"] = reg.get("installation_address")
 		r["district"] = reg.get("district")
 		r["raised_by"] = frappe.db.get_value("Dealer", r["dealer"], "dealer_name") or r["dealer"]
+		# the full-screen conversation lives on the claim's ticket
+		r["ticket"] = frappe.db.get_value("HD Ticket", {"custom_warranty_claim": r["name"]}, "name")
 
 	totals = {}
 	for s in CLAIM_OPEN + ("Settled", "Rejected"):
@@ -809,4 +811,160 @@ def claim_action(name, action, approved_amount=None, remarks=None):
 		"state": doc.workflow_state,
 		"approved_amount": flt(doc.approved_amount),
 		"message": message,
+	}
+
+
+
+# ============================================================ on the phone
+#
+# Not every job starts in the portal. A customer rings, a dealer emails, a
+# distributor's man walks in - and KUMAR's own people have to be able to raise
+# the request and book the visit themselves, for any pump, from the desk.
+
+
+@frappe.whitelist()
+def raise_request_for_pump(serial_no, request_type="Complaint", complaint_category="Other",
+		description="", priority="Medium"):
+	"""A request raised by KUMAR staff on behalf of whoever rang."""
+	_require_staff()
+	if not frappe.db.exists("Serial No", serial_no):
+		frappe.throw(_("Serial number {0} not found").format(serial_no), frappe.DoesNotExistError)
+	if not (description or "").strip():
+		frappe.throw(_("Say what was reported."))
+
+	sr = frappe.new_doc("Service Request")
+	sr.update(
+		{
+			"serial_no": serial_no,
+			"complaint_category": complaint_category or "Other",
+			"custom_request_type": request_type or "Complaint",
+			"complaint_description": description,
+			"priority": priority or "Medium",
+			"reported_on": now_datetime(),
+		}
+	)
+	# the controller pulls model, warranty and dealer off the serial; a pump
+	# sold direct simply has no dealer, and that is allowed
+	sr.flags.ignore_permissions = True
+	sr.insert(ignore_permissions=True)
+	sr.submit()
+	return {
+		"name": sr.name,
+		"dealer": sr.dealer,
+		"is_under_warranty": cint(sr.is_under_warranty),
+		"ticket": frappe.db.get_value("HD Ticket", {"custom_service_request": sr.name, "custom_warranty_claim": ["is", "not set"]}, "name"),
+	}
+
+
+@frappe.whitelist()
+def schedule_visit_for_claim(claim, technician, visit_date, visit_type="On-Site", note=None):
+	"""Book a technician against a claim.
+
+	A Service Visit hangs off a Service Request, and a claim raised straight
+	from the portal may have none. One is created for it - typed as a
+	complaint against the same pump, linked back to the claim - and the
+	ordinary booking then applies, dealer notice and all.
+	"""
+	_require_staff()
+	if not frappe.db.exists("Kumar Warranty Claim", claim):
+		frappe.throw(_("{0} does not exist").format(claim), frappe.DoesNotExistError)
+	c = frappe.db.get_value(
+		"Kumar Warranty Claim", claim, ["service_request", "serial_no", "claim_type"], as_dict=True
+	)
+	sr = c.service_request
+	if not sr or not frappe.db.exists("Service Request", sr):
+		made = raise_request_for_pump(
+			c.serial_no, "Complaint", "Other",
+			_("Visit for warranty claim {0} ({1}).").format(claim, c.claim_type or ""),
+		)
+		sr = made["name"]
+		frappe.db.set_value("Kumar Warranty Claim", claim, "service_request", sr, update_modified=False)
+	out = schedule_visit(sr, technician, visit_date, visit_type=visit_type, note=note)
+	out["service_request"] = sr
+	# The agent booked this from the claim, so the claim's own thread - and
+	# its ticket - must say so too. schedule_visit told the request's thread;
+	# a dealer reading the claim would otherwise never see the date.
+	try:
+		tech_name = frappe.db.get_value("Service Technician", technician, "technician_name") or technician
+		add_reply(
+			"Kumar Warranty Claim", claim,
+			_("Visit scheduled for {0}. {1} will attend ({2}). Tracked on {3}.").format(
+				frappe.utils.formatdate(visit_date), tech_name, _(visit_type), sr,
+			),
+		)
+	except Exception:
+		frappe.log_error(title="KUMAR Pumps Desk bridge", message=frappe.get_traceback())
+	return out
+
+
+@frappe.whitelist()
+def ticket_context(ticket):
+	"""Everything KUMAR knows about the job behind a ticket, for its sidebar.
+
+	One screen, the user said, and meant it: the request, the pump and its
+	warranty, the claim if there is one and where it stands, every visit booked
+	or done, and what the agent can do next - all next to the conversation,
+	so an agent never leaves the ticket to find out.
+	"""
+	_require_staff()
+	t = frappe.db.get_value(
+		"HD Ticket", ticket,
+		["custom_service_request", "custom_warranty_claim", "custom_serial_no"], as_dict=True,
+	)
+	if not t:
+		frappe.throw(_("{0} does not exist").format(ticket), frappe.DoesNotExistError)
+
+	sr_name = t.custom_service_request
+	claim_name = t.custom_warranty_claim
+	if not claim_name and sr_name:
+		claim_name = frappe.db.get_value("Kumar Warranty Claim", {"service_request": sr_name}, "name")
+	if not sr_name and claim_name:
+		sr_name = frappe.db.get_value("Kumar Warranty Claim", claim_name, "service_request")
+
+	request = frappe.db.get_value(
+		"Service Request", sr_name,
+		["name", "status", "sla_status", "custom_request_type", "complaint_category", "priority",
+		 "reported_on", "response_due_on", "first_response_on", "resolution_due_on", "resolved_on",
+		 "is_under_warranty", "assigned_technician", "dealer", "end_customer_name",
+		 "end_customer_mobile", "pump_model", "serial_no"],
+		as_dict=True,
+	) if sr_name else None
+
+	claim = frappe.db.get_value(
+		"Kumar Warranty Claim", claim_name,
+		["name", "workflow_state", "claim_type", "root_cause", "claim_amount", "approved_amount",
+		 "claim_date", "settled_on"],
+		as_dict=True,
+	) if claim_name else None
+	if claim:
+		claim["actions"] = _claim_actions(claim["workflow_state"])
+		claim["ticket"] = frappe.db.get_value("HD Ticket", {"custom_warranty_claim": claim["name"]}, "name")
+
+	visits = frappe.get_all(
+		"Service Visit",
+		filters={"service_request": sr_name, "docstatus": ["<", 2]},
+		fields=["name", "visit_date", "technician", "visit_type", "is_chargeable", "docstatus",
+			"findings", "action_taken"],
+		order_by="visit_date desc",
+	) if sr_name else []
+	today = nowdate()
+	for v in visits:
+		v["upcoming"] = str(v.visit_date) >= today
+
+	serial = t.custom_serial_no or (request and request.serial_no)
+	site = frappe.db.get_value(
+		"Pump Registration", {"serial_no": serial, "docstatus": 1},
+		["installation_address", "district", "warranty_expiry_date"], as_dict=True,
+	) if serial else None
+
+	return {
+		"request": request,
+		"claim": claim,
+		"visits": visits,
+		"serial_no": serial,
+		"site": site,
+		"technicians": frappe.get_all(
+			"Service Technician", fields=["name", "technician_name", "dealer"],
+			order_by="technician_name", limit_page_length=0,
+		),
 	}
