@@ -202,7 +202,10 @@ def visits():
 		order_by="reported_on asc",
 		limit_page_length=0,
 	)
-	for r in open_reqs[:7]:
+	# The first two land TODAY, by design: "Visits booked 7, none today" is the
+	# tile a prospect reads in the first ten seconds, and a desk with visits
+	# booked and nobody out today looks idle. The rest spread across the week.
+	for i, r in enumerate(open_reqs[:7]):
 		if r.name in booked:
 			continue
 		visit = frappe.get_doc(
@@ -211,7 +214,7 @@ def visits():
 				"service_request": r.name,
 				"serial_no": r.serial_no,
 				"technician": rng.choice(techs),
-				"visit_date": add_days(nowdate(), rng.randint(0, 6)),
+				"visit_date": add_days(nowdate(), 0 if i < 2 else rng.randint(1, 6)),
 				"visit_type": "On-Site",
 				"is_chargeable": 0 if cint(r.is_under_warranty) else 1,
 				# marks it as ours, so the next run can take it back
