@@ -31,6 +31,11 @@ export const agentPortalSidebarOptions = [
     to: "KumarManage",
   },
   {
+    label: __("Raise for a Pump"),
+    icon: LucideFilePlus,
+    to: "KumarRaise",
+  },
+  {
     label: __("Pump Lookup"),
     icon: LucideSearchCheck,
     to: "KumarLookup",

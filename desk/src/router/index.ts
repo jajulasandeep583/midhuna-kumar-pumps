@@ -56,7 +56,8 @@ const portalRoutes = [
   {
     path: "/tickets/new/:templateId?",
     name: "TicketAgentNew",
-    component: () => import("@/pages/ticket/TicketNew.vue"),
+    // a ticket with no pump on it is not a KUMAR ticket; agents raise from the pump
+    redirect: { name: "KumarRaise" },
     props: true,
     meta: {
       onSuccessRoute: "TicketAgent",
@@ -239,6 +240,14 @@ const portalRoutes = [
     name: "KumarContact",
     component: () => import("@/pages/kumar/Contact.vue"),
     meta: { public: true, auth: true },
+  },
+  {
+    // One place for KUMAR staff to raise anything for a pump - a request, a
+    // claim, a visit - for whoever rang or wrote in.
+    path: "/raise",
+    name: "KumarRaise",
+    component: () => import("@/pages/kumar/Raise.vue"),
+    meta: { auth: true },
   },
   {
     // Any serial, for whoever is on the phone: whose pump, how long is left.

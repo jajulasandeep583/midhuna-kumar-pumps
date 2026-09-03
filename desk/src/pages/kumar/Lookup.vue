@@ -81,7 +81,7 @@
 
         <!-- somebody rang about this pump: raise it from here --------------- -->
         <div class="flex flex-wrap gap-2">
-          <Button variant="solid" theme="blue" :label="__('Raise a request for this pump')" @click="raising = true" />
+          <Button variant="solid" theme="blue" :label="__('Raise for this pump')" @click="router.push({ name: 'KumarRaise', query: { serial: p.serial_no } })" />
           <Button variant="subtle" :label="__('Visits')" @click="router.push({ name: 'KumarVisits' })" />
         </div>
 

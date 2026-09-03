@@ -16,7 +16,7 @@ import frappe
 from frappe import _
 from frappe.utils import add_days, cint, flt, now_datetime, nowdate
 
-from kumar_service.utils import EXPIRING_SOON_DAYS
+from kumar_service.utils import EXPIRING_SOON_DAYS, warranty_status_for
 from kumar_service.portal_api import TICKET_DOCTYPES, add_reply, thread_for
 
 #: Who may answer a dealer. A Dealer role must never reach these - a dealer
@@ -824,7 +824,7 @@ def claim_action(name, action, approved_amount=None, remarks=None):
 
 @frappe.whitelist()
 def raise_request_for_pump(serial_no, request_type="Complaint", complaint_category="Other",
-		description="", priority="Medium"):
+		description="", priority="Medium", attachments=None):
 	"""A request raised by KUMAR staff on behalf of whoever rang."""
 	_require_staff()
 	if not frappe.db.exists("Serial No", serial_no):
@@ -848,12 +848,230 @@ def raise_request_for_pump(serial_no, request_type="Complaint", complaint_catego
 	sr.flags.ignore_permissions = True
 	sr.insert(ignore_permissions=True)
 	sr.submit()
+	attached = _attach_from_staff("Service Request", sr.name, attachments, sr.dealer)
 	return {
 		"name": sr.name,
 		"dealer": sr.dealer,
 		"is_under_warranty": cint(sr.is_under_warranty),
+		"attached": attached,
 		"ticket": frappe.db.get_value("HD Ticket", {"custom_service_request": sr.name, "custom_warranty_claim": ["is", "not set"]}, "name"),
+		"message": _("{0} raised for {1}.").format(sr.name, serial_no),
 	}
+
+
+def _dealer_user(dealer):
+	return frappe.db.get_value("Dealer", dealer, "portal_user") if dealer else None
+
+
+def _attach_from_staff(doctype, name, attachments, dealer):
+	"""Photos and documents the caller sent in, on the thread, the dealer told."""
+	if not attachments:
+		return 0
+	if isinstance(attachments, str):
+		attachments = frappe.parse_json(attachments)
+	attachments = [a for a in (attachments or []) if a]
+	if not attachments:
+		return 0
+	user = _dealer_user(dealer)
+	add_reply(
+		doctype, name, _("Attachments from KUMAR"),
+		notify_users=[user] if user else None, attachments=attachments,
+	)
+	return len(attachments)
+
+
+def _select_options(doctype, fieldname):
+	f = frappe.get_meta(doctype).get_field(fieldname)
+	return [o for o in (f.options or "").split("\n") if o] if f else []
+
+
+@frappe.whitelist()
+def raise_options():
+	"""Everything the Raise screen's three forms choose from."""
+	_require_staff()
+	return {
+		"request_types": _select_options("Service Request", "custom_request_type"),
+		"complaint_categories": _select_options("Service Request", "complaint_category"),
+		"priorities": _select_options("Service Request", "priority") or ["Low", "Medium", "High", "Critical"],
+		"claim_types": _select_options("Kumar Warranty Claim", "claim_type"),
+		"root_causes": _select_options("Kumar Warranty Claim", "root_cause"),
+		"visit_types": _select_options("Service Visit", "visit_type") or ["On-Site", "Workshop", "Telephonic"],
+		"technicians": frappe.get_all(
+			"Service Technician", fields=["name", "technician_name", "dealer"],
+			order_by="technician_name", limit_page_length=0,
+		),
+	}
+
+
+@frappe.whitelist()
+def find_pumps(q, limit=12):
+	"""The pump behind a phone call: by serial, customer, phone, dealer, district or invoice.
+
+	Registered pumps first - they carry the customer and the warranty. A serial
+	that exists but was never registered still comes back, marked, because the
+	call is real whether or not the dealer did the paperwork.
+	"""
+	_require_staff()
+	q = (q or "").strip()
+	if len(q) < 2:
+		return []
+	like = f"%{q}%"
+	limit = cint(limit) or 12
+	rows = frappe.get_all(
+		"Pump Registration",
+		filters={"docstatus": 1},
+		or_filters=[
+			["serial_no", "like", like], ["end_customer_name", "like", like],
+			["end_customer_mobile", "like", like], ["dealer", "like", like],
+			["district", "like", like], ["invoice_no", "like", like],
+		],
+		fields=["serial_no", "pump_model", "dealer", "end_customer_name", "end_customer_mobile",
+			"district", "sale_date", "warranty_expiry_date"],
+		order_by="sale_date desc",
+		limit_page_length=limit,
+	)
+	# a registration whose serial no longer exists is a broken record, not a pump
+	rows = [r for r in rows if frappe.db.exists("Serial No", r.serial_no)]
+	seen = {r.serial_no for r in rows}
+	for r in rows:
+		r["registered"] = 1
+		r["warranty_status"] = warranty_status_for(r.warranty_expiry_date)
+	if len(rows) < limit:
+		for sn in frappe.get_all(
+			"Serial No",
+			filters=[["name", "like", like], ["name", "not in", list(seen) or [""]]],
+			fields=["name", "custom_pump_model", "custom_dealer"],
+			limit_page_length=limit - len(rows),
+		):
+			rows.append({
+				"serial_no": sn.name, "pump_model": sn.custom_pump_model, "dealer": sn.custom_dealer,
+				"end_customer_name": None, "end_customer_mobile": None, "district": None,
+				"sale_date": None, "warranty_expiry_date": None,
+				"registered": 0, "warranty_status": warranty_status_for(None, registered=False),
+			})
+	return rows
+
+
+@frappe.whitelist()
+def pump_context(serial_no):
+	"""The pump, and what is already open on it - so nothing is raised twice."""
+	_require_staff()
+	from kumar_service.api import get_pump_snapshot
+
+	snap = get_pump_snapshot(serial_no)
+	reqs = frappe.get_all(
+		"Service Request",
+		filters={"serial_no": serial_no, "docstatus": 1,
+			"status": ["not in", ["Resolved", "Closed", "Cancelled"]]},
+		fields=["name", "status", "custom_request_type", "complaint_category", "priority", "reported_on"],
+		order_by="reported_on desc",
+	)
+	for r in reqs:
+		r["ticket"] = frappe.db.get_value(
+			"HD Ticket", {"custom_service_request": r.name, "custom_warranty_claim": ["is", "not set"]}, "name"
+		)
+	claims = frappe.get_all(
+		"Kumar Warranty Claim",
+		filters={"serial_no": serial_no, "docstatus": ["<", 2],
+			"workflow_state": ["not in", ["Settled", "Rejected"]]},
+		fields=["name", "workflow_state", "claim_type", "claim_amount", "claim_date", "service_request"],
+		order_by="claim_date desc",
+	)
+	for c in claims:
+		c["ticket"] = frappe.db.get_value("HD Ticket", {"custom_warranty_claim": c.name}, "name")
+	return {"pump": snap, "open_requests": reqs, "open_claims": claims}
+
+
+def _request_is_for(service_request, serial_no):
+	if not service_request:
+		return None
+	row = frappe.db.get_value("Service Request", service_request, ["serial_no", "docstatus"], as_dict=True)
+	if not row or row.docstatus == 2:
+		frappe.throw(_("{0} does not exist").format(service_request), frappe.DoesNotExistError)
+	if row.serial_no != serial_no:
+		frappe.throw(_("{0} is for a different pump ({1}).").format(service_request, row.serial_no))
+	return service_request
+
+
+@frappe.whitelist()
+def raise_claim_for_pump(serial_no, claim_type="Part Replacement", claim_amount=0, technician_report=None,
+		root_cause=None, service_request=None, attachments=None):
+	"""A warranty claim lodged by KUMAR staff for a dealer who rang or wrote in.
+
+	Same document, same workflow, same ticket as a claim the dealer lodges
+	through the portal - the dealer is simply told it was opened for them.
+	"""
+	_require_staff()
+	if not frappe.db.exists("Serial No", serial_no):
+		frappe.throw(_("Serial number {0} not found").format(serial_no), frappe.DoesNotExistError)
+	dealer = (
+		frappe.db.get_value("Pump Registration", {"serial_no": serial_no, "docstatus": 1}, "dealer")
+		or frappe.db.get_value("Serial No", serial_no, "custom_dealer")
+	)
+	if not dealer:
+		frappe.throw(_("{0} has no dealer on record. Register the sale first; a claim is settled with a dealer.").format(serial_no))
+	if claim_type and claim_type not in _select_options("Kumar Warranty Claim", "claim_type"):
+		frappe.throw(_("{0} is not a claim type.").format(claim_type))
+	service_request = _request_is_for(service_request, serial_no)
+
+	doc = frappe.new_doc("Kumar Warranty Claim")
+	doc.update({
+		"serial_no": serial_no,
+		"dealer": dealer,
+		"claim_date": nowdate(),
+		"claim_type": claim_type or "Part Replacement",
+		"claim_amount": flt(claim_amount),
+		"technician_report": technician_report or None,
+		"root_cause": root_cause or None,
+		"service_request": service_request,
+	})
+	doc.flags.ignore_permissions = True
+	doc.insert(ignore_permissions=True)
+	attached = _attach_from_staff("Kumar Warranty Claim", doc.name, attachments, dealer)
+	# the dealer learns a claim was opened in their name, on the thread they read
+	user = _dealer_user(dealer)
+	add_reply(
+		"Kumar Warranty Claim", doc.name,
+		_("Claim opened by KUMAR on your behalf for {0}.").format(serial_no),
+		notify_users=[user] if user else None,
+	)
+	return {
+		"name": doc.name,
+		"dealer": dealer,
+		"state": doc.get("workflow_state"),
+		"attached": attached,
+		"ticket": frappe.db.get_value("HD Ticket", {"custom_warranty_claim": doc.name}, "name"),
+		"message": _("{0} opened for {1}.").format(doc.name, dealer),
+	}
+
+
+@frappe.whitelist()
+def schedule_visit_for_pump(serial_no, technician, visit_date, visit_type="On-Site", note=None,
+		service_request=None, reason=None):
+	"""Book a technician onto a pump, from a phone call.
+
+	A visit hangs off a request. Attach it to one already open on this pump,
+	or say what the visit is for and one is opened - typed as a visit, so the
+	queue does not read it as a fresh complaint.
+	"""
+	_require_staff()
+	if not frappe.db.exists("Serial No", serial_no):
+		frappe.throw(_("Serial number {0} not found").format(serial_no), frappe.DoesNotExistError)
+	service_request = _request_is_for(service_request, serial_no)
+	if not service_request:
+		if not (reason or "").strip():
+			frappe.throw(_("Say what the visit is for, or attach it to a request already open on this pump."))
+		types = _select_options("Service Request", "custom_request_type")
+		kind = next((t for t in ("Service Visit", "Visit", "Preventive Maintenance", "Complaint") if t in types), None) \
+			or (types[0] if types else "Complaint")
+		made = raise_request_for_pump(serial_no, kind, "Other", reason, "Medium")
+		service_request = made["name"]
+	out = schedule_visit(service_request, technician, visit_date, visit_type=visit_type, note=note)
+	out["service_request"] = service_request
+	out["ticket"] = frappe.db.get_value(
+		"HD Ticket", {"custom_service_request": service_request, "custom_warranty_claim": ["is", "not set"]}, "name"
+	)
+	return out
 
 
 @frappe.whitelist()

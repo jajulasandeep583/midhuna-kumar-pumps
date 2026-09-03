@@ -155,6 +155,7 @@
     <a href="#kb">Knowledge Base</a>
     <div class="grp">KUMAR team</div>
     <a href="#command">Command Centre</a>
+      <a href="#raise">Raise for a Pump</a>
     <a href="#queue">Tickets</a>
     <a href="#claimsdesk">Claims desk</a>
     <a href="#visits">Visits</a>
@@ -356,6 +357,33 @@
         keeps breaking — which is a manufacturing answer as often as a service one.</p>
     </section>
 
+    <section id="raise">
+      <span class="who staff">KUMAR team</span>
+      <h2>Raise for a Pump</h2>
+      <p class="deck"><span class="route">/kumar-desk/raise</span> — the one place to raise anything for whoever rang or wrote in.</p>
+      <p>A dealer raises from the portal. Everyone else — a pump owner on the phone, an email
+        from a site, a distributor's WhatsApp — reaches KUMAR, and KUMAR raises it for them
+        here. Find the pump by <b>serial, customer name, phone, dealer, district or invoice</b>,
+        or scan the nameplate. The pump card shows the warranty verdict, the customer and what is
+        already open on it, so nothing is raised twice — a chip opens the existing ticket.</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Raise</th><th>What happens</th><th>Where it lands</th></tr></thead>
+        <tbody>
+          <tr><td><b>Request</b></td><td>Type, what is wrong, priority, the caller's words, photos or
+              video. Submitted, so the SLA clock starts.</td><td>Its ticket; the dealer is told.</td></tr>
+          <tr><td><b>Warranty claim</b></td><td>Claim type, amount, root cause if known, the failure
+              account, evidence; optionally against a request already open on the pump.
+              Same document and workflow as a dealer's claim.</td>
+              <td>Its own ticket at Pending Review; the dealer is told it was opened for them.</td></tr>
+          <tr><td><b>Visit</b></td><td>Against a request open on the pump, or say what it is for and
+              one is opened typed as a visit. Technician, date, type, a note.</td>
+              <td>The request's ticket, with the booking on the thread.</td></tr>
+        </tbody></table></div>
+      <p>The desk's own <b>Create</b> button on the ticket list comes here too: a ticket with no
+        pump on it is not a KUMAR ticket. A claim needs a dealer on record; a pump sold direct
+        with no registration is told so and the sale is registered first.</p>
+    </section>
+
     <section id="queue">
       <span class="who staff">KUMAR team</span>
       <h2>Tickets</h2>
@@ -438,11 +466,9 @@
         Not registered, with the days left and whether the visit is chargeable said in words, and a
         bar showing how much cover is spent. Under it: whose pump, which heat and winding batch it
         came from, and everything that has already gone wrong with it. A repeat failure is called one.</p>
-      <p><b>Raise a request for this pump</b> is for the caller on the phone or the email that
-        came in: KUMAR staff open a request on any registered pump, on the dealer's behalf, and
-        land on its ticket ready to write. Individual pump owners never need a login; the team
-        carries their call for them. A ticket's KUMAR panel links here with the serial already
-        looked up.</p>
+      <p><b>Raise for this pump</b> hands the serial to <a href="#raise">Raise for a Pump</a>.
+        Individual pump owners never need a login; the team carries their call for them. A
+        ticket's KUMAR panel links here with the serial already looked up.</p>
     </section>
 
     <section id="running">
@@ -492,10 +518,11 @@ bench --site kumarpumps.localhost execute kumar_service.desk_bridge.backfill_thr
       <pre><code>NODE_OPTIONS="--max-old-space-size=6144" yarn --cwd apps/kumar_service/desk build
 bench build --app kumar_service
 bench --site kumarpumps.localhost run-tests --app kumar_service</code></pre>
-      <p>181 tests, including suites that prove one dealer cannot read another's data, that every
+      <p>189 tests, including suites that prove one dealer cannot read another's data, that every
         request and every claim reaches the desk, that a message crosses between request and
         ticket exactly once in each direction, and that a dealer's reply reopens a closed
-        request.</p>
+        request, and that KUMAR staff can find a pump by the caller's phone and raise a request,
+        a claim or a visit for it that lands where a dealer's would.</p>
     </section>
 
     <section id="who-sees">

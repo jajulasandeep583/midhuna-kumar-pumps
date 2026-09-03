@@ -36,7 +36,10 @@ class KumarWarrantyClaim(Document):
 				row.rate = frappe.db.get_value("Item", row.item_code, "valuation_rate") or 0
 			row.amount = flt(row.qty) * flt(row.rate)
 			total += row.amount
-		self.claim_amount = total
+		# with part rows the amount is theirs; without any, the amount that was
+		# typed stands - a claim lodged by phone has a figure before it has parts
+		if self.defective_parts:
+			self.claim_amount = total
 
 	def on_submit(self):
 		if self.service_request:

@@ -5,6 +5,7 @@
         <div class="text-lg font-semibold text-ink-gray-9">{{ __("Command Centre") }}</div>
       </template>
       <template #right-header>
+          <Button variant="solid" theme="blue" :label="__('Raise for a pump')" @click="router.push({ name: 'KumarRaise' })" />
         <Button variant="ghost" :label="__('Refresh')" @click="d.reload()" />
       </template>
     </LayoutHeader>

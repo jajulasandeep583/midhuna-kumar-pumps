@@ -13,7 +13,7 @@
       <template #right-header>
         <RouterLink
           class="inline-flex"
-          :to="{ name: isCustomerPortal ? 'TicketNew' : 'TicketAgentNew' }"
+          :to="{ name: isCustomerPortal ? 'TicketNew' : 'KumarRaise' }"
         >
           <Button
             class="rtl:flex-row-reverse"
