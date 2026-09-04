@@ -398,6 +398,13 @@
         visits rather than a wall of subjects. A ticket a member of staff raised for a caller
         opens with a line saying so: <i>Raised by KUMAR (Ravi) for Deccan Pumps, via Phone</i> —
         the dealer sees at once that KUMAR took the call.</p>
+      <p><b>Who raised it, and for which dealer</b>, is on every ticket and in the list. Each
+        ticket carries <i>Raised by dealer</i> or <i>Raised by KUMAR · the person's name</i>, and
+        the dealer it belongs to. The list has <b>Dealer</b>, <b>Raised by</b> and <b>Via</b>
+        columns, all of them filters — so "everything Deccan Pumps has open" or "everything our
+        own people raised this week" is one filter, not a hunt. Three views are already saved
+        under <b>Public Views</b> in the sidebar for everyone: <i>Raised by dealers</i>,
+        <i>Raised by KUMAR</i> and <i>Warranty claims</i>.</p>
       <p>The right-hand panel, <b>KUMAR Pumps</b>, sits above the ticket's own fields and shows
         the job behind the ticket without leaving the conversation:</p>
       <ul>
@@ -528,7 +535,7 @@ bench --site kumarpumps.localhost execute kumar_service.desk_bridge.backfill_thr
       <pre><code>NODE_OPTIONS="--max-old-space-size=6144" yarn --cwd apps/kumar_service/desk build
 bench build --app kumar_service
 bench --site kumarpumps.localhost run-tests --app kumar_service</code></pre>
-      <p>191 tests, including suites that prove one dealer cannot read another's data, that every
+      <p>192 tests, including suites that prove one dealer cannot read another's data, that every
         request and every claim reaches the desk, that a message crosses between request and
         ticket exactly once in each direction, and that a dealer's reply reopens a closed
         request, and that KUMAR staff can find a pump by the caller's phone and raise a request,

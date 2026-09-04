@@ -116,6 +116,24 @@ TICKET_FIELDS = [
 		"in_standard_filter": 1,
 		"insert_after": "custom_warranty",
 	},
+	{
+		"fieldname": "custom_origin",
+		"fieldtype": "Select",
+		"options": "\nDealer\nKUMAR",
+		"label": "Raised by",
+		"read_only": 1,
+		"in_standard_filter": 1,
+		"insert_after": "custom_channel",
+		"description": "Dealer: they raised it through the portal. KUMAR: a member of staff "
+		"raised it for a caller, a mail or a walk-in.",
+	},
+	{
+		"fieldname": "custom_raised_by_name",
+		"fieldtype": "Data",
+		"label": "Raised by (person)",
+		"read_only": 1,
+		"insert_after": "custom_origin",
+	},
 ]
 
 
@@ -414,6 +432,33 @@ SUPERSEDED_PAGES = {
 }
 
 
+#: Saved views for the ticket list, public, so the queue can be read by who
+#: raised it without anyone building a filter first.
+VIEWS = (
+	("STD-VIEW-KUMAR-BY-DEALERS", "Raised by dealers", {"custom_origin": "Dealer"}),
+	("STD-VIEW-KUMAR-BY-KUMAR", "Raised by KUMAR", {"custom_origin": "KUMAR"}),
+	("STD-VIEW-KUMAR-CLAIMS", "Warranty claims", {"ticket_type": "Warranty Claim"}),
+)
+
+
+def views():
+	if not frappe.db.exists("DocType", "HD View"):
+		return []
+	made = []
+	for name, label, filters in VIEWS:
+		if frappe.db.exists("HD View", name):
+			continue
+		doc = frappe.get_doc({
+			"doctype": "HD View", "name": name, "label": label, "dt": "HD Ticket", "type": "list",
+			"route_name": "TicketsAgent", "public": 1, "is_standard": 1, "load_default_columns": 1,
+			"user": "Administrator", "filters": frappe.as_json(filters), "columns": "[]", "rows": "[]",
+		})
+		doc.flags.ignore_permissions = True
+		doc.insert(ignore_permissions=True, set_name=name)
+		made.append(name)
+	return made
+
+
 def retire_superseded():
 	"""Take down what the desk replaced, and helpdesk's own out-of-box furniture.
 
@@ -508,6 +553,7 @@ def build_all():
 		"agents": agents(),
 		"ticket_types": ticket_types(),
 		"ticket_fields": ticket_fields(),
+		"views": views(),
 		"request_type_field": request_type_field(),
 		"dealer_permissions": dealer_permissions(),
 		"staff_permissions": staff_permissions(),

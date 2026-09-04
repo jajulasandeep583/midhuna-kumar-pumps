@@ -27,8 +27,20 @@
           <span v-if="ticket.doc.custom_serial_no" class="text-xs tabular-nums text-ink-gray-6">
             {{ ticket.doc.custom_serial_no }}
           </span>
+          <span v-if="ticket.doc.custom_dealer" class="text-xs text-ink-gray-6">
+            · {{ ticket.doc.custom_dealer }}
+          </span>
+          <!-- who raised it: the dealer themselves, or a member of KUMAR staff for a caller -->
+          <Badge
+            v-if="ticket.doc.custom_origin"
+            :label="ticket.doc.custom_origin === 'KUMAR'
+              ? __('Raised by KUMAR{0}', [ticket.doc.custom_raised_by_name ? ' · ' + ticket.doc.custom_raised_by_name : ''])
+              : __('Raised by dealer')"
+            :theme="ticket.doc.custom_origin === 'KUMAR' ? 'blue' : 'gray'"
+            variant="outline"
+          />
           <span v-if="ticket.doc.custom_channel" class="text-xs text-ink-gray-5">
-            · {{ __("via {0}", [__(ticket.doc.custom_channel)]) }}
+            {{ __("via {0}", [__(ticket.doc.custom_channel)]) }}
           </span>
         </div>
       </div>

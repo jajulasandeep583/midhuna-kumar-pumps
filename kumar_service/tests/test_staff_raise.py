@@ -174,6 +174,11 @@ class TestStaffRaise(IntegrationTestCase):
 		)
 		self.assertEqual(t.ticket_type, "Complaint", "the ticket's kind is the request's kind")
 		self.assertEqual(t.custom_channel, "WhatsApp", "the ticket says how it reached KUMAR")
+		self.assertEqual(
+			frappe.db.get_value("HD Ticket", out["ticket"], "custom_origin"), "KUMAR",
+			"a staff-raised ticket is filed as raised by KUMAR",
+		)
+		self.assertTrue(frappe.db.get_value("HD Ticket", out["ticket"], "custom_raised_by_name"), "and names the person")
 		self.assertIn("Raised by KUMAR", t.description, "the opener says who raised it")
 		self.assertIn(frappe.utils.escape_html(self.reg.dealer), t.description, "...and for whom")
 
@@ -184,3 +189,12 @@ class TestStaffRaise(IntegrationTestCase):
 		self.made.append(("Service Request", out["name"]))
 		self._track_ticket(out.get("ticket"))
 		self.assertEqual(frappe.db.get_value("Service Request", out["name"], "custom_channel"), "Phone")
+
+	def test_the_queue_can_be_read_by_who_raised_it(self):
+		if not frappe.db.exists("DocType", "HD View"):
+			self.skipTest("no HD View on this site")
+		for name, label in (("STD-VIEW-KUMAR-BY-DEALERS", "Raised by dealers"), ("STD-VIEW-KUMAR-BY-KUMAR", "Raised by KUMAR")):
+			v = frappe.db.get_value("HD View", name, ["label", "public", "filters"], as_dict=True)
+			self.assertTrue(v, f"{label} view is missing")
+			self.assertEqual(v.public, 1)
+			self.assertIn("custom_origin", v.filters)

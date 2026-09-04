@@ -1192,6 +1192,9 @@ class HDTicket(Document):
                 "key": "ticket_type",
                 "width": "11rem",
             },
+            {"label": "Dealer", "type": "Link", "options": "Dealer", "key": "custom_dealer", "width": "11rem"},
+            {"label": "Raised by", "type": "Select", "key": "custom_origin", "width": "7rem"},
+            {"label": "Via", "type": "Select", "key": "custom_channel", "width": "8rem"},
             {
                 "label": "Team",
                 "type": "Link",

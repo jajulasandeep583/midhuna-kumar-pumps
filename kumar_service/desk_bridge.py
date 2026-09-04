@@ -152,6 +152,15 @@ def _channel(doc):
 	return "Dealer Portal" if (doc.get("owner") or frappe.session.user) in _portal_users() else "Phone"
 
 
+def _origin(doc):
+	return "Dealer" if _channel(doc) == "Dealer Portal" else "KUMAR"
+
+
+def _raised_by_name(doc):
+	who = doc.get("owner") or frappe.session.user
+	return frappe.db.get_value("User", who, "full_name") or who
+
+
 def _raised_for_line(doc, dealer):
 	"""'Raised by KUMAR (Ravi) for Deccan Pumps, by phone.' - or nothing when the
 	dealer raised it themselves, because then the sender line already says so."""
@@ -222,6 +231,8 @@ def _mirror(sr):
 		"custom_pump_model": sr.get("pump_model"),
 		"custom_warranty": "In Warranty" if cint(sr.get("is_under_warranty")) else "Out of Warranty",
 		"custom_channel": _channel(sr),
+		"custom_origin": _origin(sr),
+		"custom_raised_by_name": _raised_by_name(sr),
 	}
 
 	if existing:
@@ -340,6 +351,8 @@ def _mirror_claim(claim):
 		"custom_pump_model": claim.get("pump_model"),
 		"custom_warranty": _warranty_label(claim.get("serial_no")),
 		"custom_channel": _channel(claim),
+		"custom_origin": _origin(claim),
+		"custom_raised_by_name": _raised_by_name(claim),
 	}
 	if existing:
 		for field, value in values.items():

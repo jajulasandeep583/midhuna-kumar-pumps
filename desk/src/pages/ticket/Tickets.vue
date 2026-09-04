@@ -204,6 +204,16 @@ const options = computed(() => ({
     priority: {
       custom: ({ item }) => h(TicketPriority, { priority: item }),
     },
+    custom_origin: {
+      custom: ({ item }) =>
+        item
+          ? h(Badge, {
+              label: item === "KUMAR" ? __("KUMAR") : __("Dealer"),
+              theme: item === "KUMAR" ? "blue" : "gray",
+              variant: "outline",
+            })
+          : null,
+    },
     ticket_type: {
       custom: ({ item }) =>
         h(Badge, {
