@@ -365,7 +365,9 @@
         from a site, a distributor's WhatsApp — reaches KUMAR, and KUMAR raises it for them
         here. Find the pump by <b>serial, customer name, phone, dealer, district or invoice</b>,
         or scan the nameplate. The pump card shows the warranty verdict, the customer and what is
-        already open on it, so nothing is raised twice — a chip opens the existing ticket.</p>
+        already open on it, so nothing is raised twice — a chip opens the existing ticket. Say how
+        it reached you — phone, email, WhatsApp, walk-in, field visit — and that travels onto the
+        request and the ticket.</p>
       <div class="tablewrap"><table>
         <thead><tr><th>Raise</th><th>What happens</th><th>Where it lands</th></tr></thead>
         <tbody>
@@ -388,6 +390,14 @@
       <span class="who staff">KUMAR team</span>
       <h2>Tickets</h2>
       <p class="deck">Every request and every claim is a ticket, and the ticket is the one screen.</p>
+      <p><b>What kind of ticket it is</b> is the first thing on it. Under the title sit a coloured
+        chip for the kind — <span class="pill warn">Complaint</span> Warranty Claim, Installation,
+        Spare Part, Enquiry — the warranty verdict, the serial, and how it reached KUMAR
+        (<i>via Dealer Portal</i>, <i>via Phone</i>, WhatsApp, Email, Walk-in). The ticket list
+        carries the same chip in its Type column, so a queue reads as complaints, claims and
+        visits rather than a wall of subjects. A ticket a member of staff raised for a caller
+        opens with a line saying so: <i>Raised by KUMAR (Ravi) for Deccan Pumps, via Phone</i> —
+        the dealer sees at once that KUMAR took the call.</p>
       <p>The right-hand panel, <b>KUMAR Pumps</b>, sits above the ticket's own fields and shows
         the job behind the ticket without leaving the conversation:</p>
       <ul>
@@ -518,7 +528,7 @@ bench --site kumarpumps.localhost execute kumar_service.desk_bridge.backfill_thr
       <pre><code>NODE_OPTIONS="--max-old-space-size=6144" yarn --cwd apps/kumar_service/desk build
 bench build --app kumar_service
 bench --site kumarpumps.localhost run-tests --app kumar_service</code></pre>
-      <p>189 tests, including suites that prove one dealer cannot read another's data, that every
+      <p>191 tests, including suites that prove one dealer cannot read another's data, that every
         request and every claim reaches the desk, that a message crosses between request and
         ticket exactly once in each direction, and that a dealer's reply reopens a closed
         request, and that KUMAR staff can find a pump by the caller's phone and raise a request,

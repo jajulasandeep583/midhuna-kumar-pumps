@@ -155,3 +155,32 @@ class TestStaffRaise(IntegrationTestCase):
 				find_pumps("KP-")
 		finally:
 			frappe.set_user("Administrator")
+
+
+	def test_a_staff_raised_ticket_says_what_it_is_and_how_it_came(self):
+		from kumar_service.staff_api import raise_request_for_pump
+
+		out = raise_request_for_pump(
+			self.reg.serial_no, "Complaint", "Other", "Caller says it hums and trips", "High",
+			channel="WhatsApp",
+		)
+		self.made.append(("Service Request", out["name"]))
+		self._track_ticket(out.get("ticket"))
+		self.assertEqual(frappe.db.get_value("Service Request", out["name"], "custom_channel"), "WhatsApp")
+		if not desk_installed():
+			return
+		t = frappe.db.get_value(
+			"HD Ticket", out["ticket"], ["ticket_type", "custom_channel", "description"], as_dict=True
+		)
+		self.assertEqual(t.ticket_type, "Complaint", "the ticket's kind is the request's kind")
+		self.assertEqual(t.custom_channel, "WhatsApp", "the ticket says how it reached KUMAR")
+		self.assertIn("Raised by KUMAR", t.description, "the opener says who raised it")
+		self.assertIn(frappe.utils.escape_html(self.reg.dealer), t.description, "...and for whom")
+
+	def test_a_bad_channel_falls_back_to_phone(self):
+		from kumar_service.staff_api import raise_request_for_pump
+
+		out = raise_request_for_pump(self.reg.serial_no, "Complaint", "Other", "x", "Low", channel="Carrier pigeon")
+		self.made.append(("Service Request", out["name"]))
+		self._track_ticket(out.get("ticket"))
+		self.assertEqual(frappe.db.get_value("Service Request", out["name"], "custom_channel"), "Phone")

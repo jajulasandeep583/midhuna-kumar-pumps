@@ -194,8 +194,17 @@ def get_communications(ticket: str):
     for c in communications:
         c.attachments = get_attachments("Communication", c.name)
         user_id = c.user if c.sent_or_received == "Sent" and c.user else c.sender
-        c.user = get_user_info_for_avatar(user_id)
+        c.user = get_user_info_for_avatar(_user_for(user_id))
     return communications
+
+
+def _user_for(user_id):
+    """Communication stores a sender as an email; a User is keyed by name. For
+    most users those are the same string; for Administrator (admin@example.com)
+    they are not, and the desk showed the address where the name belongs."""
+    if user_id and not frappe.db.exists("User", user_id):
+        return frappe.db.get_value("User", {"email": user_id}, "name") or user_id
+    return user_id
 
 
 def get_comments(ticket: str):

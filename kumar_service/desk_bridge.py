@@ -140,6 +140,33 @@ def _subject(sr):
 	return " - ".join(bits)
 
 
+def _channel(doc):
+	"""How it reached KUMAR. Set on the document by whoever raised it; else
+	inferred: a portal user's document came through the portal, anyone else's
+	was a call taken by staff."""
+	if doc.get("custom_channel"):
+		return doc.get("custom_channel")
+	if doc.flags.get("channel"):
+		return doc.flags.get("channel")
+	from kumar_service.portal_api import _portal_users
+	return "Dealer Portal" if (doc.get("owner") or frappe.session.user) in _portal_users() else "Phone"
+
+
+def _raised_for_line(doc, dealer):
+	"""'Raised by KUMAR (Ravi) for Deccan Pumps, by phone.' - or nothing when the
+	dealer raised it themselves, because then the sender line already says so."""
+	channel = _channel(doc)
+	if channel == "Dealer Portal":
+		return ""
+	who = doc.get("owner") or frappe.session.user
+	name = frappe.db.get_value("User", who, "full_name") or who
+	for_whom = f" for {frappe.utils.escape_html(dealer)}" if dealer else ""
+	return (
+		f"<p><em>Raised by KUMAR ({frappe.utils.escape_html(name)}){for_whom}, "
+		f"via {frappe.utils.escape_html(channel)}.</em></p>"
+	)
+
+
 def _description(sr):
 	rows = [
 		("Serial No", sr.get("serial_no")),
@@ -156,7 +183,7 @@ def _description(sr):
 		for k, v in rows if v
 	)
 	body = frappe.utils.escape_html(sr.get("complaint_description") or "")
-	return f"<p>{body}</p><table>{lines}</table>"
+	return f"{_raised_for_line(sr, sr.get('dealer'))}<p>{body}</p><table>{lines}</table>"
 
 
 def _ticket_type(sr):
@@ -194,6 +221,7 @@ def _mirror(sr):
 		"custom_dealer": sr.get("dealer"),
 		"custom_pump_model": sr.get("pump_model"),
 		"custom_warranty": "In Warranty" if cint(sr.get("is_under_warranty")) else "Out of Warranty",
+		"custom_channel": _channel(sr),
 	}
 
 	if existing:
@@ -311,6 +339,7 @@ def _mirror_claim(claim):
 		"custom_dealer": claim.get("dealer"),
 		"custom_pump_model": claim.get("pump_model"),
 		"custom_warranty": _warranty_label(claim.get("serial_no")),
+		"custom_channel": _channel(claim),
 	}
 	if existing:
 		for field, value in values.items():
@@ -334,7 +363,7 @@ def _mirror_claim(claim):
 	ticket = frappe.get_doc(
 		dict(
 			doctype="HD Ticket",
-			description=f"<p>{report}</p><table>{table}</table>",
+			description=f"{_raised_for_line(claim, claim.get('dealer'))}<p>{report}</p><table>{table}</table>",
 			customer=customer,
 			ticket_type="Warranty Claim" if frappe.db.exists("HD Ticket Type", "Warranty Claim") else None,
 			**values,
@@ -559,7 +588,13 @@ def backfill_thread(limit=None):
 			fields=["name", "reference_name", "content", "comment_email", "owner", "creation"],
 			order_by="creation asc", limit_page_length=cint(limit) or 0,
 		):
-			if frappe.db.exists("Communication", {"message_id": f"kumar-comment:{c.name}"}):
+			tk = ticket_for(dt, c.reference_name)
+			if not tk:
+				continue
+			# on THIS ticket: a marker left on a ticket that was since deleted (its
+			# reference goes blank) must not stop the message reaching the new one
+			if frappe.db.exists("Communication", {"reference_doctype": "HD Ticket", "reference_name": tk,
+					"message_id": f"kumar-comment:{c.name}"}):
 				skipped += 1
 				continue
 			who = c.comment_email or c.owner

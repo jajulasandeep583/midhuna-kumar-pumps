@@ -100,6 +100,16 @@
         </div>
 
         <div class="mt-4 rounded-xl border bg-surface-white p-5">
+          <!-- how it reached KUMAR: stamped on the request and shown on the ticket -->
+          <div class="mb-4 flex flex-wrap items-center gap-2 border-b pb-4">
+            <span class="text-sm text-ink-gray-6">{{ __("Reached you via") }}</span>
+            <button
+              v-for="c in options.data?.channels || []" :key="c"
+              class="rounded-full border px-3 py-1 text-sm transition-colors"
+              :class="channel === c ? 'border-blue-600 bg-blue-50 text-blue-800' : 'text-ink-gray-7 hover:bg-surface-gray-2'"
+              @click="channel = c"
+            >{{ __(c) }}</button>
+          </div>
           <!-- a request -->
           <div v-if="mode === 'request'" class="space-y-3">
             <div class="grid gap-3 sm:grid-cols-3">
@@ -188,6 +198,7 @@ const MODES = [
   { key: "visit", label: __("Visit") },
 ];
 const mode = ref<string>("request");
+const channel = ref<string>("Phone");
 
 // ---------------------------------------------------------------- the pump
 const q = ref("");
@@ -279,20 +290,20 @@ function landed(d: any, fallback: string) {
 const sendRequest = createResource({
   url: "kumar_service.staff_api.raise_request_for_pump",
   makeParams: () => ({ serial_no: picked.value, request_type: req.request_type, complaint_category: req.complaint_category,
-    description: req.description, priority: req.priority, attachments: attachments() }),
+    description: req.description, priority: req.priority, attachments: attachments(), channel: channel.value }),
   onSuccess: (d: any) => landed(d, __("Request raised")),
 });
 const sendClaim = createResource({
   url: "kumar_service.staff_api.raise_claim_for_pump",
   makeParams: () => ({ serial_no: picked.value, claim_type: clm.claim_type, claim_amount: clm.claim_amount || 0,
     technician_report: clm.technician_report, root_cause: clm.root_cause || null, service_request: clm.service_request || null,
-    attachments: attachments() }),
+    attachments: attachments(), channel: channel.value }),
   onSuccess: (d: any) => landed(d, __("Claim lodged")),
 });
 const sendVisit = createResource({
   url: "kumar_service.staff_api.schedule_visit_for_pump",
   makeParams: () => ({ serial_no: picked.value, technician: vis.technician, visit_date: vis.visit_date, visit_type: vis.visit_type,
-    note: vis.note, service_request: vis.service_request || null, reason: vis.reason }),
+    note: vis.note, service_request: vis.service_request || null, reason: vis.reason, channel: channel.value }),
   onSuccess: (d: any) => landed(d, __("Visit booked")),
 });
 

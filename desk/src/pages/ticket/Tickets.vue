@@ -89,6 +89,7 @@ import { __ } from "@/translation";
 import { View } from "@/types";
 import { isCustomerPortal, shortDuration } from "@/utils";
 import { Badge, dayjs, Tooltip, usePageMeta } from "frappe-ui";
+import { ticketTypeLabel, ticketTypeTheme } from "@/utils/kumarTypes";
 import { computed, h, onMounted, onUnmounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -202,6 +203,14 @@ const options = computed(() => ({
     },
     priority: {
       custom: ({ item }) => h(TicketPriority, { priority: item }),
+    },
+    ticket_type: {
+      custom: ({ item }) =>
+        h(Badge, {
+          label: ticketTypeLabel(item),
+          theme: ticketTypeTheme(item),
+          variant: "subtle",
+        }),
     },
     agreement_status: {
       custom: ({ item }) => {

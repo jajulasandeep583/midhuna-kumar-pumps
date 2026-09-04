@@ -291,6 +291,7 @@ def raise_complaint(serial_no, complaint_category, complaint_description, priori
 			"complaint_category": complaint_category,
 			"complaint_description": complaint_description,
 			"custom_request_type": request_type or "Complaint",
+			"custom_channel": "Dealer Portal",
 			"priority": priority or "Medium",
 			"reported_on": now_datetime(),
 		}
@@ -375,6 +376,7 @@ def raise_claim(
 			"service_request": service_request or None,
 		}
 	)
+	doc.flags.channel = "Dealer Portal"
 
 	if parts:
 		if isinstance(parts, str):

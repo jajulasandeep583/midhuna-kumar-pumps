@@ -823,8 +823,13 @@ def claim_action(name, action, approved_amount=None, remarks=None):
 
 
 @frappe.whitelist()
+def _valid_channel(channel):
+	from kumar_service.setup.desk import CHANNELS
+	return channel if channel in CHANNELS and channel != "Dealer Portal" else "Phone"
+
+
 def raise_request_for_pump(serial_no, request_type="Complaint", complaint_category="Other",
-		description="", priority="Medium", attachments=None):
+		description="", priority="Medium", attachments=None, channel="Phone"):
 	"""A request raised by KUMAR staff on behalf of whoever rang."""
 	_require_staff()
 	if not frappe.db.exists("Serial No", serial_no):
@@ -838,6 +843,7 @@ def raise_request_for_pump(serial_no, request_type="Complaint", complaint_catego
 			"serial_no": serial_no,
 			"complaint_category": complaint_category or "Other",
 			"custom_request_type": request_type or "Complaint",
+			"custom_channel": _valid_channel(channel),
 			"complaint_description": description,
 			"priority": priority or "Medium",
 			"reported_on": now_datetime(),
@@ -896,6 +902,7 @@ def raise_options():
 		"claim_types": _select_options("Kumar Warranty Claim", "claim_type"),
 		"root_causes": _select_options("Kumar Warranty Claim", "root_cause"),
 		"visit_types": _select_options("Service Visit", "visit_type") or ["On-Site", "Workshop", "Telephonic"],
+		"channels": [c for c in __import__("kumar_service.setup.desk", fromlist=["CHANNELS"]).CHANNELS if c != "Dealer Portal"],
 		"technicians": frappe.get_all(
 			"Service Technician", fields=["name", "technician_name", "dealer"],
 			order_by="technician_name", limit_page_length=0,
@@ -995,7 +1002,7 @@ def _request_is_for(service_request, serial_no):
 
 @frappe.whitelist()
 def raise_claim_for_pump(serial_no, claim_type="Part Replacement", claim_amount=0, technician_report=None,
-		root_cause=None, service_request=None, attachments=None):
+		root_cause=None, service_request=None, attachments=None, channel="Phone"):
 	"""A warranty claim lodged by KUMAR staff for a dealer who rang or wrote in.
 
 	Same document, same workflow, same ticket as a claim the dealer lodges
@@ -1026,6 +1033,7 @@ def raise_claim_for_pump(serial_no, claim_type="Part Replacement", claim_amount=
 		"service_request": service_request,
 	})
 	doc.flags.ignore_permissions = True
+	doc.flags.channel = _valid_channel(channel)
 	doc.insert(ignore_permissions=True)
 	attached = _attach_from_staff("Kumar Warranty Claim", doc.name, attachments, dealer)
 	# the dealer learns a claim was opened in their name, on the thread they read
@@ -1047,7 +1055,7 @@ def raise_claim_for_pump(serial_no, claim_type="Part Replacement", claim_amount=
 
 @frappe.whitelist()
 def schedule_visit_for_pump(serial_no, technician, visit_date, visit_type="On-Site", note=None,
-		service_request=None, reason=None):
+		service_request=None, reason=None, channel="Phone"):
 	"""Book a technician onto a pump, from a phone call.
 
 	A visit hangs off a request. Attach it to one already open on this pump,
@@ -1064,7 +1072,7 @@ def schedule_visit_for_pump(serial_no, technician, visit_date, visit_type="On-Si
 		types = _select_options("Service Request", "custom_request_type")
 		kind = next((t for t in ("Service Visit", "Visit", "Preventive Maintenance", "Complaint") if t in types), None) \
 			or (types[0] if types else "Complaint")
-		made = raise_request_for_pump(serial_no, kind, "Other", reason, "Medium")
+		made = raise_request_for_pump(serial_no, kind, "Other", reason, "Medium", channel=channel)
 		service_request = made["name"]
 	out = schedule_visit(service_request, technician, visit_date, visit_type=visit_type, note=note)
 	out["service_request"] = service_request

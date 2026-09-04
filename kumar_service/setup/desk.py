@@ -37,6 +37,10 @@ TICKET_TYPES = (
 # What HD Ticket has to carry to be a useful mirror of a Service Request. These
 # are custom fields on the fork's doctype rather than edits to its json, so the
 # fork stays mergeable with upstream.
+#: How a request or claim reached KUMAR. "Dealer Portal" is set by the portal
+#: itself; the rest are what a member of staff picks on the Raise screen.
+CHANNELS = ("Dealer Portal", "Phone", "Email", "WhatsApp", "Walk-in", "Field Visit")
+
 TICKET_FIELDS = [
 	{
 		"fieldname": "custom_kumar_section",
@@ -103,6 +107,15 @@ TICKET_FIELDS = [
 		"insert_after": "custom_dealer",
 		"description": "Whether the visit is chargeable - the first thing a dealer asks.",
 	},
+	{
+		"fieldname": "custom_channel",
+		"fieldtype": "Select",
+		"options": "\n".join(CHANNELS),
+		"label": "Reached KUMAR via",
+		"read_only": 1,
+		"in_standard_filter": 1,
+		"insert_after": "custom_warranty",
+	},
 ]
 
 
@@ -132,7 +145,17 @@ SERVICE_REQUEST_FIELDS = [
 		"in_standard_filter": 1,
 		"description": "What the dealer is asking for. A complaint is a fault; "
 		"the rest are work they want done.",
-	}
+	},
+	{
+		"fieldname": "custom_channel",
+		"fieldtype": "Select",
+		"label": "Reached KUMAR via",
+		"options": "\n".join(CHANNELS),
+		"insert_after": "custom_request_type",
+		"in_standard_filter": 1,
+		"description": "How this reached KUMAR: the dealer portal, or a call, mail, "
+		"WhatsApp or walk-in that a member of staff raised on their behalf.",
+	},
 ]
 
 
@@ -402,7 +425,12 @@ def retire_superseded():
 	# work somebody has to do
 	if frappe.db.exists("DocType", "HD Ticket"):
 		for t in frappe.get_all(
-			"HD Ticket", filters={"custom_service_request": ["in", ["", None]]}, pluck="name"
+			# a ticket with neither a request nor a claim behind it is helpdesk's
+			# sample; a claim's ticket has no request link BY DESIGN and stays
+			"HD Ticket",
+			filters={"custom_service_request": ["in", ["", None]],
+				"custom_warranty_claim": ["in", ["", None]]},
+			pluck="name",
 		):
 			frappe.delete_doc("HD Ticket", t, force=True, ignore_permissions=True)
 			done.append(f"sample ticket {t}")

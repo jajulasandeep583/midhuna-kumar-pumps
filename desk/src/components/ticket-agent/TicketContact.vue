@@ -30,7 +30,7 @@
         </p>
         <div class="flex items-center">
           <span>{{
-            ticket.doc.via_customer_portal ? __("via Portal") : __("via Email")
+            ticket.doc.custom_channel ? __("via {0}", [__(ticket.doc.custom_channel)]) : ticket.doc.via_customer_portal ? __("via Portal") : __("via Email")
           }}</span>
         </div>
       </div>

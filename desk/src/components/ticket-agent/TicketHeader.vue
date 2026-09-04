@@ -11,6 +11,26 @@
             />
           </template>
         </Breadcrumbs>
+        <!-- what kind of ticket this is, before anything else -->
+        <div v-if="ticket.doc" class="mt-0.5 flex flex-wrap items-center gap-1.5">
+          <Badge
+            :label="ticketTypeLabel(ticket.doc.ticket_type)"
+            :theme="ticketTypeTheme(ticket.doc.ticket_type)"
+            variant="solid"
+          />
+          <Badge
+            v-if="ticket.doc.custom_warranty"
+            :label="__(ticket.doc.custom_warranty)"
+            :theme="warrantyTheme(ticket.doc.custom_warranty)"
+            variant="subtle"
+          />
+          <span v-if="ticket.doc.custom_serial_no" class="text-xs tabular-nums text-ink-gray-6">
+            {{ ticket.doc.custom_serial_no }}
+          </span>
+          <span v-if="ticket.doc.custom_channel" class="text-xs text-ink-gray-5">
+            · {{ __("via {0}", [__(ticket.doc.custom_channel)]) }}
+          </span>
+        </div>
       </div>
     </template>
     <template #right-header>
@@ -78,6 +98,7 @@
 
 <script setup lang="ts">
 import { MultipleAvatar } from "@/components";
+import { ticketTypeLabel, ticketTypeTheme, warrantyTheme } from "@/utils/kumarTypes";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import TicketMergeModal from "@/components/ticket/TicketMergeModal.vue";
 import { showMergeModal } from "@/pages/ticket/modalStates";
@@ -98,11 +119,12 @@ import {
 import { HDTicketStatus } from "@/types/doctypes";
 import { getIcon } from "@/utils";
 import {
+  Badge,
   Breadcrumbs,
   Button,
+  Dropdown,
   call,
   createResource,
-  Dropdown,
   toast,
 } from "frappe-ui";
 import {
