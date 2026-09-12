@@ -110,7 +110,9 @@
                 <Badge :label="visitState(v).label" :theme="visitState(v).theme" variant="subtle" />
               </div>
               <div class="text-xs text-ink-gray-6">
-                {{ v.technician }} · {{ v.visit_type }}<span v-if="v.is_chargeable"> · {{ __("chargeable") }}</span>
+                {{ v.technician }}<a v-if="v.technician_mobile" :href="`tel:${v.technician_mobile}`"
+                  class="tabular-nums text-ink-blue-6 hover:underline"> {{ v.technician_mobile }}</a>
+                · {{ v.visit_type }}<span v-if="v.is_chargeable"> · {{ __("chargeable") }}</span>
               </div>
               <div v-if="v.docstatus === 1 && (v.findings || v.action_taken)" class="mt-0.5 line-clamp-2 text-xs text-ink-gray-5">
                 {{ v.findings || v.action_taken }}

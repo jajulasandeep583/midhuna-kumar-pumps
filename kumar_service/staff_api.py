@@ -384,6 +384,10 @@ def visit_board(limit=100):
 			"Service Request", v.service_request, "end_customer_name"
 		)
 		v["dealer"] = frappe.db.get_value("Service Request", v.service_request, "dealer")
+		# the person going carries a phone; the board is where you ring them from
+		v["technician_mobile"] = frappe.db.get_value(
+			"Service Technician", v.technician, "mobile_no"
+		)
 
 	technicians = frappe.get_all(
 		"Service Technician",
@@ -446,7 +450,13 @@ def schedule_visit(service_request, technician, visit_date, visit_type="On-Site"
 	visit.flags.ignore_permissions = True
 	visit.insert(ignore_permissions=True)
 
-	tech_name = frappe.db.get_value("Service Technician", technician, "technician_name") or technician
+	tech = frappe.db.get_value(
+		"Service Technician", technician, ["technician_name", "mobile_no"], as_dict=True
+	) or frappe._dict()
+	tech_name = tech.technician_name or technician
+	if tech.mobile_no:
+		# the dealer plans the day around this visit; give them someone to ring
+		tech_name = f"{tech_name} ({tech.mobile_no})"
 	when = frappe.utils.formatdate(visit_date, "dd-MM-yyyy")
 	message = _("Visit scheduled for {0}. {1} will attend.").format(when, tech_name)
 	if chargeable:
@@ -905,7 +915,7 @@ def raise_options():
 		"visit_types": _select_options("Service Visit", "visit_type") or ["On-Site", "Workshop", "Telephonic"],
 		"channels": [c for c in __import__("kumar_service.setup.desk", fromlist=["CHANNELS"]).CHANNELS if c != "Dealer Portal"],
 		"technicians": frappe.get_all(
-			"Service Technician", fields=["name", "technician_name", "dealer"],
+			"Service Technician", fields=["name", "technician_name", "dealer", "mobile_no"],
 			order_by="technician_name", limit_page_length=0,
 		),
 	}
@@ -1116,7 +1126,12 @@ def schedule_visit_for_claim(claim, technician, visit_date, visit_type="On-Site"
 	# its ticket - must say so too. schedule_visit told the request's thread;
 	# a dealer reading the claim would otherwise never see the date.
 	try:
-		tech_name = frappe.db.get_value("Service Technician", technician, "technician_name") or technician
+		tech = frappe.db.get_value(
+			"Service Technician", technician, ["technician_name", "mobile_no"], as_dict=True
+		) or frappe._dict()
+		tech_name = tech.technician_name or technician
+		if tech.mobile_no:
+			tech_name = f"{tech_name} ({tech.mobile_no})"
 		add_reply(
 			"Kumar Warranty Claim", claim,
 			_("Visit scheduled for {0}. {1} will attend ({2}). Tracked on {3}.").format(
@@ -1181,6 +1196,9 @@ def ticket_context(ticket):
 	today = nowdate()
 	for v in visits:
 		v["upcoming"] = str(v.visit_date) >= today
+		v["technician_mobile"] = frappe.db.get_value(
+			"Service Technician", v.technician, "mobile_no"
+		)
 
 	serial = t.custom_serial_no or (request and request.serial_no)
 	site = frappe.db.get_value(
@@ -1195,7 +1213,7 @@ def ticket_context(ticket):
 		"serial_no": serial,
 		"site": site,
 		"technicians": frappe.get_all(
-			"Service Technician", fields=["name", "technician_name", "dealer"],
+			"Service Technician", fields=["name", "technician_name", "dealer", "mobile_no"],
 			order_by="technician_name", limit_page_length=0,
 		),
 	}

@@ -441,6 +441,19 @@ VIEWS = (
 )
 
 
+#: Helpdesk's own seeded views. Every one filters on "assigned to @me", which on
+#: this desk is an empty list dressed as a shortcut - tickets are worked from
+#: the queue and the Command Centre, not from personal assignment. Left public,
+#: they sat ABOVE the three KUMAR views and were the only thing anyone saw
+#: under Public Views.
+STOCK_VIEWS_TO_UNPUBLISH = (
+	"STD-VIEW-SLA-ALERTS",
+	"STD-VIEW-RECENTLY-ASSIGNED-TICKETS",
+	"STD-VIEW-PENDING-TICKETS",
+	"STD-VIEW-ALL-FEEDBACK",
+)
+
+
 def views():
 	if not frappe.db.exists("DocType", "HD View"):
 		return []
@@ -456,6 +469,10 @@ def views():
 		doc.flags.ignore_permissions = True
 		doc.insert(ignore_permissions=True, set_name=name)
 		made.append(name)
+	for name in STOCK_VIEWS_TO_UNPUBLISH:
+		if frappe.db.exists("HD View", name) and frappe.db.get_value("HD View", name, "public"):
+			frappe.db.set_value("HD View", name, "public", 0, update_modified=False)
+			made.append(f"unpublished {name}")
 	return made
 
 

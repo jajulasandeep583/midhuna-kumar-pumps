@@ -10,24 +10,32 @@
     </LayoutHeader>
 
     <div class="px-5 py-5">
+      <!-- say what each number IS - a first-time viewer should not have to
+           guess where these rows come from -->
+      <p class="mb-4 max-w-3xl text-sm text-ink-gray-6">
+        {{ __("Every open request that has nobody booked to go lands here by itself - raised by a dealer on the portal or by KUMAR for a caller. Book a technician and the row moves to Booked, and the dealer is told on their ticket.") }}
+      </p>
       <div class="mb-5 grid gap-3 sm:grid-cols-3">
         <div class="rounded-xl border border-amber-200 bg-amber-50 p-4">
           <div class="text-xs font-medium text-amber-700">{{ __("Waiting for a visit") }}</div>
           <div class="mt-1 text-3xl font-semibold tabular-nums text-amber-800">
             {{ board.data?.needs_visit?.length ?? "-" }}
           </div>
+          <div class="mt-0.5 text-xs text-amber-700">{{ __("open requests, nobody booked yet") }}</div>
         </div>
         <div class="rounded-xl border border-blue-200 bg-blue-50 p-4">
           <div class="text-xs font-medium text-blue-700">{{ __("Booked") }}</div>
           <div class="mt-1 text-3xl font-semibold tabular-nums text-blue-800">
             {{ board.data?.scheduled?.length ?? "-" }}
           </div>
+          <div class="mt-0.5 text-xs text-blue-700">{{ __("visits from today onward") }}</div>
         </div>
         <div class="rounded-xl border border-outline-gray-2 bg-surface-white p-4">
           <div class="text-xs font-medium text-ink-gray-5">{{ __("Technicians") }}</div>
           <div class="mt-1 text-3xl font-semibold tabular-nums text-ink-gray-9">
             {{ board.data?.technicians?.length ?? "-" }}
           </div>
+          <div class="mt-0.5 text-xs text-ink-gray-5">{{ __("field engineers you can send") }}</div>
         </div>
       </div>
 
@@ -102,7 +110,11 @@
           <tbody>
             <tr v-for="v in board.data.scheduled" :key="v.name" class="border-t hover:bg-surface-gray-1">
               <td class="px-3 py-2 font-medium tabular-nums text-ink-gray-8">{{ v.visit_date }}</td>
-              <td class="px-3 py-2 text-ink-gray-7">{{ v.technician }}</td>
+              <td class="px-3 py-2">
+                <div class="text-ink-gray-7">{{ v.technician }}</div>
+                <a v-if="v.technician_mobile" class="text-xs tabular-nums text-ink-blue-6 hover:underline"
+                   :href="`tel:${v.technician_mobile}`">{{ v.technician_mobile }}</a>
+              </td>
               <td class="px-3 py-2 tabular-nums text-ink-gray-7">{{ v.serial_no }}</td>
               <td class="px-3 py-2 text-ink-gray-7">{{ v.customer }}</td>
               <td class="px-3 py-2">
