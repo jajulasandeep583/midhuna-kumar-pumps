@@ -1043,6 +1043,10 @@ def raise_claim_for_pump(serial_no, claim_type="Part Replacement", claim_amount=
 		_("Claim opened by KUMAR on your behalf for {0}.").format(serial_no),
 		notify_users=[user] if user else None,
 	)
+	# out of Draft and onto the claims desk, same as a dealer's own claim
+	from kumar_service.portal_api import submit_claim_for_review
+
+	submit_claim_for_review(doc)
 	return {
 		"name": doc.name,
 		"dealer": dealer,

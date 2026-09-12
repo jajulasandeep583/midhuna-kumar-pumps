@@ -167,11 +167,12 @@ const portalRoutes = [
     // A dealer raising a ticket is always raising it about a pump. The stock
     // form asks for a subject and nothing else, which produces a ticket nobody
     // can act on - no serial, no warranty position, no dealer. Send them to the
-    // complaint form, which asks the questions that matter and files a real
-    // Service Request behind it.
+    // complaint FORM itself - not the request list, which is where this pointed
+    // for a while: a dealer pressing Create was answered with another list and
+    // had to find the New Request button on it to get the form they asked for.
     path: "/my-tickets/new",
     name: "TicketNew",
-    redirect: { name: "KumarComplaint" },
+    redirect: { name: "KumarComplaintNew" },
     meta: { public: true, auth: true },
   },
   // ------------------------------------------------- KUMAR dealer routes
@@ -209,6 +210,16 @@ const portalRoutes = [
     path: "/dealer/pumps",
     name: "KumarPumps",
     component: () => import("@/pages/kumar/MyPumps.vue"),
+    meta: { public: true, auth: true },
+  },
+  {
+    // A dealer at the counter checking any serial: is it registered, is it in
+    // warranty. Their own sales show the customer; another dealer's shows the
+    // warranty and nothing that identifies someone else's customer. Scoping
+    // lives in kumar_service.portal_api.dealer_pump_lookup.
+    path: "/dealer/lookup",
+    name: "KumarDealerLookup",
+    component: () => import("@/pages/kumar/DealerLookup.vue"),
     meta: { public: true, auth: true },
   },
   // List first, form behind an Add button. A dealer opening "Warranty Claim"

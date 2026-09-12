@@ -148,9 +148,10 @@ import ScanButton from "./ScanButton.vue";
 import LucidePaperclip from "~icons/lucide/paperclip";
 import LucideFile from "~icons/lucide/file";
 import { __ } from "@/translation";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 const router = useRouter();
+const route = useRoute();
 const selected = ref<any>(null);
 const picked = ref<any>(null);
 const snapshot = ref<any>(null);
@@ -172,7 +173,19 @@ function human(bytes: number) {
 }
 
 
-const pumps = createResource({ url: "kumar_service.portal_api.my_pumps", auto: true });
+// Deep-linked from Pump Lookup or What I Sold with ?serial=: pick that pump as
+// soon as the list is in, so the dealer lands on the claim already filled.
+const pumps = createResource({
+  url: "kumar_service.portal_api.my_pumps",
+  auto: true,
+  onSuccess: (rows: any[]) => {
+    const wanted = String(route.query.serial || "");
+    if (wanted && !picked.value) {
+      const hit = (rows || []).find((p: any) => p.serial_no === wanted);
+      if (hit) take(hit);
+    }
+  },
+});
 const options = createResource({ url: "kumar_service.portal_api.portal_options", auto: true });
 
 const claimTypeOptions = computed(() =>

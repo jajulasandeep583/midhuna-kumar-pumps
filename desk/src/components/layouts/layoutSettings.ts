@@ -106,6 +106,11 @@ export const customerPortalSidebarOptions = [
     to: "KumarPumps",
   },
   {
+    label: __("Pump Lookup"),
+    icon: LucideSearchCheck,
+    to: "KumarDealerLookup",
+  },
+  {
     label: __("Raise a Request"),
     icon: LucideMessageSquare,
     to: "KumarComplaint",

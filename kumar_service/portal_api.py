@@ -274,6 +274,128 @@ def pump_snapshot(serial_no):
 
 
 @frappe.whitelist()
+def dealer_pump_lookup(serial_no):
+	"""Look a serial up from the counter: is it sold, and is it in warranty.
+
+	The dealer at the counter needs the same answer KUMAR staff get - is this
+	pump registered, and what is its warranty - WITHOUT the ERPNext stock desk
+	and without seeing another shop's customer. So this is scoped in two layers:
+
+	  * the warranty verdict (model, in / expiring / out / not registered, days
+	    left, chargeable) is safe for anyone standing over the pump and is always
+	    returned;
+	  * the customer's name, number and address, and the service history, are
+	    returned ONLY when the pump was sold by this dealer's own tree. For any
+	    other dealer's pump the answer stops at "registered to another KUMAR
+	    dealer" - enough to know the warranty is live and honour it, nothing that
+	    identifies someone else's customer.
+
+	This reads Pump Registration with `frappe.db` (which ignores permissions) on
+	purpose, then gates every identifying field on scope itself, rather than
+	handing the dealer a doctype permission that other endpoints would inherit -
+	that is exactly how the earlier leaks happened.
+	"""
+	me = _me()
+	serial_no = (serial_no or "").strip()
+	if not serial_no:
+		frappe.throw(_("Serial number is required"))
+
+	from kumar_service.utils import warranty_status_for
+
+	reg = frappe.db.get_value(
+		"Pump Registration",
+		{"serial_no": serial_no, "docstatus": 1},
+		["name", "dealer", "pump_model", "end_customer_name", "end_customer_mobile",
+		 "sale_date", "warranty_expiry_date", "installation_address", "district"],
+		as_dict=True,
+	)
+
+	# the serial itself may exist in stock without ever being sold
+	serial_exists = bool(reg) or frappe.db.exists("Serial No", serial_no)
+	if not serial_exists:
+		return {
+			"serial_no": serial_no,
+			"found": False,
+			"message": _("No pump with that serial. Check the number on the nameplate."),
+		}
+
+	model_name = reg.pump_model if reg else frappe.db.get_value("Serial No", serial_no, "item_code")
+	model = (
+		frappe.db.get_value("Pump Model", model_name, ["hp", "phase", "pump_category"], as_dict=True)
+		or {}
+	) if model_name else {}
+
+	if not reg:
+		# a real KUMAR serial that nobody has registered - so no warranty yet
+		return {
+			"serial_no": serial_no,
+			"found": True,
+			"is_registered": False,
+			"mine": False,
+			"pump_model": model_name,
+			"hp": model.get("hp"),
+			"category": model.get("pump_category"),
+			"warranty_status": "Not Registered",
+			"in_warranty": False,
+			"chargeable": True,
+			"message": _("This pump is not registered, so no warranty has started. If it is your sale, register it under Register a Sale."),
+		}
+
+	mine = reg.dealer in _my_scope()
+	status = warranty_status_for(reg.warranty_expiry_date, True)
+	days_left = None
+	if reg.warranty_expiry_date:
+		days_left = (getdate(reg.warranty_expiry_date) - getdate(nowdate())).days
+	in_warranty = status in ("In Warranty", "Expiring Soon")
+
+	out = {
+		"serial_no": serial_no,
+		"found": True,
+		"is_registered": True,
+		"mine": mine,
+		"pump_model": reg.pump_model,
+		"hp": model.get("hp"),
+		"category": model.get("pump_category"),
+		"warranty_status": status,
+		"in_warranty": in_warranty,
+		"expiring_soon": status == "Expiring Soon",
+		"chargeable": not in_warranty,
+		"days_remaining": days_left,
+		"sale_date": reg.sale_date,
+		"warranty_expiry_date": reg.warranty_expiry_date,
+		"expiring_soon_days": EXPIRING_SOON_DAYS,
+	}
+
+	if mine:
+		# our own sale: the counter can see the whole record, same as What I Sold
+		out.update({
+			"end_customer_name": reg.end_customer_name,
+			"end_customer_mobile": reg.end_customer_mobile,
+			"where": reg.installation_address,
+			"district": reg.district,
+			"registration": reg.name,
+			"service_history": _service_history(serial_no),
+		})
+	else:
+		# someone else's sale: warranty only, no customer, no dealer name
+		out["sold_elsewhere"] = True
+		out["message"] = _("Registered to another KUMAR dealer. The warranty above is live; a claim on it is raised by the outlet that sold it.")
+
+	return out
+
+
+def _service_history(serial_no, limit=10):
+	rows = frappe.get_all(
+		"Service Request",
+		filters={"serial_no": serial_no, "docstatus": ["<", 2]},
+		fields=["name", "reported_on", "complaint_category", "custom_request_type", "status"],
+		order_by="reported_on desc",
+		limit_page_length=limit,
+	)
+	return rows
+
+
+@frappe.whitelist()
 def raise_complaint(serial_no, complaint_category, complaint_description, priority="Medium",
 		attachments=None, request_type="Complaint"):
 	"""A dealer logging a customer's complaint. Submits, so the SLA clock starts."""
@@ -340,6 +462,24 @@ def raise_complaint(serial_no, complaint_category, complaint_description, priori
 	}
 
 
+def submit_claim_for_review(doc):
+	"""Take a freshly-lodged claim from Draft to Pending Review, the first state
+	KUMAR's claims desk shows.
+
+	This is the workflow's "Submit for Review" transition, but applied by the app
+	rather than by a user clicking a button: the portal lodges on the dealer's
+	behalf and the Raise screen lodges on staff's, and only one of those callers
+	holds the Dealer role the transition is scoped to. So set the state and submit
+	directly, with permissions bypassed - the app is the actor, and it always
+	moves a lodged claim to exactly this one state."""
+	if doc.docstatus != 0:
+		return
+	doc.reload()
+	doc.workflow_state = "Pending Review"
+	doc.flags.ignore_permissions = True
+	doc.submit()
+
+
 @frappe.whitelist()
 def raise_claim(
 	serial_no,
@@ -352,9 +492,14 @@ def raise_claim(
 ):
 	"""A dealer asking KUMAR to settle a warranty claim.
 
-	Left in Draft on purpose. A claim is money, and the workflow (Draft ->
-	Submitted -> Under Investigation -> Approved/Rejected -> Settled) is what
-	KUMAR's own staff drive - the dealer's job ends at lodging it with evidence.
+	Lodging IS the "Submit for Review" step: the dealer's one action moves the
+	claim from the Draft it is born in to Pending Review, which is the first
+	state KUMAR's claims desk actually sees. Leaving it in Draft (as this once
+	did) meant the dealer was told "KUMAR will review it" while the claim sat
+	invisible to every staff screen - nobody at KUMAR ever knew it existed. From
+	Pending Review on, KUMAR's own staff drive the workflow (Review -> Approve
+	-> Settle, or Reject); the dealer's job ends here, at lodging it with
+	evidence.
 	"""
 	reg = _my_serial(serial_no)
 
@@ -398,7 +543,9 @@ def raise_claim(
 
 	# A claim is money, and a claim with evidence is settled faster than one
 	# without - a photograph of the failed part is the whole argument. Same path
-	# a complaint's photos take, so there is one place this can go wrong.
+	# a complaint's photos take, so there is one place this can go wrong. Attach
+	# while the claim is still a Draft, so the evidence is on it before it is
+	# submitted for review.
 	attached = 0
 	if attachments:
 		if isinstance(attachments, str):
@@ -414,10 +561,13 @@ def raise_claim(
 			)
 			attached = len(attachments)
 
+	# Move it out of Draft and onto KUMAR's claims desk.
+	submit_claim_for_review(doc)
+
 	return {
 		"name": doc.name,
 		"attached": attached,
-		"state": doc.get("workflow_state") or "Draft",
+		"state": doc.get("workflow_state") or "Pending Review",
 		"claim_amount": flt(doc.claim_amount),
 		"message": _("Claim {0} has been lodged. KUMAR will review it and you can follow it under My Tickets.").format(doc.name),
 	}
