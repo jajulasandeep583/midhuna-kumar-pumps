@@ -822,8 +822,9 @@ def claim_action(name, action, approved_amount=None, remarks=None):
 # the request and book the visit themselves, for any pump, from the desk.
 
 
-@frappe.whitelist()
 def _valid_channel(channel):
+	# internal helper - not an endpoint; it only sanitises a channel string that
+	# whitelisted callers pass through, so it must not be reachable on its own
 	from kumar_service.setup.desk import CHANNELS
 	return channel if channel in CHANNELS and channel != "Dealer Portal" else "Phone"
 
