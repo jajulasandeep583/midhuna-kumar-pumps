@@ -78,17 +78,7 @@
             <span v-if="claim.approved_amount"> · {{ __("approved") }} {{ money(claim.approved_amount) }}</span>
             <span v-if="claim.settled_on"> · {{ __("settled") }} {{ fmt(claim.settled_on) }}</span>
           </div>
-          <div v-if="claim.actions?.length" class="mt-2 flex flex-wrap gap-2">
-            <Button
-              v-for="a in claim.actions"
-              :key="a.action"
-              size="sm"
-              variant="subtle"
-              :theme="a.action === 'Reject' ? 'red' : a.action === 'Approve' || a.action === 'Settle' ? 'green' : 'gray'"
-              :label="__(a.action)"
-              @click="openAction(a)"
-            />
-          </div>
+          <ClaimDecision class="mt-2" :claim="claim" @done="refresh" />
           <button
             v-if="claim.ticket && claim.ticket !== ticketName"
             class="mt-2 text-xs text-ink-gray-5 hover:underline"
@@ -157,35 +147,6 @@
     </template>
   </Dialog>
 
-  <!-- move the claim; the dealer is told the outcome, and on a rejection the reason -->
-  <Dialog v-model="acting" :options="{ title: actionTitle }">
-    <template #body-content>
-      <div v-if="claim" class="mb-4 rounded-lg border bg-surface-gray-1 p-3 text-sm">
-        <div class="font-medium text-ink-gray-8">{{ claim.name }}</div>
-        <div class="tabular-nums text-ink-gray-6">{{ __("claimed") }} {{ money(claim.claim_amount) }}</div>
-      </div>
-      <FormControl
-        v-if="pending?.action === 'Approve'"
-        v-model="amount"
-        type="number"
-        :label="__('Approve how much')"
-        :description="__('Cannot exceed the {0} claimed.', [money(claim?.claim_amount)])"
-      />
-      <FormControl
-        class="mt-3"
-        v-model="remarks"
-        type="textarea"
-        :rows="3"
-        :label="__('What should the dealer be told')"
-        :placeholder="pending?.action === 'Reject' ? __('They are owed the reason, not just the outcome') : __('Optional')"
-      />
-      <ErrorMessage v-if="act.error" class="mt-3" :message="act.error" />
-    </template>
-    <template #actions>
-      <Button class="w-full" variant="solid" :theme="pending?.action === 'Reject' ? 'red' : 'blue'"
-        :loading="act.loading" :label="actionTitle" @click="act.submit()" />
-    </template>
-  </Dialog>
 </template>
 
 <script setup lang="ts">
@@ -196,6 +157,8 @@ import { Badge, Button, Dialog, ErrorMessage, FormControl, createResource, dayjs
 import LucideCalendarPlus from "~icons/lucide/calendar-plus";
 import { computed, inject, reactive, ref } from "vue";
 import { useRouter } from "vue-router";
+import { kumarTicketContext } from "@/composables/kumarTicketContext";
+import ClaimDecision from "./ClaimDecision.vue";
 import Section from "../Section.vue";
 
 const ticket = inject(TicketSymbol)!;
@@ -204,11 +167,10 @@ const router = useRouter();
 const ticketName = computed(() => String(ticket.value?.doc?.name || ""));
 const opened = useStorage("kumarPanelOpened", true, localStorage);
 
-const ctx = createResource({
-  url: "kumar_service.staff_api.ticket_context",
-  params: { ticket: ticketName.value },
-  auto: true,
-});
+// shared per ticket with the header's claim actions - one fetch, and a
+// decision made in either place updates both. The panel owns the mount, so
+// it asks for fresh data on a revisit.
+const ctx = kumarTicketContext(ticketName.value, { fresh: true })!;
 const request = computed(() => ctx.data?.request || null);
 const claim = computed(() => ctx.data?.claim || null);
 const visits = computed(() => ctx.data?.visits || []);
@@ -294,30 +256,4 @@ function submitVisit() {
   else if (claim.value) bookClaim.submit({ claim: claim.value.name, ...p });
 }
 
-// ---------------------------------------------------------------- claim
-const acting = ref(false);
-const pending = ref<any>(null);
-const amount = ref<number | null>(null);
-const remarks = ref("");
-const actionTitle = computed(() => (pending.value ? __(pending.value.action) + " " + (claim.value?.name || "") : ""));
-function openAction(a: any) {
-  pending.value = a;
-  amount.value = claim.value?.claim_amount ?? null;
-  remarks.value = "";
-  acting.value = true;
-}
-const act = createResource({
-  url: "kumar_service.staff_api.claim_action",
-  makeParams: () => ({
-    name: claim.value?.name,
-    action: pending.value?.action,
-    approved_amount: pending.value?.action === "Approve" ? amount.value : undefined,
-    remarks: remarks.value,
-  }),
-  onSuccess: (d: any) => {
-    acting.value = false;
-    toast.success(d?.message || __("Done"));
-    refresh();
-  },
-});
 </script>

@@ -27,11 +27,31 @@
         </button>
       </div>
 
+      <!-- which pump, which claim, whose: one box over the loaded board -->
+      <div class="mb-4 flex flex-wrap items-center gap-2">
+        <FormControl
+          class="w-full sm:w-96"
+          v-model="search"
+          type="text"
+          :placeholder="__('Serial, claim no, model, dealer or customer')"
+          autocomplete="off"
+        />
+        <Button
+          v-if="search || filter"
+          variant="subtle"
+          :label="__('Clear')"
+          @click="search = ''; filter = ''"
+        />
+        <span v-if="search || filter" class="text-xs text-ink-gray-5">
+          {{ __("{0} of {1} claims", [String(rows.length), String(board.data?.claims?.length || 0)]) }}
+        </span>
+      </div>
+
       <div v-if="board.loading && !board.data" class="py-12 text-center text-ink-gray-5">
         {{ __("Loading...") }}
       </div>
       <div v-else-if="!rows.length" class="rounded-lg border border-dashed py-12 text-center text-ink-gray-5">
-        {{ __("No claim is waiting on a decision.") }}
+        {{ search || filter ? __("No claim matches that.") : __("No claim is waiting on a decision.") }}
       </div>
 
       <div v-else class="space-y-3">
@@ -106,16 +126,15 @@
             </Button>
           </div>
 
-          <div v-if="c.actions.length" class="mt-4 flex flex-wrap gap-2 border-t pt-3">
-            <Button
-              v-for="a in c.actions"
-              :key="a.action"
-              :variant="a.action === 'Reject' ? 'subtle' : 'solid'"
-              :theme="a.action === 'Reject' ? 'red' : 'blue'"
-              :label="actionLabel(a.action)"
-              @click="open(c, a)"
-            />
-          </div>
+          <!-- the same component the ticket header uses, so deciding here and
+               deciding there is literally the same buttons and dialog -->
+          <ClaimDecision
+            v-if="c.actions.length"
+            class="mt-4 border-t pt-3"
+            :claim="c"
+            size="md"
+            @done="board.reload()"
+          />
           <p v-else class="mt-3 border-t pt-3 text-xs text-ink-gray-5">
             {{ __("Waiting on someone else - your roles cannot move this one.") }}
           </p>
@@ -142,52 +161,14 @@
       </template>
     </Dialog>
 
-    <Dialog v-model="showing" :options="{ title: dialogTitle }">
-      <template #body-content>
-        <div v-if="target" class="mb-4 rounded-lg border bg-surface-gray-1 p-3 text-sm">
-          <div class="font-medium text-ink-gray-8">{{ target.name }} · {{ target.dealer }}</div>
-          <div class="tabular-nums text-ink-gray-6">
-            {{ target.serial_no }} · {{ __("claimed") }} {{ money(target.claim_amount) }}
-          </div>
-        </div>
-
-        <FormControl
-          v-if="pending?.action === 'Approve'"
-          v-model="amount"
-          type="number"
-          :label="__('Approve how much')"
-          :description="__('Cannot exceed the {0} claimed.', [money(target?.claim_amount)])"
-        />
-        <FormControl
-          class="mt-3"
-          v-model="remarks"
-          type="textarea"
-          :rows="3"
-          :label="__('What should the dealer be told')"
-          :placeholder="pending?.action === 'Reject'
-            ? __('They are owed the reason, not just the outcome')
-            : __('Optional')"
-        />
-        <ErrorMessage v-if="act.error" class="mt-3" :message="act.error" />
-      </template>
-      <template #actions>
-        <Button
-          class="w-full"
-          variant="solid"
-          :theme="pending?.action === 'Reject' ? 'red' : 'blue'"
-          :loading="act.loading"
-          :label="dialogTitle"
-          @click="act.submit()"
-        />
-      </template>
-    </Dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
+import { computed, reactive, ref, watch } from "vue";
 import { Badge, Button, Dialog, ErrorMessage, FormControl, createResource, toast } from "frappe-ui";
 import { LayoutHeader } from "@/components";
+import ClaimDecision from "@/components/ticket-agent/ClaimDecision.vue";
 import LucideMessageSquare from "~icons/lucide/message-square";
 import LucideCalendarCheck from "~icons/lucide/calendar-check";
 import { __ } from "@/translation";
@@ -230,11 +211,11 @@ const book = createResource({
   },
 });
 const filter = ref("");
-const showing = ref(false);
-const target = ref<any>(null);
-const pending = ref<any>(null);
-const amount = ref<number | null>(null);
-const remarks = ref("");
+const search = ref("");
+// The board fetches only the OPEN states by default, so the Settled and
+// Rejected tiles used to filter a list that could not contain them and came
+// back empty. Clicking a tile now refetches with that state.
+watch(filter, (s) => board.submit(s ? { state: s } : {}));
 
 function money(v: number) {
   return "₹" + Math.round(v || 0).toLocaleString("en-IN");
@@ -268,8 +249,17 @@ const stages = computed(() =>
 );
 
 const rows = computed(() => {
-  const all = board.data?.claims || [];
-  return filter.value ? all.filter((c: any) => c.workflow_state === filter.value) : all;
+  let all = board.data?.claims || [];
+  if (filter.value) all = all.filter((c: any) => c.workflow_state === filter.value);
+  const q = search.value.trim().toLowerCase();
+  if (q) {
+    all = all.filter((c: any) =>
+      [c.name, c.serial_no, c.pump_model, c.dealer, c.raised_by, c.customer,
+        c.heat_no, c.winding_batch]
+        .some((v: any) => v && String(v).toLowerCase().includes(q))
+    );
+  }
+  return all;
 });
 
 function stateTheme(s: string) {
@@ -279,37 +269,4 @@ function stateTheme(s: string) {
   return "blue";
 }
 
-function actionLabel(a: string) {
-  return {
-    Review: __("Send for investigation"),
-    Approve: __("Approve"),
-    Reject: __("Reject"),
-    Settle: __("Mark settled"),
-  }[a] || __(a);
-}
-
-const dialogTitle = computed(() => (pending.value ? actionLabel(pending.value.action) : ""));
-
-function open(claim: any, action: any) {
-  target.value = claim;
-  pending.value = action;
-  amount.value = claim.approved_amount || claim.claim_amount;
-  remarks.value = "";
-  showing.value = true;
-}
-
-const act = createResource({
-  url: "kumar_service.staff_api.claim_action",
-  makeParams: () => ({
-    name: target.value?.name,
-    action: pending.value?.action,
-    approved_amount: pending.value?.action === "Approve" ? amount.value : undefined,
-    remarks: remarks.value,
-  }),
-  onSuccess: (d: any) => {
-    showing.value = false;
-    toast.success(d.message);
-    board.reload();
-  },
-});
 </script>

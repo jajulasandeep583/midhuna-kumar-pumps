@@ -47,6 +47,19 @@
     </template>
     <template #right-header>
       <div class="flex gap-2 items-center">
+        <!-- A claim ticket is decided HERE as easily as on the Claims desk:
+             same buttons, same dialog, same words. Coming from a claims card
+             via "Open conversation" and having to walk back to decide was the
+             complaint that put these here. -->
+        <template v-if="headerClaim">
+          <ClaimDecision :claim="headerClaim" @done="claimDecided" />
+          <Button
+            variant="ghost"
+            :label="__('Claims desk')"
+            @click="router.push({ name: 'KumarClaims' })"
+          />
+          <div class="h-5 w-px bg-outline-gray-2" />
+        </template>
         <MultipleAvatar
           :avatars="JSON.stringify(viewers)"
           size="md"
@@ -153,6 +166,8 @@ import {
 import { useRoute, useRouter } from "vue-router";
 import LucideMerge from "~icons/lucide/merge";
 import { IndicatorIcon } from "../icons";
+import { kumarTicketContext } from "@/composables/kumarTicketContext";
+import ClaimDecision from "./ClaimDecision.vue";
 import TicketSubjectModal from "./TicketSubjectModal.vue";
 const { isAdmin } = useAuthStore();
 const { $dialog } = globalStore();
@@ -175,6 +190,24 @@ const activities = inject(ActivitiesSymbol)!;
 const showSubjectDialog = ref(false);
 
 const { notifyTicketUpdate } = useNotifyTicketUpdate(ticket.value?.name);
+
+// ---- claim tickets decide from the header, sharing the panel's context ----
+const kumarCtx = ref<any>(null);
+watchEffect(() => {
+  const doc = ticket.value?.doc;
+  if (doc?.custom_warranty_claim && doc?.name && !kumarCtx.value) {
+    kumarCtx.value = kumarTicketContext(String(doc.name));
+  }
+});
+const headerClaim = computed(() => kumarCtx.value?.data?.claim || null);
+function claimDecided() {
+  // one decision touches three things the user is looking at: the claim's
+  // buttons, the conversation (the dealer was just told), and the ticket's
+  // own status when the workflow state maps to a desk status
+  kumarCtx.value?.reload?.();
+  activities.value?.reload?.();
+  ticket.value?.reload?.();
+}
 const statusDropdown = computed(() => {
   const statuses =
     ticketStatusStore.statuses.data?.filter((s) => s.enabled) || [];
