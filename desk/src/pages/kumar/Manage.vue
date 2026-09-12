@@ -72,8 +72,27 @@
                   <td class="whitespace-nowrap px-3 py-2 text-right">
                     <Badge :theme="r.warranty ? 'green' : 'orange'"
                            :label="r.warranty ? __('Free') : __('Chargeable')" />
-                    <Button class="ml-2" variant="subtle" theme="blue" :label="__('Schedule')"
-                            @click="router.push({ name: 'KumarVisits' })" />
+                    <Button
+                      v-if="r.ticket"
+                      class="ml-2"
+                      variant="subtle"
+                      :label="__('Open conversation')"
+                      @click="router.push({ name: 'TicketAgent', params: { ticketId: r.ticket } })"
+                    >
+                      <template #prefix><LucideMessageSquare class="size-4" /></template>
+                    </Button>
+                    <!-- books THIS request, right here - it used to just walk
+                         the manager to the Visits board to find the row again -->
+                    <ScheduleVisit
+                      class="ml-2 inline-flex"
+                      :request="r.name"
+                      :serial="r.serial_no"
+                      :technicians="d.data?.technicians"
+                      :label="__('Schedule')"
+                      variant="subtle"
+                      theme="blue"
+                      @done="d.reload()"
+                    />
                   </td>
                 </tr>
               </tbody>
@@ -190,8 +209,10 @@ import { computed } from "vue";
 import { useRouter } from "vue-router";
 import { Badge, Button, createResource } from "frappe-ui";
 import { LayoutHeader } from "@/components";
+import ScheduleVisit from "@/components/ticket-agent/ScheduleVisit.vue";
 import { __ } from "@/translation";
 import LucideAlertTriangle from "~icons/lucide/alert-triangle";
+import LucideMessageSquare from "~icons/lucide/message-square";
 import LucideInbox from "~icons/lucide/inbox";
 import LucideIndianRupee from "~icons/lucide/indian-rupee";
 import LucideCalendarCheck from "~icons/lucide/calendar-check";
@@ -230,6 +251,7 @@ const kpis = computed(() => {
       value: m.pending_count ?? "-",
       hint: money(m.pending_value) + __(" waiting on a decision"),
       icon: LucideIndianRupee,
+      to: "KumarClaims",
       card: "border-amber-200 bg-amber-50 hover:border-amber-300",
       strong: "text-amber-800", muted: "text-amber-700",
     },

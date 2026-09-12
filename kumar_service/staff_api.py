@@ -641,7 +641,7 @@ def manager_dashboard(days=30):
 	)[:6]
 
 	def slim(rows, n=8):
-		return [
+		out = [
 			{
 				"name": r["name"], "dealer": r["dealer"], "serial_no": r["serial_no"],
 				"what": r["custom_request_type"] or r["complaint_category"],
@@ -651,6 +651,15 @@ def manager_dashboard(days=30):
 			}
 			for r in sorted(rows, key=lambda x: str(x["reported_on"]))[:n]
 		]
+		# the row's conversation, one tap away - a work list that cannot open
+		# the thread it is about sends the manager to Tickets to go searching
+		for row in out:
+			row["ticket"] = frappe.db.get_value(
+				"HD Ticket",
+				{"custom_service_request": row["name"], "custom_warranty_claim": ["is", "not set"]},
+				"name",
+			)
+		return out
 
 	return {
 		"window_days": days,
@@ -680,6 +689,12 @@ def manager_dashboard(days=30):
 		"visits": visits[:8],
 		"network": network,
 		"top_faults": top_faults,
+		# so Needs-you can book the visit right there, not send the manager
+		# to another board to find the same row again
+		"technicians": frappe.get_all(
+			"Service Technician", fields=["name", "technician_name", "dealer", "mobile_no"],
+			order_by="technician_name", limit_page_length=0,
+		),
 	}
 
 
