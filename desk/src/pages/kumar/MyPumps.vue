@@ -121,7 +121,8 @@
                 <!-- the certificate is what the dealer owes the customer, so it
                      belongs on the row rather than three clicks away -->
                 <Button
-                  variant="ghost"
+                  variant="subtle"
+                  icon-left="printer"
                   :label="__('Print')"
                   @click="printCertificate(p)"
                 />

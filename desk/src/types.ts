@@ -408,6 +408,7 @@ export interface View {
   group_by_field?: string;
   name: string;
   is_customer_portal?: boolean;
+  creation?: string;
 }
 
 export interface ViewType {

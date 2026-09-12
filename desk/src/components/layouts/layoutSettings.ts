@@ -23,17 +23,12 @@ import { __ } from "@/translation";
 export const showShortcutsModal = ref(false);
 
 // Ordered the way a KUMAR service person moves through a day, top to bottom:
-// land on the overview, open the queue, create work, look a pump up, then the
-// claims and visits desks, and finally the reference and directory screens.
-// (The Helpdesk "Dashboard" analytics page is intentionally not here - it needs
-// the Agent Manager role none of the service roles carry, so it only ever threw
-// a permission error; Command Centre is this product's management screen.)
+// the Command Centre is this product's front door and the landing screen, then
+// the queue, creating work, looking a pump up, the claims and visits desks,
+// and finally the personal and reference screens. (The Helpdesk "Dashboard"
+// analytics page is intentionally not here - it needs the Agent Manager role
+// none of the service roles carry, so it only ever threw a permission error.)
 export const agentPortalSidebarOptions = [
-  {
-    label: __("Home"),
-    icon: LucideHome,
-    to: "Home",
-  },
   {
     label: __("Command Centre"),
     icon: LucideGauge,
@@ -63,6 +58,11 @@ export const agentPortalSidebarOptions = [
     label: __("Visits"),
     icon: LucideCalendarCheck,
     to: "KumarVisits",
+  },
+  {
+    label: __("Home"),
+    icon: LucideHome,
+    to: "Home",
   },
   {
     label: __("Knowledge Base"),

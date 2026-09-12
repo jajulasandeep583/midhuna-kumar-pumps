@@ -94,12 +94,14 @@
         </div>
         <a
           v-if="done.certificate_url"
-          class="mt-2 inline-block text-sm font-medium text-ink-blue-5"
+          class="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-ink-blue-5"
           :href="done.certificate_url"
           target="_blank"
           rel="noopener"
-          >{{ __("Print Certificate") }}</a
         >
+          <FeatherIcon name="printer" class="h-3.5 w-3.5" />
+          {{ __("Print Certificate") }}
+        </a>
       </div>
     </div>
   </div>
@@ -107,7 +109,7 @@
 
 <script setup lang="ts">
 import { computed, reactive, ref } from "vue";
-import { Button, ErrorMessage, FormControl, createResource } from "frappe-ui";
+import { Button, ErrorMessage, FeatherIcon, FormControl, createResource } from "frappe-ui";
 import { LayoutHeader } from "@/components";
 import ScanButton from "./ScanButton.vue";
 import { __ } from "@/translation";

@@ -33,7 +33,10 @@ const portalRoutes = [
   // Agent Portal Routes
   {
     path: "",
-    redirect: "/home",
+    // Staff land on the Command Centre - the handbook promises exactly that,
+    // and it is the product's own screen, not helpdesk's. A dealer never gets
+    // here: the guard below sends anyone without desk access to KumarHome.
+    redirect: "/manage",
   },
   {
     path: "/home",

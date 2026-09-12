@@ -121,8 +121,17 @@ export function useView(dt: string = null) {
       .map(parseView)
   );
 
+  // Oldest first: the list arrives modified-desc, which put the three standard
+  // views (Raised by dealers / Raised by KUMAR / Warranty claims) in whatever
+  // order they were last touched. Creation order is the deliberate one - setup
+  // makes them in reading order, and a view someone saves later joins the end.
   const publicViews = computed(() =>
-    views.data?.filter((view: View) => view.public).map(parseView)
+    views.data
+      ?.filter((view: View) => view.public)
+      .sort((a: View, b: View) =>
+        String(a.creation ?? "").localeCompare(String(b.creation ?? ""))
+      )
+      .map(parseView)
   );
 
   const defaultView = computed(() =>
