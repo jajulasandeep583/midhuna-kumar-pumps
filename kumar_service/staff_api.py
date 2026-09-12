@@ -1198,6 +1198,15 @@ def ticket_context(ticket):
 		as_dict=True,
 	) if sr_name else None
 
+	if request:
+		# the request's own ticket, so a claim's panel can hand you across in
+		# one tap rather than restating the whole request
+		request["ticket"] = frappe.db.get_value(
+			"HD Ticket",
+			{"custom_service_request": request["name"], "custom_warranty_claim": ["is", "not set"]},
+			"name",
+		)
+
 	claim = frappe.db.get_value(
 		"Kumar Warranty Claim", claim_name,
 		["name", "workflow_state", "claim_type", "root_cause", "claim_amount", "approved_amount",

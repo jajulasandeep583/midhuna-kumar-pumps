@@ -58,16 +58,19 @@
             :serial="kumarCtx?.data?.serial_no"
             :technicians="kumarCtx?.data?.technicians"
             :label="__('Schedule a visit')"
-            variant="ghost"
+            variant="subtle"
+            theme="blue"
             @done="kumarActed"
           />
           <ClaimDecision v-if="headerClaim" :claim="headerClaim" @done="kumarActed" />
           <Button
             v-if="headerClaim"
-            variant="ghost"
+            variant="subtle"
             :label="__('Claims desk')"
             @click="router.push({ name: 'KumarClaims' })"
-          />
+          >
+            <template #prefix><LucideIndianRupee class="h-4 w-4" /></template>
+          </Button>
           <div class="h-5 w-px bg-outline-gray-2" />
         </template>
         <MultipleAvatar
@@ -174,6 +177,7 @@ import {
   watchEffect,
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import LucideIndianRupee from "~icons/lucide/indian-rupee";
 import LucideMerge from "~icons/lucide/merge";
 import { IndicatorIcon } from "../icons";
 import { kumarTicketContext } from "@/composables/kumarTicketContext";

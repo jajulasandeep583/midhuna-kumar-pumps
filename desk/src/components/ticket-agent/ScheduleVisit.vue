@@ -2,7 +2,7 @@
   <!-- Book a technician onto the job behind a ticket - from the ticket header,
        the KUMAR panel or a claims-desk card, through the same dialog. The
        dealer is told on their own thread either way. -->
-  <Button :size="size" :variant="variant" :label="label" @click="open()">
+  <Button :size="size" :variant="variant" :theme="theme" :label="label" @click="open()">
     <template #prefix><LucideCalendarPlus class="size-4" /></template>
   </Button>
 
@@ -46,9 +46,10 @@ const props = withDefaults(
     technicians?: any[];       // [{ name, technician_name, dealer }]
     label?: string;
     variant?: string;
+    theme?: string;
     size?: string;
   }>(),
-  { request: null, claim: null, serial: null, technicians: () => [], label: "Schedule a visit", variant: "subtle", size: "sm" }
+  { request: null, claim: null, serial: null, technicians: () => [], label: "Schedule a visit", variant: "subtle", theme: "gray", size: "sm" }
 );
 const emit = defineEmits<{ (e: "done", result: any): void }>();
 

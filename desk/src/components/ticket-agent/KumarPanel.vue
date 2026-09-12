@@ -30,63 +30,97 @@
           </div>
         </div>
 
-        <!-- the request -->
-        <div v-if="request" class="space-y-1.5">
-          <div class="flex items-center justify-between gap-2">
-            <span class="font-medium text-ink-gray-8">{{ request.name }}</span>
-            <Badge :label="request.status" :theme="statusTheme(request.status)" variant="subtle" />
-          </div>
-          <div class="text-ink-gray-6">
-            {{ [request.custom_request_type, request.complaint_category].filter(Boolean).join(" · ") }}
-            <span v-if="request.priority"> · {{ request.priority }}</span>
-          </div>
-          <div v-if="request.end_customer_name" class="text-ink-gray-6">
-            {{ __("For") }} {{ request.end_customer_name }}<span v-if="request.end_customer_mobile"> · {{ request.end_customer_mobile }}</span>
-          </div>
-          <div v-if="request.assigned_technician" class="text-ink-gray-6">
-            {{ __("Technician") }}: {{ request.assigned_technician }}
-          </div>
-          <!-- the two SLA clocks, in words -->
-          <div class="flex flex-wrap gap-x-3 gap-y-0.5 text-xs">
-            <span :class="request.first_response_on ? 'text-green-700' : overdue(request.response_due_on) ? 'text-red-600' : 'text-ink-gray-5'">
-              {{ request.first_response_on
-                ? __("Replied {0}", [fmt(request.first_response_on)])
-                : request.response_due_on ? __("Reply due {0}", [fmt(request.response_due_on)]) : "" }}
-            </span>
-            <span :class="request.resolved_on ? 'text-green-700' : overdue(request.resolution_due_on) ? 'text-red-600' : 'text-ink-gray-5'">
-              {{ request.resolved_on
-                ? __("Resolved {0}", [fmt(request.resolved_on)])
-                : request.resolution_due_on ? __("Resolve by {0}", [fmt(request.resolution_due_on)]) : "" }}
-            </span>
-          </div>
-        </div>
-        <div v-else-if="!claim" class="text-ink-gray-5">
-          {{ __("No KUMAR request behind this ticket.") }}
-        </div>
+        <!-- THIS ticket's subject in full; its counterpart as one light row.
+             A claim ticket used to open with the whole request block - its
+             status, priority, customer and two SLA clocks - ABOVE the claim it
+             is actually about, which read as three tickets fighting. -->
 
-        <!-- the claim -->
-        <div v-if="claim" class="rounded-lg border p-3" :class="stage(claim.workflow_state).card">
-          <div class="flex items-center justify-between gap-2">
-            <span class="font-medium" :class="stage(claim.workflow_state).strong">{{ claim.name }}</span>
-            <Badge :label="claim.workflow_state" :theme="claimTheme(claim.workflow_state)" variant="subtle" />
+        <!-- claim ticket: the claim is the subject -->
+        <template v-if="isClaimTicket">
+          <div v-if="claim" class="rounded-lg border p-3" :class="stage(claim.workflow_state).card">
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-medium" :class="stage(claim.workflow_state).strong">{{ claim.name }}</span>
+              <Badge :label="claim.workflow_state" :theme="claimTheme(claim.workflow_state)" variant="subtle" />
+            </div>
+            <div class="mt-0.5" :class="stage(claim.workflow_state).muted">
+              {{ [claim.claim_type, claim.root_cause].filter(Boolean).join(" · ") }}
+            </div>
+            <div class="mt-1 tabular-nums" :class="stage(claim.workflow_state).muted">
+              {{ __("Claimed") }} {{ money(claim.claim_amount) }}
+              <span v-if="claim.approved_amount"> · {{ __("approved") }} {{ money(claim.approved_amount) }}</span>
+              <span v-if="claim.settled_on"> · {{ __("settled") }} {{ fmt(claim.settled_on) }}</span>
+            </div>
+            <ClaimDecision class="mt-2" :claim="claim" @done="refresh" />
           </div>
-          <div class="mt-0.5" :class="stage(claim.workflow_state).muted">
-            {{ [claim.claim_type, claim.root_cause].filter(Boolean).join(" · ") }}
-          </div>
-          <div class="mt-1 tabular-nums" :class="stage(claim.workflow_state).muted">
-            {{ __("Claimed") }} {{ money(claim.claim_amount) }}
-            <span v-if="claim.approved_amount"> · {{ __("approved") }} {{ money(claim.approved_amount) }}</span>
-            <span v-if="claim.settled_on"> · {{ __("settled") }} {{ fmt(claim.settled_on) }}</span>
-          </div>
-          <ClaimDecision class="mt-2" :claim="claim" @done="refresh" />
-          <button
-            v-if="claim.ticket && claim.ticket !== ticketName"
-            class="mt-2 text-xs text-ink-gray-5 hover:underline"
-            @click="router.push({ name: 'TicketAgent', params: { ticketId: claim.ticket } })"
+          <Button
+            v-if="request"
+            class="w-full !justify-between"
+            variant="outline"
+            @click="request.ticket && router.push({ name: 'TicketAgent', params: { ticketId: request.ticket } })"
           >
-            {{ __("The claim has its own ticket #{0} - open it", [claim.ticket]) }}
-          </button>
-        </div>
+            <template #default>
+              <span class="truncate text-ink-gray-7">
+                {{ __("Service request") }} <span class="font-medium tabular-nums">{{ request.name }}</span>
+              </span>
+            </template>
+            <template #suffix>
+              <Badge :label="request.status" :theme="statusTheme(request.status)" variant="subtle" />
+            </template>
+          </Button>
+        </template>
+
+        <!-- request ticket: the request is the subject -->
+        <template v-else>
+          <div v-if="request" class="space-y-1.5">
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-medium text-ink-gray-8">{{ request.name }}</span>
+              <Badge :label="request.status" :theme="statusTheme(request.status)" variant="subtle" />
+            </div>
+            <div class="text-ink-gray-6">
+              {{ [request.custom_request_type, request.complaint_category].filter(Boolean).join(" · ") }}
+              <span v-if="request.priority"> · {{ request.priority }}</span>
+            </div>
+            <div v-if="request.end_customer_name" class="text-ink-gray-6">
+              {{ __("For") }} {{ request.end_customer_name }}<span v-if="request.end_customer_mobile"> · {{ request.end_customer_mobile }}</span>
+            </div>
+            <div v-if="request.assigned_technician" class="text-ink-gray-6">
+              {{ __("Technician") }}: {{ request.assigned_technician }}
+            </div>
+            <!-- the two SLA clocks, in words -->
+            <div class="flex flex-wrap gap-x-3 gap-y-0.5 text-xs">
+              <span :class="request.first_response_on ? 'text-green-700' : overdue(request.response_due_on) ? 'text-red-600' : 'text-ink-gray-5'">
+                {{ request.first_response_on
+                  ? __("Replied {0}", [fmt(request.first_response_on)])
+                  : request.response_due_on ? __("Reply due {0}", [fmt(request.response_due_on)]) : "" }}
+              </span>
+              <span :class="request.resolved_on ? 'text-green-700' : overdue(request.resolution_due_on) ? 'text-red-600' : 'text-ink-gray-5'">
+                {{ request.resolved_on
+                  ? __("Resolved {0}", [fmt(request.resolved_on)])
+                  : request.resolution_due_on ? __("Resolve by {0}", [fmt(request.resolution_due_on)]) : "" }}
+              </span>
+            </div>
+          </div>
+          <div v-else-if="!claim" class="text-ink-gray-5">
+            {{ __("No KUMAR request behind this ticket.") }}
+          </div>
+          <template v-if="claim">
+            <Button
+              class="w-full !justify-between"
+              variant="outline"
+              @click="claim.ticket && router.push({ name: 'TicketAgent', params: { ticketId: claim.ticket } })"
+            >
+              <template #default>
+                <span class="truncate text-ink-gray-7">
+                  {{ __("Warranty claim") }} <span class="font-medium tabular-nums">{{ claim.name }}</span>
+                </span>
+              </template>
+              <template #suffix>
+                <Badge :label="claim.workflow_state" :theme="claimTheme(claim.workflow_state)" variant="subtle" />
+              </template>
+            </Button>
+            <ClaimDecision :claim="claim" @done="refresh" />
+          </template>
+        </template>
 
         <!-- the visits -->
         <div>
@@ -131,7 +165,7 @@
 import { __ } from "@/translation";
 import { ActivitiesSymbol, TicketSymbol } from "@/types";
 import { useStorage } from "@vueuse/core";
-import { Badge, ErrorMessage, dayjs } from "frappe-ui";
+import { Badge, Button, ErrorMessage, dayjs } from "frappe-ui";
 import { computed, inject } from "vue";
 import { useRouter } from "vue-router";
 import { kumarTicketContext } from "@/composables/kumarTicketContext";
@@ -152,6 +186,8 @@ const ctx = kumarTicketContext(ticketName.value, { fresh: true })!;
 const request = computed(() => ctx.data?.request || null);
 const claim = computed(() => ctx.data?.claim || null);
 const visits = computed(() => ctx.data?.visits || []);
+// which story is THIS ticket telling - the claim's, or the request's
+const isClaimTicket = computed(() => !!ticket.value?.doc?.custom_warranty_claim);
 
 // after anything that writes to the thread, both the panel and the
 // conversation are stale; the conversation is the activities resource
