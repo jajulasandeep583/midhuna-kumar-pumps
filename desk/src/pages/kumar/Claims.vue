@@ -117,13 +117,14 @@
             >
               <template #prefix><LucideMessageSquare class="size-4" /></template>
             </Button>
-            <Button
-              variant="subtle"
+            <ScheduleVisit
+              :claim="c.name"
+              :serial="c.serial_no"
+              :technicians="visitBoard.data?.technicians"
               :label="__('Schedule a visit')"
-              @click="openVisit(c)"
-            >
-              <template #prefix><LucideCalendarCheck class="size-4" /></template>
-            </Button>
+              size="md"
+              @done="board.reload()"
+            />
           </div>
 
           <!-- the same component the ticket header uses, so deciding here and
@@ -142,74 +143,25 @@
       </div>
     </div>
 
-    <Dialog v-model="visiting" :options="{ title: __('Schedule a visit') }">
-      <template #body-content>
-        <div v-if="visitFor" class="mb-4 rounded-lg border bg-surface-gray-1 p-3 text-sm">
-          <div class="font-medium text-ink-gray-8">{{ visitFor.name }} · {{ visitFor.serial_no }}</div>
-          <div class="text-ink-gray-6">{{ [visitFor.customer, visitFor.where].filter(Boolean).join(" · ") }}</div>
-        </div>
-        <FormControl v-model="visit.technician" type="select" :label="__('Technician')" :options="technicianOptions" />
-        <FormControl class="mt-3" v-model="visit.visit_date" type="date" :label="__('Date')" />
-        <FormControl class="mt-3" v-model="visit.note" type="textarea" :rows="2"
-                     :label="__('Anything to tell the dealer')" />
-        <ErrorMessage v-if="book.error" class="mt-3" :message="book.error" />
-      </template>
-      <template #actions>
-        <Button class="w-full" variant="solid" theme="blue" :loading="book.loading"
-                :disabled="!visit.technician || !visit.visit_date"
-                :label="__('Book it and tell the dealer')" @click="book.submit()" />
-      </template>
-    </Dialog>
-
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from "vue";
-import { Badge, Button, Dialog, ErrorMessage, FormControl, createResource, toast } from "frappe-ui";
+import { computed, ref, watch } from "vue";
+import { Badge, Button, FormControl, createResource } from "frappe-ui";
 import { LayoutHeader } from "@/components";
 import ClaimDecision from "@/components/ticket-agent/ClaimDecision.vue";
+import ScheduleVisit from "@/components/ticket-agent/ScheduleVisit.vue";
 import LucideMessageSquare from "~icons/lucide/message-square";
-import LucideCalendarCheck from "~icons/lucide/calendar-check";
 import { __ } from "@/translation";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
 const board = createResource({ url: "kumar_service.staff_api.claims_board", auto: true });
 
-// technicians come from the visit board, which already knows who can go
+// technicians come from the visit board, which already knows who can go;
+// the ScheduleVisit component on each card does the booking itself
 const visitBoard = createResource({ url: "kumar_service.staff_api.visit_board", auto: true });
-const technicianOptions = computed(() => [
-  { label: __("Choose a technician"), value: "" },
-  ...(visitBoard.data?.technicians || []).map((t: any) => ({
-    label: [t.technician_name || t.name, t.dealer].filter(Boolean).join(" · "),
-    value: t.name,
-  })),
-]);
-const visiting = ref(false);
-const visitFor = ref<any>(null);
-const visit = reactive({ technician: "", visit_date: "", note: "" });
-function openVisit(c: any) {
-  visitFor.value = c;
-  visit.technician = "";
-  visit.visit_date = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
-  visit.note = "";
-  visiting.value = true;
-}
-const book = createResource({
-  url: "kumar_service.staff_api.schedule_visit_for_claim",
-  makeParams: () => ({
-    claim: visitFor.value?.name,
-    technician: visit.technician,
-    visit_date: visit.visit_date,
-    note: visit.note,
-  }),
-  onSuccess: (d: any) => {
-    visiting.value = false;
-    toast.success(d.message);
-    board.reload();
-  },
-});
 const filter = ref("");
 const search = ref("");
 // The board fetches only the OPEN states by default, so the Settled and

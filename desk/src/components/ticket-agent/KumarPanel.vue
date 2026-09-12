@@ -92,15 +92,16 @@
         <div>
           <div class="flex items-center justify-between">
             <span class="text-xs font-medium uppercase tracking-wide text-ink-gray-5">{{ __("Visits") }}</span>
-            <Button
+            <ScheduleVisit
               v-if="request || claim"
-              size="sm"
-              variant="ghost"
+              :request="request?.name"
+              :claim="claim?.name"
+              :serial="ctx.data?.serial_no"
+              :technicians="ctx.data?.technicians"
               :label="__('Schedule')"
-              @click="openVisit"
-            >
-              <template #prefix><LucideCalendarPlus class="size-3.5" /></template>
-            </Button>
+              variant="ghost"
+              @done="refresh"
+            />
           </div>
           <ul v-if="visits.length" class="mt-1 divide-y divide-outline-gray-1">
             <li v-for="v in visits" :key="v.name" class="py-1.5">
@@ -122,43 +123,18 @@
     </div>
   </Section>
 
-  <!-- book a technician; the dealer is told on the same thread -->
-  <Dialog v-model="visiting" :options="{ title: __('Schedule a visit') }">
-    <template #body-content>
-      <div v-if="request" class="mb-3 rounded-lg border bg-surface-gray-1 p-3 text-sm text-ink-gray-7">
-        {{ request.name }} · {{ ctx.data?.serial_no }}
-      </div>
-      <div v-else-if="claim" class="mb-3 rounded-lg border bg-surface-gray-1 p-3 text-sm text-ink-gray-7">
-        {{ __("The claim has no service request yet; booking one opens it and links it to the claim.") }}
-      </div>
-      <FormControl v-model="visit.technician" type="select" :label="__('Technician')" :options="technicianOptions" />
-      <div class="mt-3 grid grid-cols-2 gap-3">
-        <FormControl v-model="visit.visit_date" type="date" :label="__('Date')" />
-        <FormControl v-model="visit.visit_type" type="select" :label="__('Type')" :options="VISIT_TYPES" />
-      </div>
-      <FormControl class="mt-3" v-model="visit.note" type="textarea" :rows="2"
-        :label="__('Anything the dealer should know')" :placeholder="__('Optional')" />
-      <ErrorMessage v-if="bookError" class="mt-3" :message="bookError" />
-    </template>
-    <template #actions>
-      <Button class="w-full" variant="solid" :loading="bookRequest.loading || bookClaim.loading"
-        :disabled="!visit.technician || !visit.visit_date"
-        :label="__('Book it and tell the dealer')" @click="submitVisit" />
-    </template>
-  </Dialog>
-
 </template>
 
 <script setup lang="ts">
 import { __ } from "@/translation";
 import { ActivitiesSymbol, TicketSymbol } from "@/types";
 import { useStorage } from "@vueuse/core";
-import { Badge, Button, Dialog, ErrorMessage, FormControl, createResource, dayjs, toast } from "frappe-ui";
-import LucideCalendarPlus from "~icons/lucide/calendar-plus";
-import { computed, inject, reactive, ref } from "vue";
+import { Badge, ErrorMessage, dayjs } from "frappe-ui";
+import { computed, inject } from "vue";
 import { useRouter } from "vue-router";
 import { kumarTicketContext } from "@/composables/kumarTicketContext";
 import ClaimDecision from "./ClaimDecision.vue";
+import ScheduleVisit from "./ScheduleVisit.vue";
 import Section from "../Section.vue";
 
 const ticket = inject(TicketSymbol)!;
@@ -220,40 +196,6 @@ function visitState(v: any) {
 }
 function openLookup() {
   router.push({ name: "KumarLookup", query: { serial: ctx.data?.serial_no } });
-}
-
-// ---------------------------------------------------------------- visits
-const VISIT_TYPES = ["On-Site", "Workshop", "Telephonic"].map((v) => ({ label: __(v), value: v }));
-const visiting = ref(false);
-const visit = reactive({ technician: "", visit_date: "", visit_type: "On-Site", note: "" });
-const technicianOptions = computed(() => [
-  { label: __("Choose…"), value: "" },
-  ...(ctx.data?.technicians || []).map((t: any) => ({
-    label: t.dealer ? t.technician_name + " · " + t.dealer : t.technician_name,
-    value: t.name,
-  })),
-]);
-function openVisit() {
-  visit.technician = "";
-  visit.visit_date = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
-  visit.visit_type = "On-Site";
-  visit.note = "";
-  visiting.value = true;
-}
-const booked = {
-  onSuccess: (d: any) => {
-    visiting.value = false;
-    toast.success(d?.message || __("Visit booked"));
-    refresh();
-  },
-};
-const bookRequest = createResource({ url: "kumar_service.staff_api.schedule_visit", ...booked });
-const bookClaim = createResource({ url: "kumar_service.staff_api.schedule_visit_for_claim", ...booked });
-const bookError = computed(() => bookRequest.error || bookClaim.error);
-function submitVisit() {
-  const p = { technician: visit.technician, visit_date: visit.visit_date, visit_type: visit.visit_type, note: visit.note };
-  if (request.value) bookRequest.submit({ service_request: request.value.name, ...p });
-  else if (claim.value) bookClaim.submit({ claim: claim.value.name, ...p });
 }
 
 </script>
