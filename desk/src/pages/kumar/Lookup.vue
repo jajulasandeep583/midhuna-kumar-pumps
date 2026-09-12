@@ -140,7 +140,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from "vue";
 import { Badge, Button, Dialog, ErrorMessage, FormControl, createResource, toast } from "frappe-ui";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { LayoutHeader } from "@/components";
 import { __ } from "@/translation";
 import ScanButton from "./ScanButton.vue";
@@ -153,7 +153,7 @@ onMounted(() => {
   const q = route.query.serial;
   if (typeof q === "string" && q) {
     serial.value = q;
-    raise.submit();
+    look();
   }
 });
 const raising = ref(false);
