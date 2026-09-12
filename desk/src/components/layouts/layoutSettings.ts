@@ -12,7 +12,6 @@ import { ref } from "vue";
 import LucideBookOpen from "~icons/lucide/book-open";
 import LucideUsers from "~icons/lucide/users";
 import LucideTicket from "~icons/lucide/ticket";
-import LucideLayoutDashboard from "~icons/lucide/layout-dashboard";
 import { OrganizationsIcon } from "../icons";
 import PhoneIcon from "../icons/PhoneIcon.vue";
 import { __ } from "@/translation";
@@ -23,11 +22,27 @@ import { __ } from "@/translation";
  */
 export const showShortcutsModal = ref(false);
 
+// Ordered the way a KUMAR service person moves through a day, top to bottom:
+// land on the overview, open the queue, create work, look a pump up, then the
+// claims and visits desks, and finally the reference and directory screens.
+// (The Helpdesk "Dashboard" analytics page is intentionally not here - it needs
+// the Agent Manager role none of the service roles carry, so it only ever threw
+// a permission error; Command Centre is this product's management screen.)
 export const agentPortalSidebarOptions = [
+  {
+    label: __("Home"),
+    icon: LucideHome,
+    to: "Home",
+  },
   {
     label: __("Command Centre"),
     icon: LucideGauge,
     to: "KumarManage",
+  },
+  {
+    label: __("Tickets"),
+    icon: LucideTicket,
+    to: "TicketsAgent",
   },
   {
     label: __("Raise for a Pump"),
@@ -48,21 +63,6 @@ export const agentPortalSidebarOptions = [
     label: __("Visits"),
     icon: LucideCalendarCheck,
     to: "KumarVisits",
-  },
-  {
-    label: __("Home"),
-    icon: LucideHome,
-    to: "Home",
-  },
-  {
-    label: __("Dashboard"),
-    icon: LucideLayoutDashboard,
-    to: "Dashboard"
-  },
-  {
-    label: __("Tickets"),
-    icon: LucideTicket,
-    to: "TicketsAgent",
   },
   {
     label: __("Knowledge Base"),

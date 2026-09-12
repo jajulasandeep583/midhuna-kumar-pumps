@@ -609,6 +609,23 @@ def _ensure_customer(dealer):
 	return doc.name
 
 
+# The one password every demo login uses, so the credential sheet handed to
+# KUMAR is always true. The admin (Administrator, and admin@kumarpumps.local
+# from the setup wizard) keep their own "admin" password and are not touched.
+DEMO_PASSWORD = "Kumar@12345"
+
+
+def _ensure_demo_login(email):
+	"""Make an existing demo user match its documented credential: enabled, and
+	with the shared password. Passwords were only ever set on creation, so a user
+	made before this ran kept whatever it had and the sheet lied about it."""
+	from frappe.utils.password import update_password
+
+	if frappe.db.get_value("User", email, "enabled") == 0:
+		frappe.db.set_value("User", email, "enabled", 1)
+	update_password(email, DEMO_PASSWORD)
+
+
 def dealer_logins():
 	"""Give the network real logins, so the portal is not a demo of one shop.
 
@@ -640,12 +657,16 @@ def dealer_logins():
 					"first_name": full_name,
 					"send_welcome_email": 0,
 					"user_type": "System User",
-					"new_password": "Kumar@12345",
+					"new_password": DEMO_PASSWORD,
 				}
 			)
 			user.append("roles", {"role": "Dealer"})
 			user.flags.ignore_permissions = True
 			user.insert(ignore_permissions=True)
+		else:
+			# a user made before this ran keeps its old password, so the
+			# credential we hand KUMAR would be wrong; reset it every run
+			_ensure_demo_login(email)
 		frappe.db.set_value("Dealer", dealer, "portal_user", email, update_modified=False)
 		made.append((email, dealer))
 	return made
@@ -660,6 +681,7 @@ def staff_logins():
 	made = []
 	for email, full_name, roles in people:
 		if frappe.db.exists("User", email):
+			_ensure_demo_login(email)
 			made.append(email)
 			continue
 		user = frappe.get_doc(
@@ -669,7 +691,7 @@ def staff_logins():
 				"first_name": full_name,
 				"send_welcome_email": 0,
 				"user_type": "System User",
-				"new_password": "Kumar@12345",
+				"new_password": DEMO_PASSWORD,
 			}
 		)
 		for role in roles:
