@@ -48,6 +48,39 @@
           </div>
         </button>
       </div>
+
+      <!-- KUMAR is coming: the visits booked on this dealer's pumps, so the
+           dealer can tell the customer to be home - previously this fact
+           lived only inside each ticket's thread -->
+      <template v-if="(visits.data || []).length">
+        <div class="mb-2 mt-8 text-xs font-semibold uppercase tracking-wider text-ink-gray-4">
+          {{ __("KUMAR is coming") }}
+        </div>
+        <div class="overflow-x-auto rounded-xl border bg-surface-white">
+          <table class="w-full text-sm">
+            <tbody>
+              <tr v-for="v in visits.data" :key="v.name" class="border-t first:border-t-0">
+                <td class="whitespace-nowrap px-4 py-2.5 font-medium tabular-nums text-ink-gray-8">
+                  {{ v.visit_date }}
+                </td>
+                <td class="px-4 py-2.5">
+                  <div class="text-ink-gray-8">{{ v.technician }}</div>
+                  <a v-if="v.technician_mobile" class="text-xs tabular-nums text-ink-blue-6 hover:underline"
+                     :href="`tel:${v.technician_mobile}`">{{ v.technician_mobile }}</a>
+                </td>
+                <td class="px-4 py-2.5">
+                  <div class="tabular-nums text-ink-gray-7">{{ v.serial_no }}</div>
+                  <div class="text-xs text-ink-gray-5">{{ v.customer }}</div>
+                </td>
+                <td class="whitespace-nowrap px-4 py-2.5 text-right">
+                  <Badge :theme="v.is_chargeable ? 'orange' : 'green'"
+                         :label="v.is_chargeable ? __('Chargeable') : __('Free - warranty')" />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -55,7 +88,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useRouter } from "vue-router";
-import { createResource } from "frappe-ui";
+import { Badge, createResource } from "frappe-ui";
 import { LayoutHeader } from "@/components";
 import { __ } from "@/translation";
 import LucideFilePlus from "~icons/lucide/file-plus";
@@ -67,6 +100,7 @@ import LucideTicket from "~icons/lucide/ticket";
 
 const router = useRouter();
 const summary = createResource({ url: "kumar_service.portal_api.my_summary", auto: true });
+const visits = createResource({ url: "kumar_service.portal_api.my_visits", auto: true });
 
 const stats = computed(() => [
   {

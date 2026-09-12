@@ -362,11 +362,27 @@ def visit_board(limit=100):
 		):
 			sites.setdefault(reg.serial_no, reg)
 
+	# every row can jump to its conversation - the ticket is where the job is
+	# actually talked about, and a board you cannot open the thread from makes
+	# the user walk to Tickets and search
+	req_names = [r["name"] for r in open_requests]
+	tickets = {}
+	if req_names:
+		for t in frappe.get_all(
+			"HD Ticket",
+			filters={"custom_service_request": ["in", req_names],
+				"custom_warranty_claim": ["is", "not set"]},
+			fields=["name", "custom_service_request"],
+			limit_page_length=0,
+		):
+			tickets.setdefault(t.custom_service_request, t.name)
+
 	for r in open_requests:
 		site = sites.get(r["serial_no"]) or {}
 		r["where"] = site.get("installation_address") or ""
 		r["district"] = site.get("district") or ""
 		r["has_visit"] = r["name"] in booked
+		r["ticket"] = tickets.get(r["name"])
 		r["overdue"] = bool(
 			r["resolution_due_on"] and str(r["resolution_due_on"]) < str(now_datetime())
 		)
@@ -387,6 +403,12 @@ def visit_board(limit=100):
 		# the person going carries a phone; the board is where you ring them from
 		v["technician_mobile"] = frappe.db.get_value(
 			"Service Technician", v.technician, "mobile_no"
+		)
+		v["ticket"] = frappe.db.get_value(
+			"HD Ticket",
+			{"custom_service_request": v.service_request,
+				"custom_warranty_claim": ["is", "not set"]},
+			"name",
 		)
 
 	technicians = frappe.get_all(

@@ -274,6 +274,42 @@ def pump_snapshot(serial_no):
 
 
 @frappe.whitelist()
+def my_visits(limit=20):
+	"""Visits KUMAR has booked on this dealer's pumps, soonest first.
+
+	The desk has a whole Visits board; the dealer had to fish each booking out
+	of a ticket thread. This is the same fact from their side: who is coming,
+	when, to whose pump, with the technician's number to ring - so the dealer
+	can tell the customer to be home.
+	"""
+	scope = set(_my_scope())
+	out = []
+	for v in frappe.get_all(
+		"Service Visit",
+		filters={"docstatus": 0, "visit_date": [">=", nowdate()]},
+		fields=["name", "service_request", "serial_no", "technician", "visit_date",
+			"visit_type", "is_chargeable"],
+		order_by="visit_date asc",
+		limit_page_length=200,
+	):
+		sr = frappe.db.get_value(
+			"Service Request", v.service_request,
+			["dealer", "end_customer_name", "end_customer_mobile"], as_dict=True,
+		) or frappe._dict()
+		if sr.get("dealer") not in scope:
+			continue
+		v["customer"] = sr.get("end_customer_name")
+		v["customer_mobile"] = sr.get("end_customer_mobile")
+		v["technician_mobile"] = frappe.db.get_value(
+			"Service Technician", v.technician, "mobile_no"
+		)
+		out.append(v)
+		if len(out) >= (cint(limit) or 20):
+			break
+	return out
+
+
+@frappe.whitelist()
 def dealer_pump_lookup(serial_no):
 	"""Look a serial up from the counter: is it sold, and is it in warranty.
 

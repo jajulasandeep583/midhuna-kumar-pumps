@@ -64,7 +64,7 @@
             <tr v-for="r in waiting" :key="r.name" class="border-t hover:bg-surface-gray-1">
               <td class="px-3 py-2">
                 <div class="font-medium text-ink-gray-8">{{ r.custom_request_type || r.complaint_category }}</div>
-                <div class="text-xs tabular-nums text-ink-gray-5">{{ r.serial_no }}</div>
+                <div class="text-xs tabular-nums text-ink-gray-5">{{ r.name }} · {{ r.serial_no }}</div>
               </td>
               <td class="px-3 py-2">
                 <div class="text-ink-gray-7">{{ r.end_customer_name }}</div>
@@ -83,6 +83,15 @@
               <td class="whitespace-nowrap px-3 py-2 text-right">
                 <Badge class="mr-2" :theme="r.is_under_warranty ? 'green' : 'orange'"
                        :label="r.is_under_warranty ? __('Free') : __('Chargeable')" />
+                <Button
+                  v-if="r.ticket"
+                  class="mr-1"
+                  variant="subtle"
+                  :label="__('Open conversation')"
+                  @click="router.push({ name: 'TicketAgent', params: { ticketId: r.ticket } })"
+                >
+                  <template #prefix><LucideMessageSquare class="size-4" /></template>
+                </Button>
                 <Button variant="solid" theme="blue" :label="__('Schedule')" @click="openFor(r)" />
               </td>
             </tr>
@@ -105,6 +114,7 @@
               <th class="px-3 py-2 text-left font-medium">{{ __("Pump") }}</th>
               <th class="px-3 py-2 text-left font-medium">{{ __("Customer") }}</th>
               <th class="px-3 py-2 text-left font-medium">{{ __("Type") }}</th>
+              <th class="px-3 py-2 text-right font-medium"></th>
             </tr>
           </thead>
           <tbody>
@@ -115,12 +125,25 @@
                 <a v-if="v.technician_mobile" class="text-xs tabular-nums text-ink-blue-6 hover:underline"
                    :href="`tel:${v.technician_mobile}`">{{ v.technician_mobile }}</a>
               </td>
-              <td class="px-3 py-2 tabular-nums text-ink-gray-7">{{ v.serial_no }}</td>
+              <td class="px-3 py-2">
+                <div class="tabular-nums text-ink-gray-7">{{ v.serial_no }}</div>
+                <div class="text-xs tabular-nums text-ink-gray-5">{{ v.service_request }}</div>
+              </td>
               <td class="px-3 py-2 text-ink-gray-7">{{ v.customer }}</td>
               <td class="px-3 py-2">
                 <Badge :theme="v.is_chargeable ? 'orange' : 'green'"
                        :label="v.is_chargeable ? __('Chargeable') : __('Warranty')" />
                 <span class="ml-2 text-xs text-ink-gray-5">{{ v.visit_type }}</span>
+              </td>
+              <td class="whitespace-nowrap px-3 py-2 text-right">
+                <Button
+                  v-if="v.ticket"
+                  variant="subtle"
+                  :label="__('Open conversation')"
+                  @click="router.push({ name: 'TicketAgent', params: { ticketId: v.ticket } })"
+                >
+                  <template #prefix><LucideMessageSquare class="size-4" /></template>
+                </Button>
               </td>
             </tr>
           </tbody>
@@ -165,9 +188,12 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from "vue";
 import { Badge, Button, Dialog, ErrorMessage, FormControl, createResource, toast } from "frappe-ui";
+import { useRouter } from "vue-router";
 import { LayoutHeader } from "@/components";
+import LucideMessageSquare from "~icons/lucide/message-square";
 import { __ } from "@/translation";
 
+const router = useRouter();
 const q = ref("");
 const showing = ref(false);
 const target = ref<any>(null);

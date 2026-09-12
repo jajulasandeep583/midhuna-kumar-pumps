@@ -89,6 +89,16 @@ class TestDealerLookup(IntegrationTestCase):
 		self.assertNotIn("end_customer_mobile", out)
 		self.assertNotIn("where", out)
 
+	def test_my_visits_stay_inside_my_tree(self):
+		from kumar_service.portal_api import my_visits
+
+		for v in my_visits():
+			owner = frappe.db.get_value("Service Request", v["service_request"], "dealer")
+			self.assertIn(
+				owner, self.mine,
+				f"{v['name']} belongs to {owner}, outside this dealer's tree",
+			)
+
 	def test_unknown_serial_is_a_clean_miss(self):
 		from kumar_service.portal_api import dealer_pump_lookup
 
