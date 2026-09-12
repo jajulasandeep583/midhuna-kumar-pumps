@@ -299,20 +299,71 @@ def warranties():
 # --------------------------------------------------------------------- claims
 
 def claims():
-	"""Claims dated into the last two months, so the claims desk is current."""
+	"""Claims dated into the last two months, so the claims desk is current.
+
+	Also decides who RAISED each claim. The seed created every claim as
+	Administrator, so the whole claims desk read "Raised by KUMAR · Administrator"
+	- and the one filter a prospect will actually try, "show me what my dealers
+	raised", came back with no claims in it. Most claims really come from the
+	dealer standing next to the failed pump, so most of these become theirs:
+	owner set to the dealer's portal login (walking up to a parent, the same way
+	the portal does), which is exactly what the bridge reads to say Dealer /
+	Dealer Portal. A few stay with KUMAR, because a desk where staff never once
+	took a claim over the phone reads as staged. Hashed by name, not shuffled,
+	so the same claims flip on every run.
+	"""
+	import zlib
+
+	from kumar_service.desk_bridge import contact_for, desk_installed, mirror_claim
+	from kumar_service.portal_api import _portal_users
+
+	portal_users = _portal_users()
 	rng = _rng()
 	rows = frappe.get_all(
 		"Kumar Warranty Claim", filters={"docstatus": ["<", 2]},
-		fields=["name", "workflow_state", "settled_on"], limit_page_length=0,
+		fields=["name", "workflow_state", "settled_on", "dealer", "owner"],
+		limit_page_length=0,
 	)
+	raised = {"Dealer": 0, "KUMAR": 0}
 	for c in rows:
 		days = rng.randint(1, 12) if c.workflow_state in ("Pending Review", "Under Investigation") \
 			else rng.randint(8, 60)
 		values = {"claim_date": add_days(nowdate(), -days)}
 		if c.workflow_state == "Settled":
 			values["settled_on"] = add_days(nowdate(), -rng.randint(1, days))
+
+		# ~three quarters dealer-raised; the rest stay as staff took the call
+		portal_user = None
+		if zlib.crc32(c.name.encode()) % 100 < 72:
+			portal_user = contact_for(c.dealer)[1]
+		if portal_user:
+			values["owner"] = portal_user
+		# a claim the seed already gave a portal owner reads Dealer either way
+		final_owner = values.get("owner") or c.owner
+		raised["Dealer" if final_owner in portal_users else "KUMAR"] += 1
 		frappe.db.set_value("Kumar Warranty Claim", c.name, values, update_modified=False)
-	return {"claims": len(rows)}
+
+	# the mirrored tickets carry the chips and filters; make them agree
+	if desk_installed():
+		for c in rows:
+			doc = frappe.get_doc("Kumar Warranty Claim", c.name)
+			mirror_claim(doc)
+			# a ticket mirrored while the claim was Administrator's opens with
+			# "Raised by KUMAR (Administrator) ..." in its description; on a
+			# claim that is now the dealer's, that line is no longer true
+			if doc.owner == "Administrator":
+				continue
+			tk = frappe.db.get_value(
+				"HD Ticket", {"custom_warranty_claim": c.name},
+				["name", "description"], as_dict=True,
+			)
+			if tk and tk.description and "Raised by KUMAR" in tk.description:
+				import re
+				cleaned = re.sub(r"<p><em>Raised by KUMAR .*?</em></p>", "", tk.description)
+				if cleaned != tk.description:
+					frappe.db.set_value("HD Ticket", tk.name, "description", cleaned,
+						update_modified=False)
+	return {"claims": len(rows), "raised_by": raised}
 
 
 # --------------------------------------------------------------- desk mirror

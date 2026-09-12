@@ -512,7 +512,11 @@
         blown their SLA — the data of a company whose service desk does not work. This reshapes it
         into a healthy month: most requests resolved inside SLA, a handful open and answered on
         time, two or three genuinely late so the alerting is seen to work, visits booked for the
-        coming week, some warranties about to lapse, claims at every stage.</p>
+        coming week, some warranties about to lapse, claims at every stage. Most claims read as
+        raised by their dealer through the portal — the seed had created every one as
+        Administrator, so the <i>Raised by dealers</i> view held no claims at all — and a few stay
+        with KUMAR, because a desk where staff never once took a claim over the phone reads as
+        staged.</p>
       <p>It is seeded and idempotent — run it the morning of a demo, as often as you like, and the
         same picture comes back dated to today. It marks what it creates so it can take it back,
         and touches nothing on a site the demo seed did not build.</p>
@@ -535,7 +539,7 @@ bench --site kumarpumps.localhost execute kumar_service.desk_bridge.backfill_thr
       <pre><code>NODE_OPTIONS="--max-old-space-size=6144" yarn --cwd apps/kumar_service/desk build
 bench build --app kumar_service
 bench --site kumarpumps.localhost run-tests --app kumar_service</code></pre>
-      <p>192 tests, including suites that prove one dealer cannot read another's data, that every
+      <p>195 tests, including suites that prove one dealer cannot read another's data, that every
         request and every claim reaches the desk, that a message crosses between request and
         ticket exactly once in each direction, and that a dealer's reply reopens a closed
         request, and that KUMAR staff can find a pump by the caller's phone and raise a request,
