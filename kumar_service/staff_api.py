@@ -789,11 +789,18 @@ def _claim_actions(state):
 
 
 @frappe.whitelist()
-def claim_action(name, action, approved_amount=None, remarks=None):
+def claim_action(name, action, approved_amount=None, remarks=None, message=None):
 	"""Move a claim through its workflow, and tell the dealer what happened.
 
 	The dealer is told because a claim decided in silence is a dealer ringing to
 	ask - and on a rejection they are owed the reason, not just the outcome.
+
+	`message` is KUMAR's own words to the dealer. The desk prefills it with a
+	sensible default for the action, but whatever the approver actually writes is
+	what the dealer receives - an approval is a note KUMAR chooses to send, not a
+	fixed template. If it is left blank the default is used, so a claim is never
+	decided in silence. (`remarks` is the older append-a-note behaviour, kept so
+	nothing that still calls it breaks.)
 	"""
 	_require_staff()
 	if not frappe.db.exists("Kumar Warranty Claim", name):
@@ -812,15 +819,19 @@ def claim_action(name, action, approved_amount=None, remarks=None):
 		amount = flt(approved_amount) if approved_amount is not None else flt(doc.claim_amount)
 		if amount <= 0:
 			frappe.throw(_("Approve an amount greater than zero, or reject the claim."))
-		if amount > flt(doc.claim_amount):
+		# the ceiling only applies when the dealer actually named a figure. A
+		# claim lodged through the portal usually carries no amount (claim_amount
+		# 0), and KUMAR assesses it at approval - so an unstated claim can be
+		# approved for whatever the engineer decides, but a stated one cannot be
+		# quietly raised above what was asked for.
+		claimed = flt(doc.claim_amount)
+		if claimed > 0 and amount > claimed:
 			frappe.throw(
 				_("Approved amount cannot exceed the {0} claimed.").format(
-					frappe.utils.fmt_money(doc.claim_amount, currency="INR")
+					frappe.utils.fmt_money(claimed, currency="INR")
 				)
 			)
 		doc.approved_amount = amount
-	if remarks:
-		doc.remarks = (doc.remarks + "\n\n" if doc.remarks else "") + str(remarks)
 	if action == "Settle" and doc.meta.get_field("settled_on") and not doc.settled_on:
 		doc.settled_on = nowdate()
 	doc.flags.ignore_permissions = True
@@ -831,24 +842,29 @@ def claim_action(name, action, approved_amount=None, remarks=None):
 	doc = apply_workflow(doc, action)
 
 	# ------------------------------------------------------------- tell them
-	money = frappe.utils.fmt_money(
-		flt(doc.approved_amount) or flt(doc.claim_amount), currency="INR"
-	)
-	said = {
-		"Review": _("Your claim {0} is being investigated."),
-		"Approve": _("Your claim {0} is approved for {1}."),
-		"Reject": _("Your claim {0} could not be accepted."),
-		"Settle": _("Your claim {0} is settled. {1} has been passed for credit."),
-	}.get(action, _("Your claim {0} has moved to {1}."))
-	message = said.format(name, money if action in ("Approve", "Settle") else _(doc.workflow_state))
-	if remarks:
-		message += "\n\n" + str(remarks)
+	# What KUMAR actually sends is what the approver wrote. The default below is
+	# only a starting point the desk prefills; an empty message falls back to it
+	# so a claim is never settled in silence.
+	body = (message or "").strip()
+	if not body:
+		money = frappe.utils.fmt_money(
+			flt(doc.approved_amount) or flt(doc.claim_amount), currency="INR"
+		)
+		default = default_claim_message(action, name, money, doc.workflow_state)
+		body = default
+		# the older callers appended a free note instead of replacing the line
+		if remarks:
+			body += "\n\n" + str(remarks)
+
+	# keep what was sent on the record, so the decision carries its own reason
+	doc.db_set("remarks", (doc.remarks + "\n\n" if doc.remarks else "") + body,
+		update_modified=False)
 
 	from kumar_service.desk_bridge import contact_for
 
 	_c, portal_user = contact_for(doc.dealer)
 	add_reply(
-		"Kumar Warranty Claim", name, message,
+		"Kumar Warranty Claim", name, body,
 		notify_users={portal_user} if portal_user else None,
 	)
 
@@ -857,8 +873,19 @@ def claim_action(name, action, approved_amount=None, remarks=None):
 		"name": name,
 		"state": doc.workflow_state,
 		"approved_amount": flt(doc.approved_amount),
-		"message": message,
+		"message": body,
 	}
+
+
+def default_claim_message(action, name, money, state):
+	"""The line the desk prefills into the approver's message box - a starting
+	point, not the final word. Kept beside claim_action so the two never drift."""
+	return {
+		"Review": _("Your claim {0} is being investigated.").format(name),
+		"Approve": _("Your claim {0} is approved for {1}.").format(name, money),
+		"Reject": _("Your claim {0} could not be accepted.").format(name),
+		"Settle": _("Your claim {0} is settled. {1} has been passed for credit.").format(name, money),
+	}.get(action, _("Your claim {0} has moved to {1}.").format(name, _(state)))
 
 
 

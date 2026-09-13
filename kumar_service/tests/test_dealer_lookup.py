@@ -124,6 +124,55 @@ class TestDealerLookup(IntegrationTestCase):
 		out = dealer_pump_lookup("KP-DEFINITELY-NOT-REAL-00000")
 		self.assertFalse(out["found"])
 
+	def test_a_claim_decision_sends_the_approvers_own_words(self):
+		"""KUMAR's message on a decision is what the approver wrote, not the
+		canned line - and a blank message falls back to the default."""
+		from kumar_service.portal_api import dealer_pump_lookup, raise_claim
+		from kumar_service.staff_api import claim_action
+
+		look = dealer_pump_lookup(self.my_serial)
+		if not look.get("in_warranty"):
+			self.skipTest("this dealer's sample pump is out of warranty")
+		claim = raise_claim(serial_no=self.my_serial, claim_type="Part Replacement",
+			technician_report="[test] worn bearing")
+		name = claim["name"]
+		try:
+			frappe.set_user("Administrator")
+
+			def last_message():
+				rows = frappe.get_all("Comment",
+					filters={"reference_doctype": "Kumar Warranty Claim", "reference_name": name,
+						"comment_type": "Comment"},
+					fields=["content"], order_by="creation desc", limit=1)
+				return frappe.utils.strip_html(rows[0].content) if rows else ""
+
+			# Pending Review -> Under Investigation, with a bespoke note
+			claim_action(name, "Review",
+				message="Sending Ravi to inspect the winding on Tuesday - please keep the pump.")
+			self.assertIn("Ravi to inspect", last_message())
+
+			# Approve with the approver's own wording (no template)
+			claim_action(name, "Approve", approved_amount=1,
+				message="Approved in full. Credit adjusted against your September ledger.")
+			msg = last_message()
+			self.assertIn("September ledger", msg)
+			self.assertNotIn("is approved for", msg)  # the canned line is gone
+
+			# a blank message must fall back to the default, never send nothing
+			claim_action(name, "Settle", message="")
+			self.assertIn("settled", last_message().lower())
+		finally:
+			frappe.set_user("Administrator")
+			if frappe.db.exists("Kumar Warranty Claim", name):
+				if frappe.db.get_value("Kumar Warranty Claim", name, "docstatus") == 1:
+					frappe.db.set_value("Kumar Warranty Claim", name, "docstatus", 2,
+						update_modified=False)
+				for tk in frappe.get_all("HD Ticket",
+						filters={"custom_warranty_claim": name}, pluck="name"):
+					frappe.delete_doc("HD Ticket", tk, force=True, ignore_permissions=True)
+				frappe.delete_doc("Kumar Warranty Claim", name, force=True,
+					ignore_permissions=True, ignore_on_trash=True)
+
 	def test_a_lodged_claim_reaches_pending_review(self):
 		from kumar_service.portal_api import dealer_pump_lookup, raise_claim
 

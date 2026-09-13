@@ -28,14 +28,20 @@
         :label="__('Approve how much')"
         :description="__('Cannot exceed the {0} claimed.', [money(claim?.claim_amount)])"
       />
+      <!-- KUMAR's own words to the dealer. Prefilled with a sensible line for
+           the action, but the approver rewrites it however they wish - it is a
+           message KUMAR chooses to send, not a fixed template. -->
       <FormControl
         class="mt-3"
-        v-model="remarks"
+        v-model="dealerMessage"
         type="textarea"
-        :rows="3"
-        :label="__('What should the dealer be told')"
-        :placeholder="pending?.action === 'Reject' ? __('They are owed the reason, not just the outcome') : __('Optional')"
+        :rows="4"
+        :label="__('Message to the dealer')"
+        :placeholder="__('This is what the dealer will read')"
       />
+      <p class="mt-1 text-xs text-ink-gray-5">
+        {{ __("Prefilled - edit it freely. Sent to the dealer on their ticket.") }}
+      </p>
       <ErrorMessage v-if="act.error" class="mt-3" :message="act.error" />
     </template>
     <template #actions>
@@ -48,7 +54,7 @@
 <script setup lang="ts">
 import { __ } from "@/translation";
 import { Button, Dialog, ErrorMessage, FormControl, createResource, toast } from "frappe-ui";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 
 const props = withDefaults(
   defineProps<{
@@ -75,17 +81,47 @@ function money(v: number) {
 const acting = ref(false);
 const pending = ref<any>(null);
 const amount = ref<number | null>(null);
-const remarks = ref("");
+const dealerMessage = ref("");
+// once the approver types, we stop rewriting their message under them
+const messageDirty = ref(false);
 const dialogTitle = computed(() =>
   pending.value ? actionLabel(pending.value.action) + " " + (props.claim?.name || "") : ""
 );
 
+// the same default the server would fall back to, so what they see prefilled
+// is exactly what would be sent if they left it untouched
+function defaultMessage(action: string) {
+  const name = props.claim?.name || "";
+  const amt = money(pending.value?.action === "Approve" ? amount.value || 0 : props.claim?.claim_amount);
+  return (
+    {
+      Review: __("Your claim {0} is being investigated.", [name]),
+      Approve: __("Your claim {0} is approved for {1}.", [name, amt]),
+      Reject: __("Your claim {0} could not be accepted.", [name]),
+      Settle: __("Your claim {0} is settled. {1} has been passed for credit.", [name, amt]),
+    } as Record<string, string>
+  )[action] || "";
+}
+
 function openAction(a: any) {
   pending.value = a;
   amount.value = props.claim?.approved_amount || props.claim?.claim_amount || null;
-  remarks.value = "";
+  messageDirty.value = false;
+  dealerMessage.value = defaultMessage(a.action);
   acting.value = true;
 }
+
+// keep the Approve/Settle default in step with the amount, until they edit it
+watch(amount, () => {
+  if (pending.value && !messageDirty.value) {
+    dealerMessage.value = defaultMessage(pending.value.action);
+  }
+});
+watch(dealerMessage, (val) => {
+  if (pending.value && val !== defaultMessage(pending.value.action)) {
+    messageDirty.value = true;
+  }
+});
 
 const act = createResource({
   url: "kumar_service.staff_api.claim_action",
@@ -93,7 +129,7 @@ const act = createResource({
     name: props.claim?.name,
     action: pending.value?.action,
     approved_amount: pending.value?.action === "Approve" ? amount.value : undefined,
-    remarks: remarks.value,
+    message: dealerMessage.value,
   }),
   onSuccess: (d: any) => {
     acting.value = false;
