@@ -110,36 +110,12 @@
       </div>
     </div>
 
-    <Dialog v-model="raising" :options="{ title: __('Raise a request') }">
-      <template #body-content>
-        <div v-if="p" class="mb-4 rounded-lg border bg-surface-gray-1 p-3 text-sm">
-          <div class="font-medium tabular-nums text-ink-gray-8">{{ p.serial_no }}</div>
-          <div class="text-ink-gray-6">{{ [p.pump_model, p.end_customer_name, p.dealer].filter(Boolean).join(" · ") }}</div>
-        </div>
-        <div class="grid gap-3 sm:grid-cols-2">
-          <FormControl v-model="req.request_type" type="select" :label="__('What is needed')"
-            :options="['Complaint','Installation','Paid Service','Spare Part','Enquiry'].map((t) => ({ label: __(t), value: t }))" />
-          <FormControl v-model="req.priority" type="select" :label="__('Priority')"
-            :options="['Low','Medium','High','Critical'].map((t) => ({ label: __(t), value: t }))" />
-        </div>
-        <FormControl v-if="req.request_type === 'Complaint'" class="mt-3" v-model="req.complaint_category"
-          type="select" :label="__('What is the problem')"
-          :options="faults.map((t) => ({ label: __(t), value: t }))" />
-        <FormControl class="mt-3" v-model="req.description" type="textarea" :rows="3"
-          :label="__('What was reported')" :placeholder="__('In the caller\'s own words')" />
-        <ErrorMessage v-if="raise.error" class="mt-3" :message="raise.error" />
-      </template>
-      <template #actions>
-        <Button class="w-full" variant="solid" theme="blue" :loading="raise.loading"
-          :disabled="!req.description.trim()" :label="__('Raise it')" @click="raise.submit()" />
-      </template>
-    </Dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from "vue";
-import { Badge, Button, Dialog, ErrorMessage, FormControl, createResource, toast } from "frappe-ui";
+import { computed, onMounted, ref } from "vue";
+import { Badge, Button, ErrorMessage, FormControl, createResource } from "frappe-ui";
 import { useRoute, useRouter } from "vue-router";
 import { LayoutHeader } from "@/components";
 import { __ } from "@/translation";
@@ -155,27 +131,6 @@ onMounted(() => {
     serial.value = q;
     look();
   }
-});
-const raising = ref(false);
-const faults = ["No Discharge", "Low Discharge", "Motor Burnt", "Noise & Vibration", "Leakage",
-  "Tripping", "Seal Failure", "Bearing Failure", "Impeller Damage", "Cable Fault", "Installation Issue", "Other"];
-const req = reactive({ request_type: "Complaint", complaint_category: "Other", description: "", priority: "Medium" });
-const raise = createResource({
-  url: "kumar_service.staff_api.raise_request_for_pump",
-  makeParams: () => ({
-    serial_no: p.value?.serial_no,
-    request_type: req.request_type,
-    complaint_category: req.request_type === "Complaint" ? req.complaint_category : "Other",
-    description: req.description,
-    priority: req.priority,
-  }),
-  onSuccess: (d: any) => {
-    raising.value = false;
-    req.description = "";
-    toast.success(__("Raised {0}", [d.name]));
-    if (d.ticket) router.push({ name: "TicketAgent", params: { ticketId: d.ticket } });
-    else look();
-  },
 });
 const notFound = ref("");
 const p = ref<any>(null);

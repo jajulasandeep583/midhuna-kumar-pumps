@@ -50,6 +50,12 @@
       <div v-if="board.loading && !board.data" class="py-12 text-center text-ink-gray-5">
         {{ __("Loading...") }}
       </div>
+      <!-- an error must not masquerade as "nothing to decide" -->
+      <div v-else-if="board.error" class="rounded-xl border border-red-200 bg-red-50 p-5 text-center">
+        <p class="font-medium text-red-800">{{ __("The claims desk could not load.") }}</p>
+        <ErrorMessage class="mt-1" :message="board.error" />
+        <Button class="mt-3" variant="solid" theme="blue" :label="__('Try again')" @click="board.reload()" />
+      </div>
       <div v-else-if="!rows.length" class="rounded-lg border border-dashed py-12 text-center text-ink-gray-5">
         {{ search || filter ? __("No claim matches that.") : __("No claim is waiting on a decision.") }}
       </div>
@@ -148,7 +154,8 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { Badge, Button, FormControl, createResource } from "frappe-ui";
+import { Badge, Button, ErrorMessage, FormControl, createResource } from "frappe-ui";
+import { money } from "@/utils/kumarTypes";
 import { LayoutHeader } from "@/components";
 import ClaimDecision from "@/components/ticket-agent/ClaimDecision.vue";
 import ScheduleVisit from "@/components/ticket-agent/ScheduleVisit.vue";
@@ -168,10 +175,6 @@ const search = ref("");
 // Rejected tiles used to filter a list that could not contain them and came
 // back empty. Clicking a tile now refetches with that state.
 watch(filter, (s) => board.submit(s ? { state: s } : {}));
-
-function money(v: number) {
-  return "₹" + Math.round(v || 0).toLocaleString("en-IN");
-}
 
 const STAGE_STYLE: Record<string, any> = {
   "Pending Review": {

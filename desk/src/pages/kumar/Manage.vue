@@ -6,12 +6,24 @@
       </template>
       <template #right-header>
           <Button variant="solid" theme="blue" :label="__('Raise for a pump')" @click="router.push({ name: 'KumarRaise' })" />
-        <Button variant="ghost" :label="__('Refresh')" @click="d.reload()" />
+        <Button variant="ghost" :loading="d.loading" :label="__('Refresh')" @click="d.reload()">
+          <template #prefix><LucideRefreshCw class="h-4 w-4" /></template>
+        </Button>
       </template>
     </LayoutHeader>
 
     <div v-if="d.loading && !d.data" class="py-16 text-center text-ink-gray-5">
       {{ __("Loading...") }}
+    </div>
+
+    <!-- an error used to leave this page blank below the header: no data, no
+         loading, no explanation - so it read as "the product is empty" -->
+    <div v-else-if="d.error" class="px-5 py-10">
+      <div class="mx-auto max-w-lg rounded-xl border border-red-200 bg-red-50 p-5 text-center">
+        <p class="font-medium text-red-800">{{ __("The Command Centre could not load.") }}</p>
+        <ErrorMessage class="mt-1" :message="d.error" />
+        <Button class="mt-3" variant="solid" theme="blue" :label="__('Try again')" @click="d.reload()" />
+      </div>
     </div>
 
     <div v-else-if="d.data" class="px-5 py-5">
@@ -40,12 +52,12 @@
             <h2 class="text-sm font-semibold text-ink-gray-8">{{ __("Needs you") }}</h2>
             <span class="text-xs text-ink-gray-5">{{ __("Oldest first") }}</span>
           </div>
-          <div class="overflow-hidden rounded-lg border bg-surface-white">
+          <div class="overflow-x-auto rounded-lg border bg-surface-white">
             <div
               v-if="!needsYou.length"
               class="py-10 text-center text-sm text-ink-gray-5"
             >
-              {{ __("Nothing is past due. ") }}
+              {{ __("Nothing is past due — the desk is current.") }}
             </div>
             <table v-else class="w-full text-sm">
               <thead class="bg-surface-gray-2 text-xs uppercase tracking-wide text-ink-gray-5">
@@ -103,7 +115,11 @@
           <h2 class="mb-2 mt-8 text-sm font-semibold text-ink-gray-8">
             {{ __("The dealer network") }}
           </h2>
-          <div class="overflow-x-auto rounded-lg border bg-surface-white">
+          <div v-if="!(d.data.network || []).length"
+               class="rounded-lg border border-dashed py-10 text-center text-sm text-ink-gray-5">
+            {{ __("No outlet has sold or reported anything yet.") }}
+          </div>
+          <div v-else class="overflow-x-auto rounded-lg border bg-surface-white">
             <table class="w-full text-sm">
               <thead class="bg-surface-gray-2 text-xs uppercase tracking-wide text-ink-gray-5">
                 <tr>
@@ -207,22 +223,20 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useRouter } from "vue-router";
-import { Badge, Button, createResource } from "frappe-ui";
+import { Badge, Button, ErrorMessage, createResource } from "frappe-ui";
 import { LayoutHeader } from "@/components";
 import ScheduleVisit from "@/components/ticket-agent/ScheduleVisit.vue";
+import { money } from "@/utils/kumarTypes";
 import { __ } from "@/translation";
 import LucideAlertTriangle from "~icons/lucide/alert-triangle";
 import LucideMessageSquare from "~icons/lucide/message-square";
+import LucideRefreshCw from "~icons/lucide/refresh-cw";
 import LucideInbox from "~icons/lucide/inbox";
 import LucideIndianRupee from "~icons/lucide/indian-rupee";
 import LucideCalendarCheck from "~icons/lucide/calendar-check";
 
 const router = useRouter();
 const d = createResource({ url: "kumar_service.staff_api.manager_dashboard", auto: true });
-
-function money(v: number) {
-  return "₹" + Math.round(v || 0).toLocaleString("en-IN");
-}
 
 const kpis = computed(() => {
   const w = d.data?.work || {};

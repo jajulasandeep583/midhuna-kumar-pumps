@@ -7,6 +7,14 @@
     </LayoutHeader>
 
     <div class="px-5 py-6">
+      <!-- the tiles used to flash "-" on every load, and stay "-" for good if
+           the call failed, with nothing to say why -->
+      <div v-if="summary.error" class="mb-6 rounded-xl border border-red-200 bg-red-50 p-5 text-center">
+        <p class="font-medium text-red-800">{{ __("Your summary could not load.") }}</p>
+        <ErrorMessage class="mt-1" :message="summary.error" />
+        <Button class="mt-3" variant="solid" theme="blue" :label="__('Try again')" @click="summary.reload()" />
+      </div>
+
       <!-- Colour that means something: green is healthy, amber is a warranty
            about to lapse, blue is work sitting with KUMAR. A dealer should be
            able to read this strip in one glance from across a counter. -->
@@ -23,7 +31,9 @@
             <component :is="s.icon" class="size-4 shrink-0" :class="s.muted" />
           </div>
           <div class="mt-2 text-3xl font-semibold tabular-nums" :class="s.strong">
-            {{ s.value }}
+            <span v-if="summary.loading && !summary.data"
+                  class="inline-block h-7 w-10 animate-pulse rounded bg-black/10"></span>
+            <template v-else>{{ s.value }}</template>
           </div>
           <div class="mt-1 text-xs" :class="s.muted">{{ s.hint }}</div>
         </button>
@@ -81,7 +91,7 @@
                 </td>
                 <td class="whitespace-nowrap px-4 py-2.5 text-right">
                   <Badge :theme="v.is_chargeable ? 'orange' : 'green'"
-                         :label="v.is_chargeable ? __('Chargeable') : __('Free - warranty')" />
+                         :label="chargeLabel(v.is_chargeable)" />
                   <span v-if="v.ticket" class="ml-2 text-xs text-ink-blue-6">{{ __("Open") }} ›</span>
                 </td>
               </tr>
@@ -96,7 +106,8 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useRouter } from "vue-router";
-import { Badge, createResource } from "frappe-ui";
+import { Badge, Button, ErrorMessage, createResource } from "frappe-ui";
+import { chargeLabel } from "@/utils/kumarTypes";
 import { LayoutHeader } from "@/components";
 import { __ } from "@/translation";
 import LucideFilePlus from "~icons/lucide/file-plus";

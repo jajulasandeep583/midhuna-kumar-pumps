@@ -70,6 +70,21 @@
       </div>
 
       <div v-if="pumps.loading" class="py-10 text-center text-ink-gray-5">{{ __("Loading...") }}</div>
+      <div v-else-if="pumps.error" class="rounded-xl border border-red-200 bg-red-50 p-5 text-center">
+        <p class="font-medium text-red-800">{{ __("Your pumps could not load.") }}</p>
+        <ErrorMessage class="mt-1" :message="pumps.error" />
+        <Button class="mt-3" variant="solid" theme="blue" :label="__('Try again')" @click="pumps.reload()" />
+      </div>
+      <!-- a dealer who has never registered a sale was being told their SEARCH
+           failed; they need the first step instead -->
+      <div v-else-if="!all.length" class="rounded-xl border border-dashed py-14 text-center">
+        <p class="text-ink-gray-6">{{ __("You have not registered a sale yet.") }}</p>
+        <p class="mt-1 text-sm text-ink-gray-5">
+          {{ __("Register a pump on the day you sell it and its warranty starts from there.") }}
+        </p>
+        <Button class="mt-3" variant="solid" theme="blue" :label="__('Register a Sale')"
+                @click="router.push({ name: 'KumarRegister' })" />
+      </div>
       <div v-else-if="!rows.length" class="rounded-lg border border-dashed py-10 text-center text-ink-gray-5">
         {{ __("No pump matches that search.") }}
       </div>
@@ -137,6 +152,7 @@
                 <Button
                   class="ml-1"
                   variant="subtle"
+                  icon-left="message-square"
                   :label="__('Complaint')"
                   @click="complain(p)"
                 />
@@ -152,9 +168,10 @@
 <script setup lang="ts">
 import { computed, nextTick, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { Badge, Button, FormControl, createResource } from "frappe-ui";
+import { Badge, Button, ErrorMessage, FormControl, createResource } from "frappe-ui";
 import { LayoutHeader } from "@/components";
 import ScanButton from "./ScanButton.vue";
+import { warrantyStateTheme } from "@/utils/kumarTypes";
 import { __ } from "@/translation";
 
 const router = useRouter();
@@ -242,11 +259,9 @@ function onScan() {
   nextTick(() => window.scrollTo({ top: 0 }));
 }
 
-function themeFor(s: string) {
-  if (s === "In Warranty") return "green";
-  if (s === "Expiring Soon") return "orange";
-  return "gray";
-}
+// one shared warranty palette, so an expired pump is the same colour here as
+// it is on the staff screens
+const themeFor = warrantyStateTheme;
 
 function printCertificate(p: any) {
   if (!p.certificate_url) return;

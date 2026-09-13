@@ -8,6 +8,18 @@
 
     <div class="px-5 py-6">
       <div v-if="contacts.loading" class="text-sm text-ink-gray-5">{{ __("Loading...") }}</div>
+
+      <!-- both of these used to be the same thing to a dealer: a blank page -->
+      <div v-else-if="contacts.error" class="rounded-xl border border-red-200 bg-red-50 p-5 text-center">
+        <p class="font-medium text-red-800">{{ __("Contacts could not load.") }}</p>
+        <ErrorMessage class="mt-1" :message="contacts.error" />
+        <Button class="mt-3" variant="solid" theme="blue" :label="__('Try again')" @click="contacts.reload()" />
+      </div>
+      <div v-else-if="!(contacts.data || []).length"
+           class="rounded-xl border border-dashed py-14 text-center text-sm text-ink-gray-5">
+        {{ __("No KUMAR contact has been published for your outlet yet. Raise a request and the desk will reach you.") }}
+      </div>
+
       <div v-else class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <div v-for="c in contacts.data || []" :key="c.role + c.dealer_name" class="rounded-lg border bg-surface-white p-4">
           <div class="text-[10px] font-semibold uppercase tracking-wider text-ink-gray-5">
@@ -40,7 +52,7 @@
 </template>
 
 <script setup lang="ts">
-import { createResource } from "frappe-ui";
+import { Button, ErrorMessage, createResource } from "frappe-ui";
 import { LayoutHeader } from "@/components";
 import { __ } from "@/translation";
 

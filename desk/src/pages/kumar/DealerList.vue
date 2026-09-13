@@ -27,6 +27,14 @@
         {{ __("Loading...") }}
       </div>
 
+      <!-- without this a failed load showed the cheerful first-run screen, as
+           though the dealer had simply never raised anything -->
+      <div v-else-if="list.error" class="rounded-xl border border-red-200 bg-red-50 p-5 text-center">
+        <p class="font-medium text-red-800">{{ __("This list could not load.") }}</p>
+        <ErrorMessage class="mt-1" :message="list.error" />
+        <Button class="mt-3" variant="solid" theme="blue" :label="__('Try again')" @click="list.reload()" />
+      </div>
+
       <div v-else-if="!all.length" class="rounded-xl border border-dashed py-14 text-center">
         <p class="text-ink-gray-6">{{ emptyLine }}</p>
         <Button class="mt-3" variant="solid" theme="blue" :label="addLabel"
@@ -69,8 +77,11 @@
                 <!-- KUMAR answering is the thing a dealer is waiting for, so it
                      is on the row rather than inside the ticket -->
                 <Badge v-if="r.kumar_replied" theme="green" :label="__('KUMAR replied')" />
+                <!-- same icon + label the staff screens use for the same act -->
                 <Button v-if="r.ticket" class="ml-2" variant="subtle" :label="__('Open')"
-                        @click="router.push({ name: 'TicketCustomer', params: { ticketId: r.ticket } })" />
+                        @click="router.push({ name: 'TicketCustomer', params: { ticketId: r.ticket } })">
+                  <template #prefix><LucideMessageSquare class="size-4" /></template>
+                </Button>
               </td>
             </tr>
           </tbody>
@@ -83,9 +94,11 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
-import { Badge, Button, FormControl, createResource } from "frappe-ui";
+import { Badge, Button, ErrorMessage, FormControl, createResource } from "frappe-ui";
 import { LayoutHeader } from "@/components";
+import { money } from "@/utils/kumarTypes";
 import { __ } from "@/translation";
+import LucideMessageSquare from "~icons/lucide/message-square";
 import LucidePlus from "~icons/lucide/plus";
 
 const props = defineProps<{
@@ -128,10 +141,6 @@ const rows = computed(() => {
     );
   });
 });
-
-function money(v: number) {
-  return "₹" + Math.round(v || 0).toLocaleString("en-IN");
-}
 
 function tone(r: any) {
   if (r.closed) return r.approved === false ? "gray" : "green";

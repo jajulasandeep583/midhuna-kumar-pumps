@@ -173,11 +173,17 @@ const submit = createResource({
   makeParams: () => ({ ...form }),
   onSuccess: (d: any) => {
     done.value = d;
+    // everything that belongs to THAT customer is cleared - district, state and
+    // application were being left behind, so the next registration silently
+    // inherited the previous customer's village and duty
     form.serial_no = "";
     form.invoice_no = "";
     form.end_customer_name = "";
     form.end_customer_mobile = "";
     form.installation_address = "";
+    form.district = "";
+    form.state = "";
+    form.application_type = "";
     found.value = null;
   },
 });

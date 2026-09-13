@@ -46,6 +46,13 @@
       </div>
 
       <div v-if="board.loading" class="py-8 text-center text-ink-gray-5">{{ __("Loading...") }}</div>
+      <!-- otherwise a failed load reads as "nothing is waiting", which is the
+           opposite of the truth and exactly what a manager must not be told -->
+      <div v-else-if="board.error" class="rounded-xl border border-red-200 bg-red-50 p-5 text-center">
+        <p class="font-medium text-red-800">{{ __("The visit board could not load.") }}</p>
+        <ErrorMessage class="mt-1" :message="board.error" />
+        <Button class="mt-3" variant="solid" theme="blue" :label="__('Try again')" @click="board.reload()" />
+      </div>
       <div v-else-if="!waiting.length" class="rounded-lg border border-dashed py-8 text-center text-ink-gray-5">
         {{ __("Nothing is waiting on a visit.") }}
       </div>
