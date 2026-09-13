@@ -303,6 +303,13 @@ def my_visits(limit=20):
 		v["technician_mobile"] = frappe.db.get_value(
 			"Service Technician", v.technician, "mobile_no"
 		)
+		# the visit's conversation, from the dealer's side
+		v["ticket"] = frappe.db.get_value(
+			"HD Ticket",
+			{"custom_service_request": v.service_request,
+				"custom_warranty_claim": ["is", "not set"]},
+			"name",
+		)
 		out.append(v)
 		if len(out) >= (cint(limit) or 20):
 			break

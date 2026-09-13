@@ -94,7 +94,15 @@
               :class="p.serial_no === highlighted ? 'bg-surface-amber-1' : ''"
             >
               <td class="px-3 py-2">
-                <div class="font-medium tabular-nums text-ink-gray-8">{{ p.serial_no }}</div>
+                <!-- the serial IS the pump's story: one tap into Pump Lookup
+                     for warranty, history and the raise buttons -->
+                <button
+                  class="font-medium tabular-nums text-ink-gray-8 hover:text-ink-blue-6 hover:underline"
+                  :title="__('Open in Pump Lookup')"
+                  @click="router.push({ name: 'KumarDealerLookup', query: { serial: p.serial_no } })"
+                >
+                  {{ p.serial_no }}
+                </button>
                 <div class="text-xs text-ink-gray-5">{{ p.model }}</div>
               </td>
               <td class="px-3 py-2">
@@ -143,17 +151,24 @@
 
 <script setup lang="ts">
 import { computed, nextTick, reactive, ref } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { Badge, Button, FormControl, createResource } from "frappe-ui";
 import { LayoutHeader } from "@/components";
 import ScanButton from "./ScanButton.vue";
 import { __ } from "@/translation";
 
 const router = useRouter();
+const route = useRoute();
 const pumps = createResource({ url: "kumar_service.portal_api.my_pumps", auto: true });
 const all = computed(() => pumps.data || []);
 
 const f = reactive({ q: "", state: "", category: "", model: "", district: "", from: "", to: "" });
+// a Home tile that says "Expiring in 30 days" lands here already filtered to
+// exactly that - making the dealer re-pick the filter was a broken promise
+const presetState = String(route.query.warranty || "");
+if (["In Warranty", "Expiring Soon", "Expired"].includes(presetState)) {
+  f.state = presetState;
+}
 const scan = ref("");
 const scanMsg = ref("");
 const scanOk = ref(false);

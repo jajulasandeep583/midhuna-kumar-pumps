@@ -59,14 +59,21 @@
         <div class="overflow-x-auto rounded-xl border bg-surface-white">
           <table class="w-full text-sm">
             <tbody>
-              <tr v-for="v in visits.data" :key="v.name" class="border-t first:border-t-0">
+              <!-- the whole row opens the conversation the booking lives on -->
+              <tr
+                v-for="v in visits.data"
+                :key="v.name"
+                class="border-t first:border-t-0"
+                :class="v.ticket ? 'cursor-pointer hover:bg-surface-gray-1' : ''"
+                @click="v.ticket && router.push({ name: 'TicketCustomer', params: { ticketId: v.ticket } })"
+              >
                 <td class="whitespace-nowrap px-4 py-2.5 font-medium tabular-nums text-ink-gray-8">
                   {{ v.visit_date }}
                 </td>
                 <td class="px-4 py-2.5">
                   <div class="text-ink-gray-8">{{ v.technician }}</div>
                   <a v-if="v.technician_mobile" class="text-xs tabular-nums text-ink-blue-6 hover:underline"
-                     :href="`tel:${v.technician_mobile}`">{{ v.technician_mobile }}</a>
+                     :href="`tel:${v.technician_mobile}`" @click.stop>{{ v.technician_mobile }}</a>
                 </td>
                 <td class="px-4 py-2.5">
                   <div class="tabular-nums text-ink-gray-7">{{ v.serial_no }}</div>
@@ -75,6 +82,7 @@
                 <td class="whitespace-nowrap px-4 py-2.5 text-right">
                   <Badge :theme="v.is_chargeable ? 'orange' : 'green'"
                          :label="v.is_chargeable ? __('Chargeable') : __('Free - warranty')" />
+                  <span v-if="v.ticket" class="ml-2 text-xs text-ink-blue-6">{{ __("Open") }} ›</span>
                 </td>
               </tr>
             </tbody>
@@ -119,6 +127,7 @@ const stats = computed(() => [
     hint: __("Still covered"),
     icon: LucideShieldCheck,
     to: "KumarPumps",
+    query: { warranty: "In Warranty" },
     card: "border-green-200 bg-green-50 hover:border-green-300",
     strong: "text-green-800",
     muted: "text-green-700",
@@ -126,10 +135,12 @@ const stats = computed(() => [
   {
     label: __("Expiring in {0} days", [String(summary.data?.expiring_soon_days ?? 30)]),
     value: summary.data?.expiring ?? "-",
-    // the one number on this screen that is a to-do list
+    // the one number on this screen that is a to-do list - so the click lands
+    // on What I Sold ALREADY filtered to exactly these pumps
     hint: __("Worth a phone call"),
     icon: LucideClock,
     to: "KumarPumps",
+    query: { warranty: "Expiring Soon" },
     card: "border-amber-200 bg-amber-50 hover:border-amber-300",
     strong: "text-amber-800",
     muted: "text-amber-700",
