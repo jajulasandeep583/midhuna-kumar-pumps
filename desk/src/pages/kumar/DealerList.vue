@@ -69,8 +69,8 @@
                 <!-- KUMAR answering is the thing a dealer is waiting for, so it
                      is on the row rather than inside the ticket -->
                 <Badge v-if="r.kumar_replied" theme="green" :label="__('KUMAR replied')" />
-                <Button class="ml-2" variant="subtle" :label="__('Open')"
-                        @click="router.push({ name: 'TicketCustomer', params: { ticketId: r.name } })" />
+                <Button v-if="r.ticket" class="ml-2" variant="subtle" :label="__('Open')"
+                        @click="router.push({ name: 'TicketCustomer', params: { ticketId: r.ticket } })" />
               </td>
             </tr>
           </tbody>

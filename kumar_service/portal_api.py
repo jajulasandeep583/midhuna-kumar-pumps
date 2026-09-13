@@ -692,6 +692,32 @@ def my_tickets(kind="all", limit=60):
 
 	tickets.sort(key=lambda t: str(t.get("on") or ""), reverse=True)
 
+	# Each row's HD Ticket id, so "Open" lands on the real ticket. The row's
+	# `name` is the Service Request / Claim (WC-.. / SR-..), NOT the ticket, so
+	# routing by it opened a ticket that does not exist - "Ticket not found".
+	# One query per doctype rather than a lookup per row.
+	if frappe.db.exists("DocType", "HD Ticket"):
+		complaint_names = [t["name"] for t in tickets if t["kind"] == "complaint"]
+		claim_names = [t["name"] for t in tickets if t["kind"] == "claim"]
+		ticket_of = {}
+		if complaint_names:
+			for row in frappe.get_all(
+				"HD Ticket",
+				filters={"custom_service_request": ["in", complaint_names],
+					"custom_warranty_claim": ["is", "not set"]},
+				fields=["name", "custom_service_request"], limit_page_length=0,
+			):
+				ticket_of.setdefault(("complaint", row.custom_service_request), row.name)
+		if claim_names:
+			for row in frappe.get_all(
+				"HD Ticket",
+				filters={"custom_warranty_claim": ["in", claim_names]},
+				fields=["name", "custom_warranty_claim"], limit_page_length=0,
+			):
+				ticket_of.setdefault(("claim", row.custom_warranty_claim), row.name)
+		for t in tickets:
+			t["ticket"] = ticket_of.get((t["kind"], t["name"]))
+
 	# Whether KUMAR has come back on each ticket. One grouped query rather than a
 	# thread read per card, because a dealer with sixty tickets should not cost
 	# sixty round trips.

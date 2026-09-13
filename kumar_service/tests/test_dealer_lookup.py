@@ -89,6 +89,25 @@ class TestDealerLookup(IntegrationTestCase):
 		self.assertNotIn("end_customer_mobile", out)
 		self.assertNotIn("where", out)
 
+	def test_my_tickets_rows_carry_their_ticket_id(self):
+		"""Every row must name its HD Ticket, or "Open" routes by the request /
+		claim name and the ticket page answers "Ticket not found"."""
+		from kumar_service.desk_bridge import desk_installed
+		from kumar_service.portal_api import my_tickets
+
+		if not desk_installed():
+			self.skipTest("helpdesk is not installed")
+		data = my_tickets()
+		rows = data["tickets"] if isinstance(data, dict) else data
+		for r in rows:
+			tid = r.get("ticket")
+			self.assertTrue(tid, f"{r['kind']} {r['name']} has no ticket id")
+			# and it must be a real HD Ticket, not the request/claim name
+			self.assertTrue(
+				frappe.db.exists("HD Ticket", tid),
+				f"{r['name']} points at {tid}, which is not an HD Ticket",
+			)
+
 	def test_my_visits_stay_inside_my_tree(self):
 		from kumar_service.portal_api import my_visits
 
