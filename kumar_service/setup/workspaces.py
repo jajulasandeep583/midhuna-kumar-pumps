@@ -46,6 +46,14 @@ WORKSPACES = [
 		"sequence": 2,
 		"roles": ["Dealer Manager", "Service Manager", "Warranty Approver", "Accounts User",
 			"System Manager"],
+		"number_cards": [
+			"Pumps sold this month",
+			"Pumps built this month",
+			"Purchases this month",
+			"Claims raised this month",
+			"Warranty cost this month",
+			"Complaints this month",
+		],
 		"guide": _guide(
 			"Management",
 			"Sales by dealer, stock on hand, and what the warranty is costing - the numbers a "
@@ -69,7 +77,9 @@ WORKSPACES = [
 			],
 		),
 		"shortcuts": [
-			("Production and Sales Summary", "Report", "Production &amp; Sales", "orange"),
+			# plain "&", not the entity: this label is rendered as TEXT in the
+			# sidebar rail, where "&amp;" shows up literally
+			("Production and Sales Summary", "Report", "Production & Sales", "orange"),
 			("Dealer Performance", "Report", "Dealer-wise Sales", "green"),
 			("Stock Balance", "Report", "Stock Balance", "blue"),
 			("Warranty Cost Analysis", "Report", "Warranty Cost", "orange"),
@@ -366,35 +376,52 @@ def ensure_sidebars():
 		label = ws["label"]
 		if not frappe.db.exists("Workspace", label):
 			continue
-		if frappe.db.exists("Workspace Sidebar", label):
-			continue
 		icon = WORKSPACE_ICONS.get(label, ws.get("icon"))
-		doc = frappe.get_doc({
-			"doctype": "Workspace Sidebar",
-			"title": label,
-			"header_icon": ws.get("icon"),
-			"module": MODULE,
-			"items": [
-				# the first item IS the workspace - that is what the tile opens
-				{"label": label, "link_type": "Workspace", "type": "Link", "link_to": label,
-					"icon": icon, "collapsible": 1},
-			],
+
+		# Rebuilt every run, not created-once. Skipping an existing sidebar meant
+		# a shortcut added to this file afterwards never reached the rail - the
+		# workspace had it and the sidebar did not, which is precisely how the
+		# Management reports ended up invisible in the nav.
+		existing = frappe.db.exists("Workspace Sidebar", label)
+		doc = frappe.get_doc("Workspace Sidebar", existing) if existing else frappe.new_doc(
+			"Workspace Sidebar"
+		)
+		doc.update({"title": label, "header_icon": ws.get("icon"), "module": MODULE})
+		doc.set("items", [])
+		# the first item IS the workspace - that is what the tile opens
+		doc.append("items", {
+			"label": label, "link_type": "Workspace", "type": "Link", "link_to": label,
+			"icon": icon, "collapsible": 1,
 		})
 		# then its shortcuts, so the rail is useful rather than a single line
 		for target, kind, text, _colour in ws.get("shortcuts", []):
+			if kind == "Report" and not frappe.db.exists("Report", target):
+				continue
+			if kind == "DocType" and not frappe.db.exists("DocType", target):
+				continue
+			if kind == "Page" and not frappe.db.exists("Page", target):
+				continue
 			doc.append("items", {
 				"label": text, "link_type": kind, "type": "Link", "link_to": target,
 				"icon": WORKSPACE_ICONS.get(text) or icon, "child": 1, "indent": 1,
 			})
 		doc.flags.ignore_permissions = True
-		doc.insert(ignore_permissions=True, set_name=label)
-		made.append(label)
+		if existing:
+			doc.save(ignore_permissions=True)
+		else:
+			doc.insert(ignore_permissions=True, set_name=label)
+			made.append(label)
+	if made:
+		print(f"  + created {len(made)} workspace sidebar(s): {', '.join(made)}")
+	return made
 	if made:
 		print(f"  + created {len(made)} workspace sidebar(s): {', '.join(made)}")
 	return made
 
 
 def build_all():
+	# cards first: _make() only attaches a card that already exists
+	ensure_number_cards()
 	for ws in WORKSPACES:
 		_make(ws)
 	prune_stale()
@@ -466,6 +493,73 @@ def prune_stale_files(wanted=None):
 	return removed
 
 
+#: The four numbers a proprietor wants before anything else, as Number Cards on
+#: the Management screen. Each is a live count or sum against a doctype with a
+#: this-month filter, so they move on their own - no script, nothing to refresh.
+#:
+#: (card label, doctype, function, field, filters, colour)
+MANAGEMENT_CARDS = [
+	("Pumps sold this month", "Pump Registration", "Count", None,
+		[["Pump Registration", "sale_date", "Timespan", "this month", False],
+		 ["Pump Registration", "docstatus", "=", 1, False]], "#16A34A"),
+	("Pumps built this month", "Serial No", "Count", None,
+		[["Serial No", "custom_manufacturing_date", "Timespan", "this month", False]], "#1D4ED8"),
+	("Claims raised this month", "Kumar Warranty Claim", "Count", None,
+		[["Kumar Warranty Claim", "claim_date", "Timespan", "this month", False],
+		 ["Kumar Warranty Claim", "docstatus", "<", 2, False]], "#C2410C"),
+	("Warranty cost this month", "Kumar Warranty Claim", "Sum", "claim_amount",
+		[["Kumar Warranty Claim", "claim_date", "Timespan", "this month", False],
+		 ["Kumar Warranty Claim", "docstatus", "<", 2, False]], "#B91C1C"),
+	("Purchases this month", "Purchase Invoice", "Sum", "grand_total",
+		[["Purchase Invoice", "posting_date", "Timespan", "this month", False],
+		 ["Purchase Invoice", "docstatus", "=", 1, False]], "#475569"),
+	("Complaints this month", "Service Request", "Count", None,
+		[["Service Request", "reported_on", "Timespan", "this month", False],
+		 ["Service Request", "docstatus", "<", 2, False]], "#A16207"),
+]
+
+
+def ensure_number_cards():
+	"""Create the Management number cards. Safe to run again.
+
+	Rebuilt every run rather than skipped-if-present: the filters are the whole
+	point of the card, and a card left behind with last month's definition is
+	worse than no card.
+	"""
+	made = []
+	for label, doctype, function, based_on, filters, colour in MANAGEMENT_CARDS:
+		if not frappe.db.exists("DocType", doctype):
+			continue
+		values = {
+			"label": label,
+			"type": "Document Type",
+			"document_type": doctype,
+			"function": function,
+			"aggregate_function_based_on": based_on,
+			"filters_json": json.dumps(filters),
+			"is_public": 1,
+			"show_percentage_stats": 1,
+			"stats_time_interval": "Monthly",
+			"color": colour,
+			"module": MODULE,
+		}
+		existing = frappe.db.exists("Number Card", label)
+		if existing:
+			doc = frappe.get_doc("Number Card", existing)
+			doc.update(values)
+			doc.flags.ignore_permissions = True
+			doc.save(ignore_permissions=True)
+		else:
+			doc = frappe.new_doc("Number Card")
+			doc.update(values)
+			doc.flags.ignore_permissions = True
+			doc.insert(ignore_permissions=True, set_name=label)
+		made.append(label)
+	if made:
+		print(f"  + number cards: {len(made)}")
+	return made
+
+
 def _make(ws):
 	# a Workspace names itself from its label, so that is the identity to check
 	name = ws["label"]
@@ -492,8 +586,18 @@ def _make(ws):
 	# screen opens on what people came to do.
 	content = [
 		_block("header", {"text": f"<span class='h4'><b>{ws['title_text']}</b></span>", "col": 12}),
-		_block("header", {"text": "<span class='h4'><b>Shortcuts</b></span>", "col": 12}),
 	]
+
+	# Number cards first, where a manager's eye lands. Only the screens that ask
+	# for them get them - a shop-floor rail does not need this month's turnover.
+	cards = ws.get("number_cards") or []
+	if cards:
+		content.append(_block("header", {"text": "<span class='h4'><b>This month</b></span>", "col": 12}))
+		for card in cards:
+			content.append(_block("number_card", {"number_card_name": card, "col": 4}))
+		content.append(_block("spacer", {"col": 12}))
+
+	content.append(_block("header", {"text": "<span class='h4'><b>Shortcuts</b></span>", "col": 12}))
 	for label, *_rest in ((s[2],) for s in ws["shortcuts"]):
 		content.append(_block("shortcut", {"shortcut_name": label, "col": 3}))
 
@@ -552,6 +656,11 @@ def _make(ws):
 			doc.append("links", row)
 			count += 1
 		doc.links[-(count + 1)].link_count = count
+
+	doc.set("number_cards", [])
+	for card in ws.get("number_cards") or []:
+		if frappe.db.exists("Number Card", card):
+			doc.append("number_cards", {"number_card_name": card, "label": card})
 
 	doc.set("roles", [])
 	for role in ws["roles"]:
