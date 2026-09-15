@@ -728,9 +728,11 @@ def salary_slips():
 	made = 0
 	for row in staff:
 		def _slip():
-			doc = frappe.new_doc("Salary Slip")
-			doc.update(
+			# built from a dict, not new_doc() + update(): the new_doc route named
+			# every slip "Sal Slip/None/000NN" - the employee missed the naming series
+			doc = frappe.get_doc(
 				{
+					"doctype": "Salary Slip",
 					"employee": row.employee,
 					"company": COMPANY,
 					"salary_structure": row.salary_structure,

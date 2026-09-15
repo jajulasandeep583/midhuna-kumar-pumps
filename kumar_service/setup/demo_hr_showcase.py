@@ -321,11 +321,18 @@ def hr_login():
 	)
 	if not manager or not frappe.db.exists("User", HR_USER):
 		return
+	# HR lands in Frappe HR, not in the service desk every other login opens: Portal
+	# Settings sends anyone without a role home page to /helpdesk, and only the
+	# user's default workspace outranks that
 	frappe.db.set_value(
 		"User", HR_USER,
-		{"first_name": manager.first_name, "last_name": manager.last_name, "user_image": manager.image},
+		{"first_name": manager.first_name, "last_name": manager.last_name,
+		 "full_name": f"{manager.first_name} {manager.last_name}", "user_image": manager.image,
+		 "default_app": "hrms",
+		 "default_workspace": "Shift & Attendance" if frappe.db.exists("Workspace", "Shift & Attendance") else None},
 		update_modified=False,
 	)
+	frappe.clear_cache(user=HR_USER)
 	frappe.db.set_value(
 		"Employee", manager.name,
 		{"user_id": HR_USER, "company_email": HR_USER, "prefered_contact_email": "Company Email",

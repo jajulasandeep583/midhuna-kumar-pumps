@@ -395,9 +395,10 @@ SALARY_SLIP = (
   .letter-head { display:none !important; }
   .ps { font-family: %s; color:#1f2933; font-size:11px; }
   .ps table { width:100%%; border-collapse:collapse; }
-  .ps td, .ps th { vertical-align:top; }
+  /* frappe's print stylesheet pads every cell 6px !important; this layout sets its own */
+  .ps td, .ps th { vertical-align:top; padding:0 !important; line-height:1.35; }
   .ps-brand { font-size:30px; font-weight:800; color:#0b5394; letter-spacing:1.5px; line-height:1; }
-  .ps-co { font-size:9.5px; color:#52606d; line-height:1.6; margin-top:5px; }
+  .ps-co { font-size:9px; color:#52606d; line-height:1.5; margin-top:5px; }
   .ps-doc { text-align:right; }
   .ps-doc-t { font-size:19px; font-weight:800; letter-spacing:4px; color:#0b5394; }
   .ps-month { display:inline-block; white-space:nowrap; margin-top:7px; background:#0b5394; color:#fff;
@@ -409,49 +410,50 @@ SALARY_SLIP = (
   .ps-rule2 { height:2px; background:#f5a623; }
 
   .ps-card { border:1px solid #d9e2ec; border-radius:6px; margin-top:10px; }
-  .ps-who td { padding:10px 14px 5px; vertical-align:middle; }
-  .ps-photo { width:70px; }
-  .ps-photo img { width:60px; height:60px; border-radius:8px; border:1px solid #d9e2ec; }
+  .ps-who td { padding:9px 14px 4px !important; vertical-align:middle; }
+  .ps-who td.ps-photo { width:64px !important; padding-right:0 !important; }
+  .ps-photo img { width:60px !important; height:60px !important; max-width:none !important;
+                  border-radius:8px; border:1px solid #d9e2ec; }
   .ps-name { font-size:17px; font-weight:800; color:#102a43; }
   .ps-role { color:#486581; font-size:11px; margin-top:2px; }
   .ps-id { text-align:right; font-size:10px; color:#7b8794; }
   .ps-id b { display:block; font-size:13px; color:#243b53; }
-  .ps-kv td { padding:4px 14px; border-top:1px solid #f0f4f8; }
+  .ps-kv td { padding:4px 14px !important; border-top:1px solid #f0f4f8; }
   .ps-kv td.k { color:#7b8794; font-size:9px; text-transform:uppercase; letter-spacing:.6px; width:16%%; padding-right:4px; }
   .ps-kv td.v { font-weight:600; color:#243b53; width:34%%; }
 
   .ps-stats { margin-top:10px; border:1px solid #d9e2ec; border-radius:6px; }
-  .ps-stats td { text-align:center; padding:7px 4px; border-left:1px solid #d9e2ec; width:20%%; }
+  .ps-stats td { text-align:center; padding:7px 4px !important; border-left:1px solid #d9e2ec; width:20%%; }
   .ps-stats td.first { border-left:none; }
-  .ps-num { font-size:18px; font-weight:800; color:#0b5394; }
+  .ps-num { font-size:17px; font-weight:800; color:#0b5394; }
   .ps-num.warn { color:#b44d12; }
   .ps-lbl { font-size:8.5px; color:#7b8794; text-transform:uppercase; letter-spacing:.7px; margin-top:2px; }
 
   .ps-pay { margin-top:10px; }
   .ps-pay th { background:#0b5394; color:#fff; font-size:9.5px; text-transform:uppercase; letter-spacing:1px;
-               padding:7px 10px; text-align:left; }
+               padding:6px 10px !important; text-align:left; }
   .ps-pay th.r, .ps-pay td.r { text-align:right; }
-  .ps-pay td { padding:5px 10px; border-bottom:1px solid #eef2f6; }
-  .ps-pay td.gap, .ps-pay th.gap { width:3%%; background:#fff; border:none; padding:0; }
+  .ps-pay td { padding:5px 10px !important; border-bottom:1px solid #eef2f6; }
+  .ps-pay td.gap, .ps-pay th.gap { width:3%%; background:#fff; border:none; padding:0 !important; }
   .ps-pay tr.tot td { background:#eef4fb; font-weight:800; color:#102a43; border-top:2px solid #0b5394; border-bottom:none; }
   .ps-pay tr.tot td.gap { background:#fff; border-top:none; }
 
   .ps-net { margin-top:10px; background:#0b5394; color:#fff; border-radius:6px; }
-  .ps-net td { padding:10px 18px; vertical-align:middle; }
+  .ps-net td { padding:11px 18px !important; vertical-align:middle; }
   .ps-net-lbl { font-size:9.5px; letter-spacing:2px; text-transform:uppercase; color:#c9dcf0; }
-  .ps-net-amt { font-size:28px; font-weight:800; line-height:1.15; }
+  .ps-net-amt { font-size:27px; font-weight:800; line-height:1.15; }
   .ps-net-words { font-size:10.5px; color:#e3eefa; margin-top:3px; }
   .ps-net-bank { text-align:right; font-size:10px; color:#c9dcf0; line-height:1.6; }
   .ps-net-bank b { color:#fff; font-size:11.5px; }
 
-  .ps-sub { margin-top:12px; font-size:9.5px; font-weight:800; color:#0b5394; text-transform:uppercase; letter-spacing:1.2px; }
+  .ps-sub { margin-top:10px; font-size:9.5px; font-weight:800; color:#0b5394; text-transform:uppercase; letter-spacing:1.2px; }
   .ps-leave { margin-top:5px; }
   .ps-leave th { font-size:9px; color:#52606d; text-transform:uppercase; letter-spacing:.6px; text-align:right;
-                 padding:5px 10px; border-bottom:1px solid #bcccdc; background:#f5f7fa; }
+                 padding:5px 10px !important; border-bottom:1px solid #bcccdc; background:#f5f7fa; }
   .ps-leave th.l, .ps-leave td.l { text-align:left; }
-  .ps-leave td { text-align:right; padding:4px 10px; border-bottom:1px solid #eef2f6; }
+  .ps-leave td { text-align:right; padding:4px 10px !important; border-bottom:1px solid #eef2f6; }
 
-  .ps-foot { margin-top:14px; border-top:1px dashed #bcccdc; padding-top:9px; font-size:9px; color:#7b8794;
+  .ps-foot { margin-top:10px; border-top:1px dashed #bcccdc; padding-top:9px; font-size:9px; color:#7b8794;
              text-align:center; line-height:1.7; }
 </style>
 """

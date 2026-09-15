@@ -22,7 +22,7 @@ def build_all():
 	frappe.flags.mute_emails = True
 	frappe.flags.in_import = True
 
-	from kumar_service.setup import demo, demo_finance, demo_hr, demo_ops
+	from kumar_service.setup import demo, demo_finance, demo_hr, demo_hr_showcase, demo_ops
 
 	print("\n=== 1/5  finance masters")
 	demo_finance.masters()
@@ -32,6 +32,7 @@ def build_all():
 
 	print("\n=== 3/5  people and payroll")
 	demo_hr.build_all()
+	demo_hr_showcase.build_all()
 
 	print("\n=== 4/5  purchase, production and sales")
 	demo_ops.build_all()
@@ -47,12 +48,13 @@ def ops_only():
 	"""Everything except the traceability layer demo.py already built."""
 	frappe.flags.mute_emails = True
 
-	from kumar_service.setup import demo_finance, demo_hr, demo_ops
+	from kumar_service.setup import demo_finance, demo_hr, demo_hr_showcase, demo_ops
 
 	print("\n=== finance masters")
 	demo_finance.masters()
 	print("\n=== people and payroll")
 	demo_hr.build_all()
+	demo_hr_showcase.build_all()
 	print("\n=== purchase, production and sales")
 	demo_ops.build_all()
 	print("\n=== payments and overheads")
