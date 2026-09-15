@@ -86,6 +86,26 @@ WORKSPACES = [
 			("Dealer Requests and Claims", "Report", "Requests & Claims", "grey"),
 			("Dealer", "DocType", "Dealer Network", "blue"),
 		],
+		# The money, one report per tile under its own heading, and the same
+		# reports down the sidebar in this order - the accountant's standard
+		# ERPNext statements, not KUMAR's own, so the figures are the ones the
+		# auditor sees.
+		"shortcut_sections": [
+			("Sales & Purchases", [
+				("Daily Business Summary", "Report", "Daily Business Summary", "blue"),
+				("Sales Invoice Trends", "Report", "Sales Invoice Trends", "green"),
+				("Purchase Invoice Trends", "Report", "Purchase Invoice Trends", "orange"),
+			]),
+			("Financial Statements", [
+				("Profit and Loss Statement", "Report", "Profit & Loss", "green"),
+				("Balance Sheet", "Report", "Balance Sheet", "blue"),
+				("Cash Flow", "Report", "Cash Flow", "cyan"),
+				("Trial Balance", "Report", "Trial Balance", "grey"),
+				("General Ledger", "Report", "General Ledger", "grey"),
+				("Accounts Receivable", "Report", "Accounts Receivable", "orange"),
+				("Accounts Payable", "Report", "Accounts Payable", "red"),
+			]),
+		],
 		"links": [
 			("What the month did", ["Production and Sales Summary", "Dealer Performance",
 				"Model Reliability"]),
@@ -430,6 +450,14 @@ def _block(btype, data):
 	return {"id": frappe.generate_hash(length=10), "type": btype, "data": data}
 
 
+def _all_shortcuts(ws):
+	"""The plain shortcuts, then each headed section's, in screen order."""
+	rows = list(ws.get("shortcuts", []))
+	for _heading, section in ws.get("shortcut_sections") or []:
+		rows.extend(section)
+	return rows
+
+
 def ensure_sidebars():
 	"""Give every KUMAR workspace a Workspace Sidebar of its own.
 
@@ -506,7 +534,7 @@ def ensure_sidebars():
 				})
 		else:
 			# then its shortcuts, so the rail is useful rather than a single line
-			for target, kind, text, _colour in ws.get("shortcuts", []):
+			for target, kind, text, _colour in _all_shortcuts(ws):
 				if not exists(kind, target):
 					continue
 				doc.append("items", {
@@ -645,6 +673,10 @@ def ensure_number_cards():
 			"is_public": 1,
 			"show_percentage_stats": 1,
 			"stats_time_interval": "Monthly",
+			# A money card shows the full figure. Shortened, a month with nothing
+			# in it reads "₹ NaN": frappe's shorten_number(0) returns "" and the
+			# currency formatter cannot parse that.
+			"show_full_number": 1 if function == "Sum" else 0,
 			"color": colour,
 			"module": MODULE,
 		}
@@ -706,6 +738,13 @@ def _make(ws):
 	for label, *_rest in ((s[2],) for s in ws["shortcuts"]):
 		content.append(_block("shortcut", {"shortcut_name": label, "col": 3}))
 
+	# headed rows of shortcuts under the plain ones - each section is its own line
+	for heading, section in ws.get("shortcut_sections") or []:
+		content.append(_block("spacer", {"col": 12}))
+		content.append(_block("header", {"text": f"<span class='h4'><b>{heading}</b></span>", "col": 12}))
+		for _link_to, _kind, label, _colour in section:
+			content.append(_block("shortcut", {"shortcut_name": label, "col": 3}))
+
 	content.append(_block("spacer", {"col": 12}))
 	content.append(_block("header", {"text": "<span class='h4'><b>Reports & Masters</b></span>", "col": 12}))
 	for card_label, _items in ws["links"]:
@@ -718,7 +757,7 @@ def _make(ws):
 	doc.content = json.dumps(content)
 
 	doc.set("shortcuts", [])
-	for link_to, link_type, label, color in ws["shortcuts"]:
+	for link_to, link_type, label, color in _all_shortcuts(ws):
 		if link_type == "DocType" and not frappe.db.exists("DocType", link_to):
 			continue
 		if link_type == "Report" and not frappe.db.exists("Report", link_to):
