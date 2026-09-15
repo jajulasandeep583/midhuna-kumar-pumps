@@ -180,9 +180,14 @@ def install():
 		doc.save()
 		made += 1
 
-	# The KUMAR Desk itself. Not a workspace, so it links out by route - and
-	# External is right here: the desk is a different app, and opening it in its
-	# own tab leaves the ERPNext session where it was.
+	# The KUMAR Desk itself. Not a workspace, so it links out by route.
+	#
+	# It has to be icon_type "App", not "Link". get_desktop_icons() permits a
+	# Link only when bootinfo.workspace_sidebar_item has an entry matching the
+	# label - a Link with no workspace behind it is silently dropped from the
+	# apps screen, which is why this tile did not appear at all. An App is
+	# checked with check_app_permission(label, app) instead, which passes for
+	# kumar_service, and is exactly how Helpdesk puts /helpdesk on that screen.
 	for label, (symbol, _colour, route) in APP_TILES.items():
 		name = frappe.db.get_value("Desktop Icon", {"label": label})
 		doc = frappe.get_doc("Desktop Icon", name) if name else frappe.new_doc("Desktop Icon")
@@ -190,7 +195,7 @@ def install():
 			doc.label = label
 		doc.app = "kumar_service"
 		doc.icon = symbol
-		doc.icon_type = "Link"
+		doc.icon_type = "App"
 		doc.standard = 1
 		doc.hidden = 0
 		doc.parent_icon = None
@@ -198,6 +203,9 @@ def install():
 		doc.link = route
 		doc.link_to = None
 		doc.sidebar = None
+		# an App tile draws its logo rather than the sprite glyph, so point it at
+		# the tile we generate for this label - same artwork as the others
+		doc.logo_url = "/assets/kumar_service/icons/desktop_icons/solid/%s.svg" % frappe.scrub(label)
 		doc.flags.ignore_permissions = True
 		doc.save()
 		made += 1
