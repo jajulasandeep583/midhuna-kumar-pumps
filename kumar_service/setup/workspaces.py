@@ -258,6 +258,35 @@ WORKSPACES = [
 				"submitting; that gap cannot be filled in later.",
 			],
 		),
+		# The rail, grouped by the shop that does the work rather than as one
+		# flat numbered list. The foundry and the winding shop run on their own
+		# rhythm and their records belong to no work order, so they collapse
+		# together; the run and its output are the other two groups.
+		# (group label, icon, [(link_type, target, label), ...])
+		"sidebar_groups": [
+			("Foundry & Winding shop", "kumar-heat", [
+				("DocType", "Heat Record", "Heat Record (melt)"),
+				("DocType", "Winding Batch Record", "Winding Batch Record"),
+				("DocType", "Batch", "Batches"),
+				("DocType", "Workstation", "Workstations"),
+			]),
+			("The production run", "kumar-factory", [
+				("DocType", "BOM", "1. BOM"),
+				("DocType", "Work Order", "2. Work Order"),
+				("DocType", "Job Card", "3. Job Card"),
+				("DocType", "Stock Entry", "4. Manufacture"),
+			]),
+			("What comes out", "kumar-serial", [
+				("DocType", "Serial No", "5. Serial No"),
+				("DocType", "Pump Test Certificate", "6. Test Certificate"),
+				("DocType", "Delivery Note", "7. Dispatch"),
+			]),
+			("Reports", "kumar-report", [
+				("Report", "Production and Sales Summary", "Production & Sales"),
+				("Report", "Batch Defect Analysis", "Batch Defect Analysis"),
+				("Report", "Serial Genealogy", "Serial Genealogy"),
+			]),
+		],
 		# In the order a pump is actually built, so the rail can be walked top to
 		# bottom in a demo: what it is made of, what authorises the run, what the
 		# shop floor works to, what the melt and the winding were, what comes out
@@ -398,18 +427,39 @@ def ensure_sidebars():
 			"label": label, "link_type": "Workspace", "type": "Link", "link_to": label,
 			"icon": icon, "collapsible": 1,
 		})
-		# then its shortcuts, so the rail is useful rather than a single line
-		for target, kind, text, _colour in ws.get("shortcuts", []):
-			if kind == "Report" and not frappe.db.exists("Report", target):
-				continue
-			if kind == "DocType" and not frappe.db.exists("DocType", target):
-				continue
-			if kind == "Page" and not frappe.db.exists("Page", target):
-				continue
-			doc.append("items", {
-				"label": text, "link_type": kind, "type": "Link", "link_to": target,
-				"icon": WORKSPACE_ICONS.get(text) or icon, "child": 1, "indent": 1,
-			})
+		def exists(kind, target):
+			return bool(
+				(kind == "Report" and frappe.db.exists("Report", target))
+				or (kind == "DocType" and frappe.db.exists("DocType", target))
+				or (kind == "Page" and frappe.db.exists("Page", target))
+			)
+
+		groups = ws.get("sidebar_groups")
+		if groups:
+			# a collapsible header per shop, with its records folded underneath -
+			# nine entries in a flat list is a wall, three groups is a process
+			for group_label, group_icon, children in groups:
+				rows = [(k, t, text) for k, t, text in children if exists(k, t)]
+				if not rows:
+					continue
+				doc.append("items", {
+					"label": group_label, "type": "Sidebar Item Group",
+					"icon": group_icon, "collapsible": 1, "show_arrow": 1,
+				})
+				for kind, target, text in rows:
+					doc.append("items", {
+						"label": text, "link_type": kind, "type": "Link", "link_to": target,
+						"icon": group_icon, "child": 1, "indent": 1, "collapsible": 1,
+					})
+		else:
+			# then its shortcuts, so the rail is useful rather than a single line
+			for target, kind, text, _colour in ws.get("shortcuts", []):
+				if not exists(kind, target):
+					continue
+				doc.append("items", {
+					"label": text, "link_type": kind, "type": "Link", "link_to": target,
+					"icon": WORKSPACE_ICONS.get(text) or icon, "child": 1, "indent": 1,
+				})
 		doc.flags.ignore_permissions = True
 		if existing:
 			doc.save(ignore_permissions=True)
