@@ -30,6 +30,7 @@ from kumar_service.setup.icons import WORKSPACE_ICONS
 # workspaces were superseded by the KUMAR Desk below, and their tiles were left
 # behind pointing at nothing.
 TILE_COLOURS = {
+	"Management": "#0B5394",
 	"Dealer Desk": "#EA580C",
 	"Warranty": "#16A34A",
 	"Traceability": "#0D9488",
@@ -56,7 +57,6 @@ APP_TILES = {
 #: ours (nothing in frappe or erpnext is named these), they have no workspace,
 #: and they only clutter the sidebar switcher.
 STALE_SIDEBARS = (
-	"Management",
 	"Service Desk",
 	"Warranty & Claims",
 	"Traceability & Quality",

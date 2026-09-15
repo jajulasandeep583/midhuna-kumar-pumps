@@ -34,6 +34,58 @@ def _guide(title, purpose, steps, watch_outs=None):
 
 WORKSPACES = [
 	{
+		# The owner's screen. The Command Centre at /kumar-desk/manage answers
+		# "what needs me today"; this answers the other half of the question a
+		# proprietor asks - what did the network SELL, what is it holding, and
+		# what is the warranty costing me - in ERPNext's own reports, because
+		# those are the ones the accountant already trusts.
+		"name": "Kumar Management",
+		"label": "Management",
+		"title_text": "Management",
+		"icon": "dashboard",
+		"sequence": 2,
+		"roles": ["Dealer Manager", "Service Manager", "Warranty Approver", "Accounts User",
+			"System Manager"],
+		"guide": _guide(
+			"Management",
+			"Sales by dealer, stock on hand, and what the warranty is costing - the numbers a "
+			"proprietor asks for, drawn from the same records the plant and the desk already keep. "
+			"Nothing here is entered twice.",
+			[
+				"<b>Dealer Performance</b> - one row per outlet: what they sold, what came back "
+				"and what they claimed. This is the dealer-wise sales picture.",
+				"<b>Stock Balance</b> and <b>Stock Ledger</b> - what is on hand, by warehouse and "
+				"item, and every movement behind it.",
+				"<b>Warranty Cost Analysis</b> - what settled claims have cost, by month and model.",
+				"<b>Command Centre</b> opens the live service desk at /kumar-desk/manage, where "
+				"past-due work and claims waiting on a decision are actionable rather than reported.",
+			],
+			[
+				"Stock Balance counts what is in the warehouse. Pumps already dispatched to a dealer "
+				"have left KUMAR's stock - the Dealer Network table is where those live.",
+				"A pump sold but never registered shows in <b>Stock vs Registration "
+				"Reconciliation</b>; it is the gap between what left the plant and what a dealer "
+				"admitted selling.",
+			],
+		),
+		"shortcuts": [
+			("Dealer Performance", "Report", "Dealer-wise Sales", "green"),
+			("Stock Balance", "Report", "Stock Balance", "blue"),
+			("Warranty Cost Analysis", "Report", "Warranty Cost", "orange"),
+			("Dealer Requests and Claims", "Report", "Requests & Claims", "grey"),
+			("Dealer", "DocType", "Dealer Network", "blue"),
+		],
+		"links": [
+			("Sales & Dealers", ["Dealer", "Pump Registration", "Sales Invoice", "Delivery Note",
+				"Customer"]),
+			("Stock on Hand", ["Stock Balance", "Stock Ledger", "Stock Projected Qty", "Item",
+				"Warehouse"]),
+			("What it is costing", ["Warranty Cost Analysis", "Dealer Performance",
+				"Dealer Requests and Claims", "Model Reliability",
+				"Stock vs Registration Reconciliation"]),
+		],
+	},
+	{
 		"name": "Kumar Dealer Desk",
 		"label": "Dealer Desk",
 		"title_text": "Dealer Desk",
@@ -271,10 +323,58 @@ def _block(btype, data):
 	return {"id": frappe.generate_hash(length=10), "type": btype, "data": data}
 
 
+def ensure_sidebars():
+	"""Give every KUMAR workspace a Workspace Sidebar of its own.
+
+	v16 navigates by Workspace Sidebar, not by Workspace: the apps-screen tile
+	and the left rail both resolve through it, and a workspace without one is
+	unreachable - frappe answers the tile click with "Icon is not correctly
+	configured". Frappe builds these during its own v16 migration, so a
+	workspace THIS file adds afterwards never gets one. Hence this.
+
+	Idempotent, and it never edits a sidebar that already exists - those carry
+	whatever the user has since arranged.
+	"""
+	from kumar_service.setup.icons import WORKSPACE_ICONS
+
+	made = []
+	for ws in WORKSPACES:
+		label = ws["label"]
+		if not frappe.db.exists("Workspace", label):
+			continue
+		if frappe.db.exists("Workspace Sidebar", label):
+			continue
+		icon = WORKSPACE_ICONS.get(label, ws.get("icon"))
+		doc = frappe.get_doc({
+			"doctype": "Workspace Sidebar",
+			"title": label,
+			"header_icon": ws.get("icon"),
+			"module": MODULE,
+			"items": [
+				# the first item IS the workspace - that is what the tile opens
+				{"label": label, "link_type": "Workspace", "type": "Link", "link_to": label,
+					"icon": icon, "collapsible": 1},
+			],
+		})
+		# then its shortcuts, so the rail is useful rather than a single line
+		for target, kind, text, _colour in ws.get("shortcuts", []):
+			doc.append("items", {
+				"label": text, "link_type": kind, "type": "Link", "link_to": target,
+				"icon": WORKSPACE_ICONS.get(text) or icon, "child": 1, "indent": 1,
+			})
+		doc.flags.ignore_permissions = True
+		doc.insert(ignore_permissions=True, set_name=label)
+		made.append(label)
+	if made:
+		print(f"  + created {len(made)} workspace sidebar(s): {', '.join(made)}")
+	return made
+
+
 def build_all():
 	for ws in WORKSPACES:
 		_make(ws)
 	prune_stale()
+	ensure_sidebars()
 	frappe.db.commit()
 
 

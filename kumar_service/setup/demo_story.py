@@ -260,6 +260,17 @@ def warranties():
 	def redate(reg, expiry):
 		months = cint(reg.warranty_months) or 12
 		sale = add_days(expiry, -30 * months)
+		# A pump cannot be sold before it was cast. Working backwards from the
+		# expiry alone produced registrations dated months BEFORE the serial's
+		# manufacturing date - and a visitor who opens one pump and reads "built
+		# 13 July, sold 24 December the year before" stops believing the rest of
+		# the screen. Where that happens, sell it just after it was built and let
+		# the expiry follow the sale instead.
+		built = frappe.db.get_value("Serial No", reg.serial_no, "custom_manufacturing_date")
+		if built and getdate(sale) < getdate(built):
+			# hashed, not random: this function is deterministic by design
+			sale = add_days(getdate(built), 1 + zlib.crc32(reg.serial_no.encode()) % 21)
+			expiry = add_days(sale, 30 * months)
 		frappe.db.set_value(
 			"Pump Registration", reg.name,
 			{"sale_date": sale, "warranty_start_date": sale, "warranty_expiry_date": expiry},
@@ -398,12 +409,91 @@ def sync_desk():
 	return {"tickets": n}
 
 
+def chronology():
+	"""Nothing may happen before the thing it depends on.
+
+	Requests, claims and visits are each re-dated by their own rule above, and
+	the rules do not know about each other - so a pump could be complained about
+	a day before it was sold, or visited before the complaint was raised. On a
+	single screen nobody notices; a visitor who follows ONE pump end to end
+	notices immediately, and stops trusting the rest of the data.
+
+	Whole documents move rather than single fields: a request keeps the shape of
+	its SLA story (replied on time, resolved late) because every stamp on it
+	shifts by the same amount.
+	"""
+	import zlib
+
+	fixed = {"requests": 0, "claims": 0, "visits": 0}
+
+	# a complaint cannot precede the sale
+	for row in frappe.db.sql(
+		"""select sr.name, sr.reported_on, r.sale_date
+		from `tabService Request` sr
+		join `tabPump Registration` r on r.serial_no = sr.serial_no and r.docstatus = 1
+		where sr.docstatus < 2 and date(sr.reported_on) < r.sale_date""",
+		as_dict=True,
+	):
+		gap = 1 + zlib.crc32(row.name.encode()) % 25
+		new = add_to_date(get_datetime(add_days(getdate(row.sale_date), gap)), hours=10)
+		delta = (new - get_datetime(row.reported_on)).days
+		if delta <= 0:
+			continue
+		values = {}
+		for field in ("reported_on", "response_due_on", "first_response_on",
+				"resolution_due_on", "resolved_on"):
+			was = frappe.db.get_value("Service Request", row.name, field)
+			if was:
+				values[field] = add_days(was, delta)
+		if values:
+			frappe.db.set_value("Service Request", row.name, values, update_modified=False)
+			fixed["requests"] += 1
+
+	# a claim cannot precede the complaint behind it, nor the sale
+	for row in frappe.db.sql(
+		"""select c.name, c.claim_date, c.settled_on, r.sale_date,
+			(select min(date(sr.reported_on)) from `tabService Request` sr
+				where sr.serial_no = c.serial_no and sr.docstatus < 2) first_report
+		from `tabKumar Warranty Claim` c
+		join `tabPump Registration` r on r.serial_no = c.serial_no and r.docstatus = 1
+		where c.docstatus < 2""",
+		as_dict=True,
+	):
+		floor = max(d for d in (getdate(row.sale_date), getdate(row.first_report)) if d)
+		if getdate(row.claim_date) >= floor:
+			continue
+		new = add_days(floor, 1 + zlib.crc32(row.name.encode()) % 10)
+		values = {"claim_date": new}
+		if row.settled_on:
+			values["settled_on"] = max(getdate(row.settled_on), new)
+		frappe.db.set_value("Kumar Warranty Claim", row.name, values, update_modified=False)
+		fixed["claims"] += 1
+
+	# a visit cannot precede the request it answers
+	for row in frappe.db.sql(
+		"""select v.name, v.visit_date, date(sr.reported_on) reported
+		from `tabService Visit` v
+		join `tabService Request` sr on sr.name = v.service_request
+		where v.docstatus < 2 and v.visit_date < date(sr.reported_on)""",
+		as_dict=True,
+	):
+		new = add_days(getdate(row.reported), 1 + zlib.crc32(row.name.encode()) % 4)
+		frappe.db.set_value("Service Visit", row.name, "visit_date", new, update_modified=False)
+		fixed["visits"] += 1
+
+	return fixed
+
+
 def build_all():
 	out = {
 		"requests": requests(),
 		"visits": visits(),
 		"warranties": warranties(),
 		"claims": claims(),
+		# last, and after everything that moves a date: each rule above re-dates
+		# its own doctype without knowing the others, so this is where the story
+		# is made to run forwards
+		"chronology": chronology(),
 		"desk": sync_desk(),
 	}
 	frappe.db.commit()
