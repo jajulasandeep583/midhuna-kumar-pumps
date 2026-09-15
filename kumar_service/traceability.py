@@ -39,14 +39,34 @@ def _bundle_batches(bundle):
 	)
 
 
+def _row_bundle(row):
+	"""The row's Serial and Batch Bundle, read from the database when the copy
+	in memory has not caught up.
+
+	This is the difference between traceability working and silently not working.
+	ERPNext links the bundle to the row during submit, and our hook can be handed
+	a row whose `serial_and_batch_bundle` is still blank in memory while the
+	persisted row already carries it. Trusting only the in-memory value meant a
+	real Manufacture entry consumed a batched casing, found no batches, and
+	stamped no heat on anything it built - which the seeded demo hid, because the
+	seed writes the heat onto each serial itself.
+	"""
+	bundle = row.get("serial_and_batch_bundle")
+	if bundle:
+		return bundle
+	name, doctype = row.get("name"), row.get("doctype")
+	if name and doctype:
+		return frappe.db.get_value(doctype, name, "serial_and_batch_bundle")
+	return None
+
+
 def row_serials(row):
 	"""Serials on a stock row, whichever way they were entered.
 
 	A bundle is the v15+ way, but with `use_serial_batch_fields` the row keeps
-	plain text in `serial_no` and the bundle may not be readable yet at the
-	moment our hook runs - so read both.
+	plain text in `serial_no` - so read both.
 	"""
-	serials = _bundle_serials(row.get("serial_and_batch_bundle"))
+	serials = _bundle_serials(_row_bundle(row))
 	if serials:
 		return serials
 	text = row.get("serial_no") or ""
@@ -54,7 +74,7 @@ def row_serials(row):
 
 
 def row_batches(row):
-	batches = _bundle_batches(row.get("serial_and_batch_bundle"))
+	batches = _bundle_batches(_row_bundle(row))
 	if batches:
 		return batches
 	return [row.get("batch_no")] if row.get("batch_no") else []
@@ -120,6 +140,65 @@ def capture_genealogy(doc, method=None):
 			title=_("Traceability Gap"),
 			indicator="orange",
 		)
+
+
+def backfill_genealogy(limit=None):
+	"""Re-stamp genealogy from every submitted Manufacture entry.
+
+	For units built before the bundle-read fix above, when the hook saw an empty
+	bundle and stamped nothing. Reads the same rows the hook does, so a unit ends
+	up with exactly what a fresh manufacture would have given it. Never clears a
+	field that is already set: the seed wrote real heats onto its own serials and
+	those stay.
+
+		bench --site kumarpumps.localhost execute \\
+			kumar_service.traceability.backfill_genealogy
+	"""
+	entries = frappe.get_all(
+		"Stock Entry",
+		filters={"purpose": ["in", ("Manufacture", "Repack")], "docstatus": 1},
+		pluck="name",
+		order_by="posting_date asc",
+		limit=cint(limit) or None,
+	)
+	touched = 0
+	verified = 0
+	for name in entries:
+		doc = frappe.get_doc("Stock Entry", name)
+		produced, consumed = [], {}
+		for row in doc.items:
+			if row.t_warehouse and not row.s_warehouse:
+				produced += row_serials(row)
+			elif row.s_warehouse and not row.t_warehouse:
+				field = CONSUMED_BATCH_MAP.get(
+					frappe.db.get_value("Item", row.item_code, "custom_trace_group")
+				)
+				if not field:
+					continue
+				batches = row_batches(row)
+				if batches:
+					consumed[field] = batches[0]
+
+		payload = dict(consumed)
+		if doc.get("work_order"):
+			payload["custom_work_order"] = doc.work_order
+		if not payload:
+			continue
+		for sn in produced:
+			if not frappe.db.exists("Serial No", sn):
+				continue
+			current = frappe.db.get_value("Serial No", sn, list(payload), as_dict=True) or {}
+			missing = {k: v for k, v in payload.items() if not current.get(k)}
+			if missing:
+				frappe.db.set_value("Serial No", sn, missing, update_modified=False)
+				touched += 1
+		if consumed:
+			frappe.db.set_value("Stock Entry", name, "custom_traceability_verified", 1,
+				update_modified=False)
+			verified += 1
+	frappe.db.commit()
+	print(f"  + genealogy backfilled onto {touched} serial(s); {verified} entries verified")
+	return {"serials": touched, "entries": verified}
 
 
 def clear_genealogy(doc, method=None):
