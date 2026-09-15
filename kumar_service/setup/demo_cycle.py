@@ -47,6 +47,16 @@ CHARGE_KG = (
 	("KR-FEMN", 16.0),
 )
 MOULDING_KG = (("KR-SANDBINDER", 45.0),)  # the moulds the iron is poured into
+
+# What one stator is wound from. The copper is almost all of its value, which is
+# why a stator costs what it costs; the insulation and varnish are small but
+# they are what the IR and HiPot readings on the Winding Batch Record actually
+# test. Per stator, multiplied by the lot size.
+WINDING_PER_STATOR = (
+	("KR-COPPERWIRE", 1.40),
+	("KR-INSULATION", 0.15),
+	("KR-VARNISH", 0.18),
+)
 CHARGE_WEIGHT = 1200
 # ~10 kg of metal per casing. Deliberately not the size of one work order: a
 # heat pours far more castings than any single run uses, which is precisely why
@@ -59,10 +69,14 @@ CHARGE_SUPPLIER = {
 	"KR-FESI": "Godavari Ferro Alloys",
 	"KR-FEMN": "Godavari Ferro Alloys",
 	"KR-SANDBINDER": "Ganapathi Foundry Consumables",
+	"KR-COPPERWIRE": "Deccan Copper Wires Pvt Ltd",
+	"KR-INSULATION": "Sagar Insulation & Varnish",
+	"KR-VARNISH": "Sagar Insulation & Varnish",
 }
 BUY_LOT = {  # a believable delivery, not a hand-to-mouth top-up
 	"KR-PIGIRON": 5000, "KR-SCRAP": 3000,
 	"KR-FESI": 200, "KR-FEMN": 150, "KR-SANDBINDER": 300,
+	"KR-COPPERWIRE": 500, "KR-INSULATION": 100, "KR-VARNISH": 200,
 }
 
 
@@ -143,17 +157,18 @@ def run(qty=None):
 	made["winding"] = wind.name
 	_p("4.", "WINDING SHOP winds a lot", wind.name, f"batch_no {wd_no}, IR 310.5, HiPot 2.2kV")
 
-	# the stator's copper and varnish are costed on the pump BOM, so the winding
-	# shop's output only has to reach stock - as a BATCH named after the record
-	_receive("KC-STATOR", wd_no, qty, WINDING_WH, today,
-		entry_type="Winding Output", stamp={"custom_winding_batch": wd_no})
+	# the whole lot the record says passed reaches stock, not just the few this
+	# run needs - a winding lot serves more than one work order, same as a heat
+	made["winding_entry"] = _wind(wd_no, wind.qty_passed, today)
+	_p("5.", "WINDING SHOP winds the lot", made["winding_entry"],
+		f"copper, insulation and varnish consumed -> {wind.qty_passed} x KC-STATOR, batch {wd_no}")
 	from kumar_service.traceability import link_batch_records
 
 	link_batch_records()
-	_p("5.", "STORES hold both batches", f"{heat_no} / {wd_no}",
+	_p("6.", "STORES hold both batches", f"{heat_no} / {wd_no}",
 		"each batch points back at its own quality record")
 
-	# ---------------------------------------------------------- 6 work order
+	# ---------------------------------------------------------- 7 work order
 	# pick the BOM first and take its item: choosing a finished pump and then
 	# hunting for its BOM lands on a model that has none, and Work Order refuses
 	# to save without one
@@ -177,13 +192,13 @@ def run(qty=None):
 	wo.submit()
 	made["work_order"] = wo.name
 	ops = [o.operation for o in (wo.operations or [])]
-	_p("6.", "PRODUCTION raises a run", wo.name, f"{qty} x {item} on {bom}")
+	_p("7.", "PRODUCTION raises a run", wo.name, f"{qty} x {item} on {bom}")
 	if ops:
 		print(f"       operations from the BOM: {' -> '.join(ops)}")
 		jobs = frappe.get_all("Job Card", filters={"work_order": wo.name}, pluck="name")
-		_p("7.", "JOB CARDS for the shop floor", f"{len(jobs)} cards", "one per operation")
+		_p("8.", "JOB CARDS for the shop floor", f"{len(jobs)} cards", "one per operation")
 
-	# ----------------------------------------------------------- 8 manufacture
+	# ----------------------------------------------------------- 9 manufacture
 	se = frappe.new_doc("Stock Entry")
 	se.stock_entry_type = "Manufacture"
 	se.company = COMPANY
@@ -204,7 +219,7 @@ def run(qty=None):
 	se.insert(ignore_permissions=True)
 	se.submit()
 	made["manufacture"] = se.name
-	_p("8.", "STORES build the pumps", se.name, "consumes the two batches, produces serials")
+	_p("9.", "STORES build the pumps", se.name, "consumes the two batches, produces serials")
 
 	# what the HOOK stamped - read back, never written here
 	serials = []
@@ -223,7 +238,7 @@ def run(qty=None):
 			f"winding={v.get('custom_winding_batch') or '-':16} "
 			f"wo={v.get('custom_work_order') or '-':20} qc={v.get('custom_qc_status')}")
 
-	# --------------------------------------------------------- 9 test bench
+	# -------------------------------------------------------- 10 test bench
 	certs = []
 	for sn in serials:
 		model = frappe.db.get_value("Serial No", sn, "custom_pump_model")
@@ -252,7 +267,7 @@ def run(qty=None):
 		c.submit()
 		certs.append(c.name)
 	made["certificates"] = certs
-	_p("9.", "TEST BENCH certifies each", f"{len(certs)} certificates", "QC status written onto the serial")
+	_p("10.", "TEST BENCH certifies each", f"{len(certs)} certificates", "QC status written onto the serial")
 
 	passed = frappe.db.count("Serial No", {"name": ["in", serials], "custom_qc_status": "Passed"})
 	print(f"\n       serials now QC Passed: {passed} of {len(serials)} - these may be dispatched")
@@ -288,9 +303,25 @@ def retag_shop_steps():
 		select distinct sed.parent from `tabStock Entry Detail` sed
 		inner join `tabStock Entry` se on se.name = sed.parent
 		where sed.item_code = 'KC-STATOR' and sed.t_warehouse = %s
-		  and se.docstatus = 1 and se.purpose = 'Material Receipt'
+		  and se.docstatus = 1 and se.purpose = 'Manufacture'
 		  and se.stock_entry_type != 'Winding Output'
 	""", WINDING_WH)
+
+	# An earlier pass tagged plain stator RECEIPTS as Winding Output, back when
+	# that type meant Material Receipt. It now means a real winding run, so those
+	# entries no longer belong to it: a list headed "what the winding shop made"
+	# must not contain stators that were received from nowhere. Sent back to the
+	# type that matches the purpose actually stored on them.
+	mistagged = frappe.db.sql_list("""
+		select se.name from `tabStock Entry` se
+		inner join `tabStock Entry Type` t on t.name = se.stock_entry_type
+		where se.docstatus = 1 and t.purpose != se.purpose
+	""")
+	for name in mistagged:
+		frappe.db.set_value("Stock Entry", name, "stock_entry_type",
+			frappe.db.get_value("Stock Entry", name, "purpose"), update_modified=False)
+	if mistagged:
+		print(f"  + {len(mistagged)} entr(ies) sent back to a type matching their purpose")
 
 	for name in melts:
 		frappe.db.set_value("Stock Entry", name, "stock_entry_type", "Foundry Melt",
@@ -346,9 +377,13 @@ def _buy_charge(posting_date):
 	to answer, and it can only answer it if the metal was bought in one document
 	and burnt in another.
 	"""
+	lot = QTY + 2  # the winding lot the record below says was produced
+	needed = CHARGE_KG + MOULDING_KG + tuple(
+		(item, per * lot) for item, per in WINDING_PER_STATOR
+	)
 	short = {
 		item: BUY_LOT.get(item, kg * 10)
-		for item, kg in CHARGE_KG + MOULDING_KG
+		for item, kg in needed
 		if _stock(item) < kg
 	}
 	if not short:
@@ -423,6 +458,47 @@ def _melt(heat_no, posting_date):
 		"is_finished_item": 1,
 		"use_serial_batch_fields": 1,
 		"batch_no": heat_no,
+	})
+	se.flags.ignore_permissions = True
+	se.insert(ignore_permissions=True)
+	se.submit()
+	return se.name
+
+
+def _wind(wd_no, lot_qty, posting_date):
+	"""Wind a lot of stators out of copper, insulation and varnish.
+
+	The winding shop's half of the same idea as _melt. The copper wire goes OUT
+	of Stores and does not come back as copper - it comes back wound into a
+	stator, under a Batch named after the Winding Batch Record that holds the IR
+	and HiPot readings for that lot. Without this the stators appeared in stock
+	by receipt and the copper was bought and never issued, which is exactly the
+	hole the foundry had.
+	"""
+	if not frappe.db.exists("Batch", wd_no):
+		b = frappe.get_doc({"doctype": "Batch", "batch_id": wd_no, "item": "KC-STATOR"})
+		b.flags.ignore_permissions = True
+		b.insert(ignore_permissions=True)
+
+	se = frappe.new_doc("Stock Entry")
+	se.stock_entry_type = "Winding Output" if frappe.db.exists(
+		"Stock Entry Type", "Winding Output") else "Manufacture"
+	se.custom_winding_batch = wd_no
+	se.company = COMPANY
+	se.posting_date = posting_date
+	se.set_posting_time = 1
+	se.fg_completed_qty = lot_qty
+	for item, per in WINDING_PER_STATOR:
+		se.append("items", {
+			"item_code": item, "qty": flt(per * lot_qty, 3), "s_warehouse": STORES_WH,
+		})
+	se.append("items", {
+		"item_code": "KC-STATOR",
+		"qty": lot_qty,
+		"t_warehouse": WINDING_WH,
+		"is_finished_item": 1,
+		"use_serial_batch_fields": 1,
+		"batch_no": wd_no,
 	})
 	se.flags.ignore_permissions = True
 	se.insert(ignore_permissions=True)

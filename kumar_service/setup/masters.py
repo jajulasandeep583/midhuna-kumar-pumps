@@ -298,13 +298,21 @@ def build_all():
 # Production rail something it can filter on without guessing at child rows.
 STOCK_ENTRY_TYPES = (
 	("Foundry Melt", "Manufacture"),
-	("Winding Output", "Material Receipt"),
+	# Manufacture, not Material Receipt: a stator is wound FROM copper wire,
+	# insulation and varnish. Receiving one into stock out of nothing is the
+	# same hole the foundry had - the wire would be bought and never issued.
+	("Winding Output", "Manufacture"),
 )
 
 
 def stock_entry_types():
 	for name, purpose in STOCK_ENTRY_TYPES:
-		if frappe.db.exists("Stock Entry Type", name):
+		existing = frappe.db.exists("Stock Entry Type", name)
+		if existing:
+			# the purpose of Winding Output changed once the winding shop started
+			# consuming its own raw material; correct it in place
+			if frappe.db.get_value("Stock Entry Type", name, "purpose") != purpose:
+				frappe.db.set_value("Stock Entry Type", name, "purpose", purpose)
 			continue
 		doc = frappe.get_doc({
 			"doctype": "Stock Entry Type", "__newname": name, "purpose": purpose,

@@ -298,21 +298,33 @@ WORKSPACES = [
 		# quality record and the stock entry that moved the material, because
 		# "where is the melt" and "where did the pig iron go" are different
 		# questions and the demo gets asked both.
-		# (link_type, target-or-url, label)
+		# Filtered entries are DocType links carrying route_options, NOT URL
+		# links: frappe's sidebar template hardcodes target="_blank" on anything
+		# whose link_type is URL (sidebar_item.html), so a URL opens a second tab
+		# and loses the rail. A DocType link with route_options routes in place
+		# and arrives with the filter already applied (sidebar_item.js get_path).
+		# (link_type, target, label, route_options or None)
 		"rail": [
-			("DocType", "Purchase Receipt", "1 · Raw material in"),
-			("DocType", "BOM", "2 · BOM"),
-			("DocType", "Work Order", "3 · Work Order"),
-			("DocType", "Job Card", "4 · Job Card"),
-			("DocType", "Heat Record", "5 · Foundry · Heat Record"),
-			("URL", "/desk/stock-entry?stock_entry_type=Foundry%20Melt",
-				"6 · Foundry · Melt entries"),
-			("DocType", "Winding Batch Record", "7 · Winding · Batch Record"),
-			("URL", "/desk/stock-entry?stock_entry_type=Winding%20Output",
-				"8 · Winding · Stator entries"),
-			("DocType", "Stock Entry", "9 · Manufacture"),
-			("DocType", "Serial No", "10 · Serial No"),
-			("DocType", "Pump Test Certificate", "11 · Test Certificate"),
+			("DocType", "Purchase Receipt", "1 · Raw material in", None),
+			("DocType", "BOM", "2 · BOM", None),
+			("DocType", "Work Order", "3 · Work Order", None),
+			("DocType", "Job Card", "4 · Job Card", None),
+			# each shop: what it recorded, what it consumed, what it left in stock
+			("DocType", "Heat Record", "5 · Foundry · Heat Record", None),
+			("DocType", "Stock Entry", "6 · Foundry · Melt entries",
+				{"stock_entry_type": "Foundry Melt"}),
+			("DocType", "Batch", "7 · Foundry · Casting batches",
+				{"custom_batch_type": "Heat"}),
+			("DocType", "Winding Batch Record", "8 · Winding · Batch Record", None),
+			("DocType", "Stock Entry", "9 · Winding · Winding entries",
+				{"stock_entry_type": "Winding Output"}),
+			("DocType", "Batch", "10 · Winding · Stator batches",
+				{"custom_batch_type": "Winding"}),
+			# and the pump itself, which eats one batch from each shop
+			("DocType", "Stock Entry", "11 · Pump · Manufacture",
+				{"stock_entry_type": "Manufacture"}),
+			("DocType", "Serial No", "12 · Pump · Serial No", None),
+			("DocType", "Pump Test Certificate", "13 · Pump · Test Certificate", None),
 		],
 		# In the order a pump is actually built, so the rail can be walked top to
 		# bottom in a demo: what it is made of, what authorises the run, what the
@@ -484,18 +496,13 @@ def ensure_sidebars():
 			# only findable as filters. Flat and numbered - v16 renders no
 			# children under a group (see _sidebar_groups_disabled), so the shop
 			# name goes in the label and the order carries the process.
-			for kind, target, text in ws["rail"]:
-				if kind == "URL":
-					doc.append("items", {
-						"label": text, "link_type": "URL", "type": "Link", "url": target,
-						"icon": WORKSPACE_ICONS.get(text) or icon, "child": 1, "indent": 1,
-					})
-					continue
+			for kind, target, text, route_options in ws["rail"]:
 				if not exists(kind, target):
 					continue
 				doc.append("items", {
 					"label": text, "link_type": kind, "type": "Link", "link_to": target,
 					"icon": WORKSPACE_ICONS.get(text) or icon, "child": 1, "indent": 1,
+					"route_options": json.dumps(route_options) if route_options else None,
 				})
 		else:
 			# then its shortcuts, so the rail is useful rather than a single line
