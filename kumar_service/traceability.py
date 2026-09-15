@@ -80,6 +80,18 @@ def row_batches(row):
 	return [row.get("batch_no")] if row.get("batch_no") else []
 
 
+def _entry_stamp(consumed):
+	"""The consumed batches, written back onto the Stock Entry itself.
+
+	The serials carry the genealogy, but a serial is one unit - answering "which
+	entries used heat X" meant scanning bundles. With the heat and winding batch
+	on the entry, the Stock Entry list can be filtered on either, which is what
+	the Production rail's foundry and winding links do.
+	"""
+	meta = frappe.get_meta("Stock Entry")
+	return {k: v for k, v in consumed.items() if meta.has_field(k)}
+
+
 def capture_genealogy(doc, method=None):
 	"""Stamp consumed batch numbers onto every serial the entry produced."""
 	if doc.purpose not in ("Manufacture", "Repack"):
@@ -131,7 +143,8 @@ def capture_genealogy(doc, method=None):
 		frappe.db.set_value("Serial No", sn, row_payload, update_modified=False)
 
 	if consumed:
-		frappe.db.set_value("Stock Entry", doc.name, "custom_traceability_verified", 1,
+		frappe.db.set_value("Stock Entry", doc.name,
+			{"custom_traceability_verified": 1, **_entry_stamp(consumed)},
 			update_modified=False)
 	else:
 		frappe.msgprint(
@@ -193,7 +206,8 @@ def backfill_genealogy(limit=None):
 				frappe.db.set_value("Serial No", sn, missing, update_modified=False)
 				touched += 1
 		if consumed:
-			frappe.db.set_value("Stock Entry", name, "custom_traceability_verified", 1,
+			frappe.db.set_value("Stock Entry", name,
+				{"custom_traceability_verified": 1, **_entry_stamp(consumed)},
 				update_modified=False)
 			verified += 1
 	frappe.db.commit()

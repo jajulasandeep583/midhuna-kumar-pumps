@@ -249,11 +249,22 @@ CUSTOM_FIELDS = {
 			"insert_after": "custom_trace_sb",
 		},
 		{
+			# the counterpart to Heat No. The genealogy hook already works out
+			# which winding batch an entry consumed - without this field it could
+			# only write it onto the serials, so the entry itself stayed silent
+			# about half of what it used.
+			"fieldname": "custom_winding_batch",
+			"label": "Winding Batch",
+			"fieldtype": "Link",
+			"options": "Batch",
+			"insert_after": "custom_heat_no",
+		},
+		{
 			"fieldname": "custom_shift",
 			"label": "Shift",
 			"fieldtype": "Select",
 			"options": "\nA\nB\nC",
-			"insert_after": "custom_heat_no",
+			"insert_after": "custom_winding_batch",
 		},
 		{"fieldname": "custom_trace_cb", "fieldtype": "Column Break", "insert_after": "custom_shift"},
 		{

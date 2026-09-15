@@ -285,9 +285,32 @@ def build_all():
 	pump_items()
 	dealer_tree()
 	technicians()
+	stock_entry_types()
 	stock_settings()
 	settings_defaults()
 	frappe.db.commit()
+
+
+# A melt and a stator lot are both "Manufacture" and "Material Receipt" to
+# ERPNext, which is true and useless: the Stock Entry list then shows a wall of
+# identical rows and nobody can find the foundry's work in it. Naming the two
+# shop steps gives the list a column that reads like the plant, and gives the
+# Production rail something it can filter on without guessing at child rows.
+STOCK_ENTRY_TYPES = (
+	("Foundry Melt", "Manufacture"),
+	("Winding Output", "Material Receipt"),
+)
+
+
+def stock_entry_types():
+	for name, purpose in STOCK_ENTRY_TYPES:
+		if frappe.db.exists("Stock Entry Type", name):
+			continue
+		doc = frappe.get_doc({
+			"doctype": "Stock Entry Type", "__newname": name, "purpose": purpose,
+		})
+		doc.flags.ignore_permissions = True
+		doc.insert(ignore_permissions=True)
 
 
 def stock_settings():

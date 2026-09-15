@@ -291,6 +291,29 @@ WORKSPACES = [
 				("Report", "Serial Genealogy", "Serial Genealogy"),
 			]),
 		],
+		# The rail, in the order a pump is actually built, so it can be walked top
+		# to bottom on screen: the metal arrives, the run is authorised, the two
+		# shops do their work, the batches are consumed, a serialised pump comes
+		# out and is proved. The foundry and winding steps each get BOTH their
+		# quality record and the stock entry that moved the material, because
+		# "where is the melt" and "where did the pig iron go" are different
+		# questions and the demo gets asked both.
+		# (link_type, target-or-url, label)
+		"rail": [
+			("DocType", "Purchase Receipt", "1 · Raw material in"),
+			("DocType", "BOM", "2 · BOM"),
+			("DocType", "Work Order", "3 · Work Order"),
+			("DocType", "Job Card", "4 · Job Card"),
+			("DocType", "Heat Record", "5 · Foundry · Heat Record"),
+			("URL", "/desk/stock-entry?stock_entry_type=Foundry%20Melt",
+				"6 · Foundry · Melt entries"),
+			("DocType", "Winding Batch Record", "7 · Winding · Batch Record"),
+			("URL", "/desk/stock-entry?stock_entry_type=Winding%20Output",
+				"8 · Winding · Stator entries"),
+			("DocType", "Stock Entry", "9 · Manufacture"),
+			("DocType", "Serial No", "10 · Serial No"),
+			("DocType", "Pump Test Certificate", "11 · Test Certificate"),
+		],
 		# In the order a pump is actually built, so the rail can be walked top to
 		# bottom in a demo: what it is made of, what authorises the run, what the
 		# shop floor works to, what the melt and the winding were, what comes out
@@ -455,6 +478,25 @@ def ensure_sidebars():
 						"label": text, "link_type": kind, "type": "Link", "link_to": target,
 						"icon": group_icon, "child": 1, "indent": 1, "collapsible": 1,
 					})
+		elif ws.get("rail"):
+			# An explicit rail, where the shortcuts are not enough: a filtered
+			# list is a URL, not a doctype, and the foundry and winding steps are
+			# only findable as filters. Flat and numbered - v16 renders no
+			# children under a group (see _sidebar_groups_disabled), so the shop
+			# name goes in the label and the order carries the process.
+			for kind, target, text in ws["rail"]:
+				if kind == "URL":
+					doc.append("items", {
+						"label": text, "link_type": "URL", "type": "Link", "url": target,
+						"icon": WORKSPACE_ICONS.get(text) or icon, "child": 1, "indent": 1,
+					})
+					continue
+				if not exists(kind, target):
+					continue
+				doc.append("items", {
+					"label": text, "link_type": kind, "type": "Link", "link_to": target,
+					"icon": WORKSPACE_ICONS.get(text) or icon, "child": 1, "indent": 1,
+				})
 		else:
 			# then its shortcuts, so the rail is useful rather than a single line
 			for target, kind, text, _colour in ws.get("shortcuts", []):
@@ -470,9 +512,6 @@ def ensure_sidebars():
 		else:
 			doc.insert(ignore_permissions=True, set_name=label)
 			made.append(label)
-	if made:
-		print(f"  + created {len(made)} workspace sidebar(s): {', '.join(made)}")
-	return made
 	if made:
 		print(f"  + created {len(made)} workspace sidebar(s): {', '.join(made)}")
 	return made

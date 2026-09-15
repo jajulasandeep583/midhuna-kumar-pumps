@@ -145,7 +145,8 @@ def run(qty=None):
 
 	# the stator's copper and varnish are costed on the pump BOM, so the winding
 	# shop's output only has to reach stock - as a BATCH named after the record
-	_receive("KC-STATOR", wd_no, qty, WINDING_WH, today)
+	_receive("KC-STATOR", wd_no, qty, WINDING_WH, today,
+		entry_type="Winding Output", stamp={"custom_winding_batch": wd_no})
 	from kumar_service.traceability import link_batch_records
 
 	link_batch_records()
@@ -263,6 +264,74 @@ def run(qty=None):
 	return made
 
 
+def retag_shop_steps():
+	"""Name the shop step on entries that were posted before the types existed.
+
+	The Production rail finds the foundry's and the winding shop's work by
+	stock_entry_type, so an entry posted as a plain "Manufacture" is invisible to
+	it - the link opens an empty list, which is worse than no link. Retagged in
+	place rather than re-posted: both new types carry the same `purpose` as the
+	one being replaced, so nothing about the ledger, the valuation or the GL
+	changes - only the label the list groups by.
+
+		bench --site kumarpumps.localhost execute \\
+			kumar_service.setup.demo_cycle.retag_shop_steps
+	"""
+	melts = frappe.db.sql_list("""
+		select distinct sed.parent from `tabStock Entry Detail` sed
+		inner join `tabStock Entry` se on se.name = sed.parent
+		where sed.item_code = 'KR-PIGIRON' and sed.s_warehouse is not null
+		  and se.docstatus = 1 and se.purpose = 'Manufacture'
+		  and se.stock_entry_type != 'Foundry Melt'
+	""")
+	stators = frappe.db.sql_list("""
+		select distinct sed.parent from `tabStock Entry Detail` sed
+		inner join `tabStock Entry` se on se.name = sed.parent
+		where sed.item_code = 'KC-STATOR' and sed.t_warehouse = %s
+		  and se.docstatus = 1 and se.purpose = 'Material Receipt'
+		  and se.stock_entry_type != 'Winding Output'
+	""", WINDING_WH)
+
+	for name in melts:
+		frappe.db.set_value("Stock Entry", name, "stock_entry_type", "Foundry Melt",
+			update_modified=False)
+	for name in stators:
+		frappe.db.set_value("Stock Entry", name, "stock_entry_type", "Winding Output",
+			update_modified=False)
+
+	# and carry the batch onto the entry's own traceability field. These two
+	# entries PRODUCE their batch rather than consuming one, so the genealogy
+	# hook - which reads what was consumed - never fills them in. Scanned by
+	# type rather than by what was just retagged, so a second run still repairs
+	# anything the first one left blank.
+	_stamp_produced_batch("Foundry Melt", "KC-CASING", "custom_heat_no")
+	_stamp_produced_batch("Winding Output", "KC-STATOR", "custom_winding_batch")
+
+	frappe.db.commit()
+	print(f"  + retagged {len(melts)} melt(s) and {len(stators)} winding output(s)")
+	return {"melts": melts, "stators": stators}
+
+
+def _stamp_produced_batch(entry_type, item, fieldname):
+	from kumar_service.traceability import row_batches
+
+	if not frappe.get_meta("Stock Entry").has_field(fieldname):
+		return
+	entries = frappe.get_all("Stock Entry", pluck="name", filters={
+		"stock_entry_type": entry_type, "docstatus": 1, fieldname: ["is", "not set"],
+	})
+	for name in entries:
+		doc = frappe.get_doc("Stock Entry", name)
+		for row in doc.items:
+			if row.item_code != item or not row.t_warehouse:
+				continue
+			batches = row_batches(row)
+			if batches:
+				frappe.db.set_value("Stock Entry", name, fieldname, batches[0],
+					update_modified=False)
+			break
+
+
 def _stock(item, warehouse=None):
 	return flt(frappe.db.get_value(
 		"Bin", {"item_code": item, "warehouse": warehouse or STORES_WH}, "actual_qty"))
@@ -334,7 +403,11 @@ def _melt(heat_no, posting_date):
 		b.insert(ignore_permissions=True)
 
 	se = frappe.new_doc("Stock Entry")
-	se.stock_entry_type = "Manufacture"
+	# a named type, so the Stock Entry list says "Foundry Melt" instead of a
+	# fiftieth identical "Manufacture" - and so the rail can filter to it
+	se.stock_entry_type = "Foundry Melt" if frappe.db.exists(
+		"Stock Entry Type", "Foundry Melt") else "Manufacture"
+	se.custom_heat_no = heat_no
 	se.company = COMPANY
 	se.posting_date = posting_date
 	se.set_posting_time = 1
@@ -357,14 +430,24 @@ def _melt(heat_no, posting_date):
 	return se.name
 
 
-def _receive(item, batch, qty, warehouse, posting_date):
-	"""Put a batched component into stock, creating the Batch if needed."""
+def _receive(item, batch, qty, warehouse, posting_date, entry_type=None, stamp=None):
+	"""Put a batched component into stock, creating the Batch if needed.
+
+	`entry_type` names the shop step on the document (see STOCK_ENTRY_TYPES) and
+	`stamp` writes the batch onto the entry's own traceability field, so the
+	entry can be found by what it made rather than only by reading its rows.
+	"""
 	if not frappe.db.exists("Batch", batch):
 		b = frappe.get_doc({"doctype": "Batch", "batch_id": batch, "item": item})
 		b.flags.ignore_permissions = True
 		b.insert(ignore_permissions=True)
 	se = frappe.new_doc("Stock Entry")
-	se.stock_entry_type = "Material Receipt"
+	se.stock_entry_type = (
+		entry_type if entry_type and frappe.db.exists("Stock Entry Type", entry_type)
+		else "Material Receipt"
+	)
+	if stamp:
+		se.update(stamp)
 	se.company = COMPANY
 	se.posting_date = posting_date
 	se.set_posting_time = 1
