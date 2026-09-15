@@ -448,6 +448,23 @@ def schedule_visit(service_request, technician, visit_date, visit_type="On-Site"
 	if str(visit_date) < str(nowdate()):
 		frappe.throw(_("A visit cannot be scheduled in the past"))
 
+	# A second click on Schedule booked a second visit, and the dealer's list
+	# then showed the same man going to the same pump on the same day twice.
+	# An identical booking is the same booking.
+	existing = frappe.db.get_value(
+		"Service Visit",
+		{"service_request": service_request, "technician": technician,
+			"visit_date": visit_date, "docstatus": 0},
+		["name", "is_chargeable"], as_dict=True,
+	)
+	if existing:
+		return {
+			"name": existing.name,
+			"message": _("That visit is already booked."),
+			"chargeable": bool(cint(existing.is_chargeable)),
+			"already": True,
+		}
+
 	sr = frappe.db.get_value(
 		"Service Request", service_request,
 		["serial_no", "dealer", "is_under_warranty", "end_customer_name"], as_dict=True,

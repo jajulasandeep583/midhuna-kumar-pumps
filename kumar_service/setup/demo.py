@@ -677,6 +677,9 @@ def staff_logins():
 		("service.manager@kumarpumps.local", "Service Manager", ["Service Manager", "Service Technician"]),
 		("quality@kumarpumps.local", "Quality Engineer", ["Quality Engineer", "Production Manager"]),
 		("warranty@kumarpumps.local", "Warranty Approver", ["Warranty Approver", "Accounts User"]),
+		# the HR & Admin Manager - demo_hr_showcase links this login to that employee
+		("hr@kumarpumps.local", "HR Manager",
+			["HR Manager", "HR User", "Leave Approver", "Expense Approver", "Employee"]),
 	]
 	made = []
 	for email, full_name, roles in people:

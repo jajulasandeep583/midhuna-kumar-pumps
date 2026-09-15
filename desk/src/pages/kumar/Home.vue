@@ -59,12 +59,17 @@
         </button>
       </div>
 
-      <!-- KUMAR is coming: the visits booked on this dealer's pumps, so the
-           dealer can tell the customer to be home - previously this fact
-           lived only inside each ticket's thread -->
+      <!-- the visits booked on this dealer's pumps, so the dealer can tell the
+           customer to be home - previously this fact lived only inside each
+           ticket's thread -->
       <template v-if="(visits.data || []).length">
-        <div class="mb-2 mt-8 text-xs font-semibold uppercase tracking-wider text-ink-gray-4">
-          {{ __("KUMAR is coming") }}
+        <div class="mb-2 mt-8 flex items-baseline gap-3">
+          <span class="text-xs font-semibold uppercase tracking-wider text-ink-gray-4">
+            {{ __("Upcoming visits") }}
+          </span>
+          <span class="text-xs text-ink-gray-5">
+            {{ __("KUMAR is coming to these pumps") }}
+          </span>
         </div>
         <div class="overflow-x-auto rounded-xl border bg-surface-white">
           <table class="w-full text-sm">
