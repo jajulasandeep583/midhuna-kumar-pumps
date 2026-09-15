@@ -201,6 +201,46 @@ def backfill_genealogy(limit=None):
 	return {"serials": touched, "entries": verified}
 
 
+def link_batch_records():
+	"""Point every heat and winding Batch at the record that documents it.
+
+	A Serial No links to its casing and stator BATCHES; the chemistry and the
+	electrical readings live on Heat Record and Winding Batch Record, which are
+	named by their own series (HTR-…, WDR-…) rather than by the batch number. The
+	join is the batch number held on those records, so without this hop the
+	genealogy stops at "batch HT-260715-008" and never reaches the sulphur
+	reading that explains everything.
+
+		bench --site kumarpumps.localhost execute \\
+			kumar_service.traceability.link_batch_records
+	"""
+	done = {"heat": 0, "winding": 0}
+
+	for rec in frappe.get_all("Heat Record", fields=["name", "heat_no"], limit_page_length=0):
+		if not rec.heat_no or not frappe.db.exists("Batch", rec.heat_no):
+			continue
+		if frappe.db.get_value("Batch", rec.heat_no, "custom_heat_record") != rec.name:
+			frappe.db.set_value("Batch", rec.heat_no,
+				{"custom_heat_record": rec.name, "custom_batch_type": "Heat"},
+				update_modified=False)
+			done["heat"] += 1
+
+	if frappe.get_meta("Batch").has_field("custom_winding_record"):
+		for rec in frappe.get_all("Winding Batch Record", fields=["name", "batch_no"],
+				limit_page_length=0):
+			if not rec.batch_no or not frappe.db.exists("Batch", rec.batch_no):
+				continue
+			if frappe.db.get_value("Batch", rec.batch_no, "custom_winding_record") != rec.name:
+				frappe.db.set_value("Batch", rec.batch_no,
+					{"custom_winding_record": rec.name, "custom_batch_type": "Winding"},
+					update_modified=False)
+				done["winding"] += 1
+
+	frappe.db.commit()
+	print(f"  + batches linked to their records: {done['heat']} heat, {done['winding']} winding")
+	return done
+
+
 def clear_genealogy(doc, method=None):
 	if doc.purpose not in ("Manufacture", "Repack"):
 		return

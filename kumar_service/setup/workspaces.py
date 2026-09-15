@@ -285,7 +285,12 @@ WORKSPACES = [
 			("5 · Reports", ["Production and Sales Summary", "Work Order Summary",
 				"Job Card Summary", "Batch Defect Analysis", "Serial Genealogy",
 				"Stock vs Registration Reconciliation"]),
-			# What the run is configured FROM. A operator asks "where do I add a
+			# The foundry and the winding shop are their own shops - they run on
+			# their own rhythm and their records belong to nobody's work order -
+			# so they get a card of their own rather than being buried in stock.
+			("Foundry & Winding shop", ["Heat Record", "Winding Batch Record", "Batch",
+				"Workstation", "Operation"]),
+			# What the run is configured FROM. An operator asks "where do I add a
 			# model / an operation / a workstation" and it should be one group,
 			# not scattered between here and Masters.
 			("Setup · what the run is built from", ["Item", "BOM", "Operation", "Workstation",

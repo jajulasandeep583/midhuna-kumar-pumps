@@ -318,10 +318,22 @@ CUSTOM_FIELDS = {
 			"insert_after": "custom_batch_type",
 		},
 		{
+			# The winding lot's counterpart to custom_heat_record. Without it the
+			# genealogy was one-legged: a serial's casing batch opened its Heat
+			# Record and the full chemistry, while the stator batch was a dead
+			# end - the IR and HiPot readings for that lot sat on a record that
+			# nothing pointed at.
+			"fieldname": "custom_winding_record",
+			"label": "Winding Batch Record",
+			"fieldtype": "Link",
+			"options": "Winding Batch Record",
+			"insert_after": "custom_heat_record",
+		},
+		{
 			"fieldname": "custom_grade",
 			"label": "Grade",
 			"fieldtype": "Data",
-			"insert_after": "custom_heat_record",
+			"insert_after": "custom_winding_record",
 			"description": "e.g. FG 200 / FG 260",
 		},
 	],
