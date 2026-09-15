@@ -112,9 +112,22 @@
           </div>
 
           <!-- the network ------------------------------------------------ -->
-          <h2 class="mb-2 mt-8 text-sm font-semibold text-ink-gray-8">
-            {{ __("The dealer network") }}
-          </h2>
+          <div class="mb-2 mt-8 flex flex-wrap items-baseline gap-3">
+            <h2 class="text-sm font-semibold text-ink-gray-8">{{ __("The dealer network") }}</h2>
+            <span class="text-xs text-ink-gray-5">
+              {{ __("Busiest outlets first") }}
+              <span v-if="(d.data.network || []).length > networkRows.length">
+                · {{ __("top {0} of {1}", [String(networkRows.length), String(d.data.network.length)]) }}
+              </span>
+            </span>
+            <button
+              v-if="(d.data.network || []).length > NETWORK_TOP"
+              class="ml-auto text-xs text-ink-blue-6 hover:underline"
+              @click="showAllNetwork = !showAllNetwork"
+            >
+              {{ showAllNetwork ? __("Show top {0}", [String(NETWORK_TOP)]) : __("Show all {0}", [String(d.data.network.length)]) }}
+            </button>
+          </div>
           <div v-if="!(d.data.network || []).length"
                class="rounded-lg border border-dashed py-10 text-center text-sm text-ink-gray-5">
             {{ __("No outlet has sold or reported anything yet.") }}
@@ -124,14 +137,14 @@
               <thead class="bg-surface-gray-2 text-xs uppercase tracking-wide text-ink-gray-5">
                 <tr>
                   <th class="px-3 py-2 text-left font-medium">{{ __("Outlet") }}</th>
-                  <th class="px-3 py-2 text-right font-medium">{{ __("Pumps") }}</th>
+                  <th class="px-3 py-2 text-right font-medium">{{ __("Pumps sold") }}</th>
                   <th class="px-3 py-2 text-right font-medium">{{ __("Open") }}</th>
                   <th class="px-3 py-2 text-right font-medium">{{ __("Past due") }}</th>
                   <th class="px-3 py-2 text-right font-medium">{{ __("Claims") }}</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="n in d.data.network" :key="n.dealer" class="border-t hover:bg-surface-gray-1">
+                <tr v-for="n in networkRows" :key="n.dealer" class="border-t hover:bg-surface-gray-1">
                   <td class="px-3 py-2">
                     <div class="font-medium text-ink-gray-8">{{ n.label }}</div>
                     <div class="text-xs text-ink-gray-5">
@@ -221,7 +234,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 import { Badge, Button, ErrorMessage, createResource } from "frappe-ui";
 import { LayoutHeader } from "@/components";
@@ -279,6 +292,16 @@ const kpis = computed(() => {
       strong: "text-blue-800", muted: "text-blue-700",
     },
   ];
+});
+
+// A manager reads the top of this table and acts; the long tail is reference.
+// Seventeen outlets made the Command Centre scroll past the thing it exists to
+// show, so it opens on the busiest handful with the rest one click away.
+const NETWORK_TOP = 7;
+const showAllNetwork = ref(false);
+const networkRows = computed(() => {
+  const all = d.data?.network || [];
+  return showAllNetwork.value ? all : all.slice(0, NETWORK_TOP);
 });
 
 // breached first, then anything we have not answered at all

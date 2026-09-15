@@ -15,13 +15,13 @@
         <ErrorMessage class="mt-1" :message="contacts.error" />
         <Button class="mt-3" variant="solid" theme="blue" :label="__('Try again')" @click="contacts.reload()" />
       </div>
-      <div v-else-if="!(contacts.data || []).length"
+      <div v-else-if="!rows.length"
            class="rounded-xl border border-dashed py-14 text-center text-sm text-ink-gray-5">
         {{ __("No KUMAR contact has been published for your outlet yet. Raise a request and the desk will reach you.") }}
       </div>
 
       <div v-else class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        <div v-for="c in contacts.data || []" :key="c.role + c.dealer_name" class="rounded-lg border bg-surface-white p-4">
+        <div v-for="c in rows" :key="c.role + c.dealer_name" class="rounded-lg border bg-surface-white p-4">
           <div class="text-[10px] font-semibold uppercase tracking-wider text-ink-gray-5">
             {{ c.role }}
           </div>
@@ -52,9 +52,14 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
 import { Button, ErrorMessage, createResource } from "frappe-ui";
 import { LayoutHeader } from "@/components";
 import { __ } from "@/translation";
 
 const contacts = createResource({ url: "kumar_service.portal_api.my_contacts", auto: true });
+
+// my_contacts answers {contacts, outlet} - reading .length off that object gave
+// undefined, so a dealer with three published contacts was told none existed.
+const rows = computed(() => contacts.data?.contacts || []);
 </script>

@@ -22,10 +22,15 @@ from kumar_service.setup.icons import WORKSPACE_ICONS
 # the tile on the apps screen and the glyph in the sidebar cannot disagree -
 # they did once, when Production was moved to the factory glyph in one file and
 # left as a pump in this one.
+#
+# These are the ERPNext workspaces, and every one of them must really exist: a
+# tile whose workspace has been renamed away resolves to no route at all, and
+# frappe answers the click with "Icon is not correctly configured". That is
+# exactly what the old Management and Service Desk tiles had become - both
+# workspaces were superseded by the KUMAR Desk below, and their tiles were left
+# behind pointing at nothing.
 TILE_COLOURS = {
-	"Management": "#0B5394",
 	"Dealer Desk": "#EA580C",
-	"Service Desk": "#0284C7",
 	"Warranty": "#16A34A",
 	"Traceability": "#0D9488",
 	"Production": "#1D4ED8",
@@ -38,6 +43,26 @@ TILES = {
 	for label, colour in TILE_COLOURS.items()
 	if label in WORKSPACE_ICONS
 }
+
+#: The product itself, which is not an ERPNext workspace but a route of its own.
+#: This is the tile anyone demoing KUMAR Pumps actually wants on the apps
+#: screen: it opens the Command Centre, the desk's own front door.
+#: label -> (sprite symbol, tile colour, route)
+APP_TILES = {
+	"KUMAR Desk": ("kumar-management", "#0B5394", "/kumar-desk/manage"),
+}
+
+#: Sidebars left behind by workspaces that were renamed or retired. They are
+#: ours (nothing in frappe or erpnext is named these), they have no workspace,
+#: and they only clutter the sidebar switcher.
+STALE_SIDEBARS = (
+	"Management",
+	"Service Desk",
+	"Warranty & Claims",
+	"Traceability & Quality",
+	"Stock & Manufacturing",
+	"KUMAR Masters",
+)
 
 # the rounded square erpnext uses, so our tiles sit in the same grid
 SQUIRCLE = (
@@ -95,7 +120,9 @@ def write_tile_files():
 		base = frappe.get_app_path("kumar_service", "public", "icons", "desktop_icons")
 		for variant in ("solid", "subtle"):
 			os.makedirs(os.path.join(base, variant), exist_ok=True)
-		for label, (symbol, colour) in TILES.items():
+		wanted = dict(TILES)
+		wanted.update({l: (s, c) for l, (s, c, _r) in APP_TILES.items()})
+		for label, (symbol, colour) in wanted.items():
 			inner = g.get(symbol)
 			if not inner:
 				print("  ! no glyph for %s" % symbol)
@@ -122,7 +149,13 @@ def install():
 	# and the file write may legitimately fail on a read-only app tree.
 	made = 0
 	for label, (symbol, _colour) in TILES.items():
-		if not frappe.db.exists("Workspace", label):
+		# Both halves have to be there. A tile whose Workspace Sidebar is
+		# missing is written with no link at all, and frappe answers the click
+		# with "Icon is not correctly configured" - a tile that looks fine and
+		# does nothing is worse than no tile.
+		if not (frappe.db.exists("Workspace", label)
+				and frappe.db.exists("Workspace Sidebar", label)):
+			print("  ! skipping %s - no workspace/sidebar to point at" % label)
 			continue
 		name = frappe.db.get_value("Desktop Icon", {"label": label})
 		doc = frappe.get_doc("Desktop Icon", name) if name else frappe.new_doc("Desktop Icon")
@@ -140,10 +173,31 @@ def install():
 		# an External icon's link with the origin, opens it in a NEW TAB, and
 		# drops it from the app-switcher menu.
 		doc.link = None
-		if frappe.db.exists("Workspace Sidebar", label):
-			doc.link_type = "Workspace Sidebar"
-			doc.link_to = label
-			doc.sidebar = label
+		doc.link_type = "Workspace Sidebar"
+		doc.link_to = label
+		doc.sidebar = label
+		doc.flags.ignore_permissions = True
+		doc.save()
+		made += 1
+
+	# The KUMAR Desk itself. Not a workspace, so it links out by route - and
+	# External is right here: the desk is a different app, and opening it in its
+	# own tab leaves the ERPNext session where it was.
+	for label, (symbol, _colour, route) in APP_TILES.items():
+		name = frappe.db.get_value("Desktop Icon", {"label": label})
+		doc = frappe.get_doc("Desktop Icon", name) if name else frappe.new_doc("Desktop Icon")
+		if not name:
+			doc.label = label
+		doc.app = "kumar_service"
+		doc.icon = symbol
+		doc.icon_type = "Link"
+		doc.standard = 1
+		doc.hidden = 0
+		doc.parent_icon = None
+		doc.link_type = "External"
+		doc.link = route
+		doc.link_to = None
+		doc.sidebar = None
 		doc.flags.ignore_permissions = True
 		doc.save()
 		made += 1
@@ -180,11 +234,12 @@ def prune_stale_tiles():
 	`kumar-*` icon, and never the app+standard stamp that install() writes.
 	Nothing belonging to frappe or erpnext can match.
 	"""
+	keep = set(TILES) | set(APP_TILES)
 	removed = []
 	for row in frappe.get_all(
 		"Desktop Icon", filters={"icon": ["like", "kumar-%"]}, fields=["name", "label", "app"]
 	):
-		if row.label in TILES and row.app == "kumar_service":
+		if row.label in keep and row.app == "kumar_service":
 			continue
 		frappe.delete_doc(
 			"Desktop Icon", row.name, force=True, ignore_permissions=True, delete_permanently=True
@@ -192,7 +247,19 @@ def prune_stale_tiles():
 		removed.append(row.label)
 	if removed:
 		print("  + removed %d stale desktop tile(s): %s" % (len(removed), ", ".join(removed)))
-	return removed
+
+	# and the sidebars those tiles used to point at
+	dropped = []
+	for label in STALE_SIDEBARS:
+		if frappe.db.exists("Workspace", label):
+			continue  # a real workspace wears that name now - leave it alone
+		if frappe.db.exists("Workspace Sidebar", label):
+			frappe.delete_doc("Workspace Sidebar", label, force=True,
+				ignore_permissions=True, delete_permanently=True)
+			dropped.append(label)
+	if dropped:
+		print("  + removed %d stale sidebar(s): %s" % (len(dropped), ", ".join(dropped)))
+	return removed + dropped
 
 
 run = install
