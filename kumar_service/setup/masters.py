@@ -286,6 +286,7 @@ def build_all():
 	dealer_tree()
 	technicians()
 	stock_entry_types()
+	warehouse_defaults(company, abbr)
 	stock_settings()
 	settings_defaults()
 	frappe.db.commit()
@@ -788,6 +789,34 @@ def technicians():
 				"is_active": 1,
 			},
 		)
+
+
+def warehouse_defaults(company, abbr):
+	"""Pre-fill the warehouses a new Work Order asks for.
+
+	Work Order leaves Work-in-Progress and Finished Goods blank and marks them
+	mandatory, so a brand new form opens with two red boxes and whoever is
+	demonstrating has to pick warehouses from a dropdown in front of the
+	customer. v16 reads both from the COMPANY (Manufacturing Settings no longer
+	carries them - work_order.py falls back to Company.default_wip_warehouse).
+
+	Assembly WIP rather than Foundry WIP: the foundry's WIP is where castings
+	wait, and a pump is assembled, not cast. Scrap is left alone - it is not
+	mandatory, and naming one would invent a warehouse nobody posts to.
+	"""
+	defaults = {
+		"default_wip_warehouse": f"Assembly WIP - {abbr}",
+		"default_fg_warehouse": f"FG Store - {abbr}",
+	}
+	for field, warehouse in defaults.items():
+		if not frappe.db.exists("Warehouse", warehouse):
+			continue
+		if frappe.db.get_value("Company", company, field) != warehouse:
+			frappe.db.set_value("Company", company, field, warehouse)
+
+	# the source warehouse on stock forms, so "where from" is filled too
+	if not frappe.db.get_single_value("Stock Settings", "default_warehouse"):
+		frappe.db.set_single_value("Stock Settings", "default_warehouse", f"Stores - {abbr}")
 
 
 def settings_defaults():
