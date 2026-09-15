@@ -9,6 +9,12 @@ It is also the honest test of the genealogy hook: the serials are produced by a
 real Manufacture entry, and the heat and winding numbers on them are whatever
 the system stamped - this module never writes them itself.
 
+The charge is bought and burnt for the same reason. A casting that appears in
+stock by Material Receipt has no past, and the pig iron it was supposedly made
+from sits in Stores for ever - so the stock ledger contradicts the traceability
+story on the very first question anyone asks of it. Here the metal is purchased,
+issued, and destroyed, and what survives is a Batch named after the heat.
+
     bench --site kumarpumps.localhost execute kumar_service.setup.demo_cycle.run
 
 Everything it creates is dated TODAY, so it also gives the Management screen
@@ -24,8 +30,40 @@ ABBR = "SLGEW"
 FG_WH = f"FG Store - {ABBR}"
 FOUNDRY_WH = f"Foundry WIP - {ABBR}"
 WINDING_WH = f"Winding WIP - {ABBR}"
+STORES_WH = f"Stores - {ABBR}"
 
 QTY = 5  # a small run: enough to be real, small enough to read
+
+# What goes into one 1200 kg heat. This is a plain grey-iron charge: pig iron
+# for clean carbon, CI scrap (foundry returns plus bought scrap) for economy,
+# and the two ferro-alloys that pull silicon and manganese up into the FG 200
+# window - which is then what the spectro reading on the Heat Record has to
+# confirm. The weights sum to CHARGE_WEIGHT on purpose; if they stop matching,
+# the Heat Record is claiming a charge the stock ledger cannot account for.
+CHARGE_KG = (
+	("KR-PIGIRON", 660.0),
+	("KR-SCRAP", 500.0),
+	("KR-FESI", 24.0),
+	("KR-FEMN", 16.0),
+)
+MOULDING_KG = (("KR-SANDBINDER", 45.0),)  # the moulds the iron is poured into
+CHARGE_WEIGHT = 1200
+# ~10 kg of metal per casing. Deliberately not the size of one work order: a
+# heat pours far more castings than any single run uses, which is precisely why
+# a bad heat is worth tracing - it is sitting in a hundred other pumps.
+CASTINGS_PER_HEAT = 120
+
+CHARGE_SUPPLIER = {
+	"KR-PIGIRON": "Sri Balaji Pig Iron & Scrap",
+	"KR-SCRAP": "Sri Balaji Pig Iron & Scrap",
+	"KR-FESI": "Godavari Ferro Alloys",
+	"KR-FEMN": "Godavari Ferro Alloys",
+	"KR-SANDBINDER": "Ganapathi Foundry Consumables",
+}
+BUY_LOT = {  # a believable delivery, not a hand-to-mouth top-up
+	"KR-PIGIRON": 5000, "KR-SCRAP": 3000,
+	"KR-FESI": 200, "KR-FEMN": 150, "KR-SANDBINDER": 300,
+}
 
 
 def _p(step, what, name, detail=""):
@@ -41,7 +79,15 @@ def run(qty=None):
 
 	print(f"\nONE PRODUCTION CYCLE - {today}\n" + "=" * 74)
 
-	# ---------------------------------------------------------------- 1 melt
+	# ------------------------------------------------------------ 1 buy charge
+	bought = _buy_charge(today)
+	if bought:
+		_p("1.", "STORES buy the charge", ", ".join(bought), "pig iron, scrap, ferro-alloys")
+		made["purchases"] = bought
+	else:
+		_p("1.", "STORES already hold charge", "-", "enough pig iron and scrap for this heat")
+
+	# ---------------------------------------------------------------- 2 melt
 	heat_no = f"HT-{stamp}"
 	heat = frappe.get_doc({
 		"doctype": "Heat Record",
@@ -66,9 +112,15 @@ def run(qty=None):
 	heat.flags.ignore_permissions = True
 	heat.insert(ignore_permissions=True)
 	made["heat"] = heat.name
-	_p("1.", "FOUNDRY pours a melt", heat.name, f"heat_no {heat_no}, all elements in spec")
+	_p("2.", "FOUNDRY melts the charge", heat.name, f"heat_no {heat_no}, all elements in spec")
 
-	# ------------------------------------------------------------- 2 winding
+	# the charge is burnt and the castings are poured: this is where the heat
+	# number stops being a lab reference and becomes a stock batch
+	made["melt"] = _melt(heat_no, today)
+	_p("3.", "FOUNDRY pours the castings", made["melt"],
+		f"{CHARGE_WEIGHT}kg charge consumed -> {CASTINGS_PER_HEAT} x KC-CASING, batch {heat_no}")
+
+	# ------------------------------------------------------------- 4 winding
 	wd_no = f"WD-{stamp}"
 	wind = frappe.get_doc({
 		"doctype": "Winding Batch Record",
@@ -89,17 +141,18 @@ def run(qty=None):
 	wind.flags.ignore_permissions = True
 	wind.insert(ignore_permissions=True)
 	made["winding"] = wind.name
-	_p("2.", "WINDING SHOP winds a lot", wind.name, f"batch_no {wd_no}, IR 310.5, HiPot 2.2kV")
+	_p("4.", "WINDING SHOP winds a lot", wind.name, f"batch_no {wd_no}, IR 310.5, HiPot 2.2kV")
 
-	# both shops' output reaches stores as a BATCH named after the record
-	_receive("KC-CASING", heat_no, qty, FOUNDRY_WH, today)
+	# the stator's copper and varnish are costed on the pump BOM, so the winding
+	# shop's output only has to reach stock - as a BATCH named after the record
 	_receive("KC-STATOR", wd_no, qty, WINDING_WH, today)
 	from kumar_service.traceability import link_batch_records
 
 	link_batch_records()
-	_p("3.", "STORES receive the batches", f"{heat_no} / {wd_no}", "castings and stators in stock")
+	_p("5.", "STORES hold both batches", f"{heat_no} / {wd_no}",
+		"each batch points back at its own quality record")
 
-	# ---------------------------------------------------------- 4 work order
+	# ---------------------------------------------------------- 6 work order
 	# pick the BOM first and take its item: choosing a finished pump and then
 	# hunting for its BOM lands on a model that has none, and Work Order refuses
 	# to save without one
@@ -123,13 +176,13 @@ def run(qty=None):
 	wo.submit()
 	made["work_order"] = wo.name
 	ops = [o.operation for o in (wo.operations or [])]
-	_p("4.", "PRODUCTION raises a run", wo.name, f"{qty} x {item} on {bom}")
+	_p("6.", "PRODUCTION raises a run", wo.name, f"{qty} x {item} on {bom}")
 	if ops:
 		print(f"       operations from the BOM: {' -> '.join(ops)}")
 		jobs = frappe.get_all("Job Card", filters={"work_order": wo.name}, pluck="name")
-		_p("5.", "JOB CARDS for the shop floor", f"{len(jobs)} cards", "one per operation")
+		_p("7.", "JOB CARDS for the shop floor", f"{len(jobs)} cards", "one per operation")
 
-	# ----------------------------------------------------------- 6 manufacture
+	# ----------------------------------------------------------- 8 manufacture
 	se = frappe.new_doc("Stock Entry")
 	se.stock_entry_type = "Manufacture"
 	se.company = COMPANY
@@ -150,7 +203,7 @@ def run(qty=None):
 	se.insert(ignore_permissions=True)
 	se.submit()
 	made["manufacture"] = se.name
-	_p("6.", "STORES build the pumps", se.name, "consumes the two batches, produces serials")
+	_p("8.", "STORES build the pumps", se.name, "consumes the two batches, produces serials")
 
 	# what the HOOK stamped - read back, never written here
 	serials = []
@@ -169,7 +222,7 @@ def run(qty=None):
 			f"winding={v.get('custom_winding_batch') or '-':16} "
 			f"wo={v.get('custom_work_order') or '-':20} qc={v.get('custom_qc_status')}")
 
-	# --------------------------------------------------------- 7 test bench
+	# --------------------------------------------------------- 9 test bench
 	certs = []
 	for sn in serials:
 		model = frappe.db.get_value("Serial No", sn, "custom_pump_model")
@@ -198,7 +251,7 @@ def run(qty=None):
 		c.submit()
 		certs.append(c.name)
 	made["certificates"] = certs
-	_p("7.", "TEST BENCH certifies each", f"{len(certs)} certificates", "QC status written onto the serial")
+	_p("9.", "TEST BENCH certifies each", f"{len(certs)} certificates", "QC status written onto the serial")
 
 	passed = frappe.db.count("Serial No", {"name": ["in", serials], "custom_qc_status": "Passed"})
 	print(f"\n       serials now QC Passed: {passed} of {len(serials)} - these may be dispatched")
@@ -208,6 +261,100 @@ def run(qty=None):
 	print("\n" + "=" * 74)
 	print("created:", {k: (len(v) if isinstance(v, list) else v) for k, v in made.items()})
 	return made
+
+
+def _stock(item, warehouse=None):
+	return flt(frappe.db.get_value(
+		"Bin", {"item_code": item, "warehouse": warehouse or STORES_WH}, "actual_qty"))
+
+
+def _buy_charge(posting_date):
+	"""Buy whatever the melt is short of, as a real Purchase Receipt.
+
+	The melt below issues pig iron and scrap OUT of Stores, so the store has to
+	hold them first - and that is the point of this step rather than a
+	convenience. "Where did the pig iron go" is a question the stock ledger has
+	to answer, and it can only answer it if the metal was bought in one document
+	and burnt in another.
+	"""
+	short = {
+		item: BUY_LOT.get(item, kg * 10)
+		for item, kg in CHARGE_KG + MOULDING_KG
+		if _stock(item) < kg
+	}
+	if not short:
+		return []
+
+	by_supplier = {}
+	for item, qty in short.items():
+		by_supplier.setdefault(CHARGE_SUPPLIER[item], []).append((item, qty))
+
+	receipts = []
+	for supplier, rows in sorted(by_supplier.items()):
+		pr = frappe.new_doc("Purchase Receipt")
+		# match the seeded receipts: a lone PR-26-00001 among MAT-PRE-2026-000xx
+		# reads as something a script did rather than something the plant did
+		pr.naming_series = "MAT-PRE-.YYYY.-"
+		pr.supplier = supplier
+		pr.company = COMPANY
+		pr.posting_date = posting_date
+		pr.set_posting_time = 1
+		for item, qty in rows:
+			pr.append("items", {
+				"item_code": item,
+				"qty": qty,
+				"warehouse": STORES_WH,
+				"rate": flt(frappe.db.get_value("Item", item, "valuation_rate")) or 50,
+			})
+		pr.flags.ignore_permissions = True
+		pr.insert(ignore_permissions=True)
+		pr.submit()
+		receipts.append(pr.name)
+	return receipts
+
+
+def _melt(heat_no, posting_date):
+	"""Burn the charge, pour the castings, name the batch after the heat.
+
+	This single document is the whole traceability trick, and it is the step the
+	demo was missing: without it a casting appeared in stock by Material Receipt,
+	out of nothing, while the pig iron sat in Stores for ever - so the stock
+	ledger flatly contradicted the story being told over it.
+
+	What it does is a one-way conversion. The pig iron, scrap and ferro-alloys go
+	OUT of Stores and do not come back; anyone reading the ledger can see which
+	heat consumed them. What comes back IN is a *different item* - a casting -
+	carrying a Batch whose id IS the heat number. That is the only "transfer"
+	there is: the metal is destroyed, and its identity survives as a batch id,
+	which is how the heat eventually reaches the pump's serial number.
+	"""
+	if not frappe.db.exists("Batch", heat_no):
+		b = frappe.get_doc({"doctype": "Batch", "batch_id": heat_no, "item": "KC-CASING"})
+		b.flags.ignore_permissions = True
+		b.insert(ignore_permissions=True)
+
+	se = frappe.new_doc("Stock Entry")
+	se.stock_entry_type = "Manufacture"
+	se.company = COMPANY
+	se.posting_date = posting_date
+	se.set_posting_time = 1
+	se.fg_completed_qty = CASTINGS_PER_HEAT
+	for item, kg in CHARGE_KG + MOULDING_KG:
+		se.append("items", {"item_code": item, "qty": kg, "s_warehouse": STORES_WH})
+	# no basic_rate on the casting: the charge's value is what it costs, and
+	# letting ERPNext divide it is the only way the two sides stay honest
+	se.append("items", {
+		"item_code": "KC-CASING",
+		"qty": CASTINGS_PER_HEAT,
+		"t_warehouse": FOUNDRY_WH,
+		"is_finished_item": 1,
+		"use_serial_batch_fields": 1,
+		"batch_no": heat_no,
+	})
+	se.flags.ignore_permissions = True
+	se.insert(ignore_permissions=True)
+	se.submit()
+	return se.name
 
 
 def _receive(item, batch, qty, warehouse, posting_date):
