@@ -9,6 +9,11 @@ readme = "README.md"
 dynamic = ["version"]
 dependencies = [
     # "frappe~=16.0.0" # Installed and managed by bench.
+    # The warranty certificate the dealer hands the customer carries a QR code
+    # back to /warranty-check. Without this the certificate still prints and the
+    # QR is silently blank, because qr_base64() swallows the ImportError - which
+    # is exactly what happened on this bench.
+    "qrcode>=7.4",
 ]
 
 [build-system]

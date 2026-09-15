@@ -69,6 +69,7 @@ WORKSPACES = [
 			],
 		),
 		"shortcuts": [
+			("Production and Sales Summary", "Report", "Production &amp; Sales", "orange"),
 			("Dealer Performance", "Report", "Dealer-wise Sales", "green"),
 			("Stock Balance", "Report", "Stock Balance", "blue"),
 			("Warranty Cost Analysis", "Report", "Warranty Cost", "orange"),
@@ -76,6 +77,8 @@ WORKSPACES = [
 			("Dealer", "DocType", "Dealer Network", "blue"),
 		],
 		"links": [
+			("What the month did", ["Production and Sales Summary", "Dealer Performance",
+				"Model Reliability"]),
 			("Sales & Dealers", ["Dealer", "Pump Registration", "Sales Invoice", "Delivery Note",
 				"Customer"]),
 			("Stock on Hand", ["Stock Balance", "Stock Ledger", "Stock Projected Qty", "Item",
@@ -245,20 +248,41 @@ WORKSPACES = [
 				"submitting; that gap cannot be filled in later.",
 			],
 		),
+		# In the order a pump is actually built, so the rail can be walked top to
+		# bottom in a demo: what it is made of, what authorises the run, what the
+		# shop floor works to, what the melt and the winding were, what comes out
+		# with a serial, and what proves it passed.
 		"shortcuts": [
-			("Stock Entry", "DocType", "Stock Entry", "blue"),
-			("Work Order", "DocType", "Work Order", "orange"),
-			("Serial No", "DocType", "Serial No", "green"),
-			("Batch", "DocType", "Batch", "purple"),
-			("Item", "DocType", "Items", "grey"),
+			("BOM", "DocType", "1. BOM", "grey"),
+			("Work Order", "DocType", "2. Work Order", "orange"),
+			("Job Card", "DocType", "3. Job Card", "orange"),
+			("Heat Record", "DocType", "4. Heat (melt)", "red"),
+			("Winding Batch Record", "DocType", "5. Winding lot", "purple"),
+			("Stock Entry", "DocType", "6. Manufacture", "blue"),
+			("Serial No", "DocType", "7. Serial No", "green"),
+			("Pump Test Certificate", "DocType", "8. Test Certificate", "green"),
 		],
 		"links": [
-			("Manufacturing", ["BOM", "Work Order", "Job Card", "Production Plan",
-				"Workstation", "Operation", "Routing"]),
-			("Stock Transactions", ["Stock Entry", "Delivery Note", "Purchase Receipt",
-				"Material Request", "Stock Reconciliation", "Packing Slip"]),
-			("Stock Masters", ["Item", "Item Group", "Warehouse", "Batch", "Serial No",
-				"UOM", "Serial and Batch Bundle"]),
+			# the run itself, in sequence
+			("1 · Plan the run", ["BOM", "Production Plan", "Work Order", "Job Card",
+				"Routing", "Operation", "Workstation"]),
+			# what KUMAR records that ERPNext does not - and it belongs HERE, beside
+			# the run it feeds, not only under Traceability
+			("2 · Batches that go in", ["Heat Record", "Winding Batch Record", "Batch",
+				"Serial and Batch Bundle"]),
+			("3 · Build and test", ["Stock Entry", "Serial No", "Pump Test Certificate"]),
+			("4 · Dispatch", ["Delivery Note", "Sales Invoice", "Packing Slip"]),
+			("5 · Reports", ["Production and Sales Summary", "Work Order Summary",
+				"Job Card Summary", "Batch Defect Analysis", "Serial Genealogy",
+				"Stock vs Registration Reconciliation"]),
+			# What the run is configured FROM. A operator asks "where do I add a
+			# model / an operation / a workstation" and it should be one group,
+			# not scattered between here and Masters.
+			("Setup · what the run is built from", ["Item", "BOM", "Operation", "Workstation",
+				"Routing", "Pump Model", "Pump Category", "Warehouse", "Item Group", "UOM"]),
+			("Stock Transactions", ["Purchase Receipt", "Material Request",
+				"Stock Reconciliation"]),
+			("Stock Masters", ["Batch", "Serial No", "Serial and Batch Bundle"]),
 			("Buying & Selling", ["Purchase Order", "Supplier", "Sales Order",
 				"Sales Invoice", "Customer", "Quotation"]),
 			("Stock Reports", ["Stock Ledger", "Stock Balance", "Stock Projected Qty",
