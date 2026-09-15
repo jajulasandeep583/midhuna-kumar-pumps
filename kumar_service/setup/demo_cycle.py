@@ -23,7 +23,7 @@ production and purchasing figures in the current month, which the seeded month
 """
 
 import frappe
-from frappe.utils import add_days, flt, nowdate
+from frappe.utils import add_days, add_to_date, flt, nowdate
 
 COMPANY = "Sri Lakshmi Ganapathi Engineering Works"
 ABBR = "SLGEW"
@@ -130,7 +130,7 @@ def run(qty=None):
 
 	# the charge is burnt and the castings are poured: this is where the heat
 	# number stops being a lab reference and becomes a stock batch
-	made["melt"] = _melt(heat_no, today)
+	made["melt"] = _melt(heat.name, today)
 	_p("3.", "FOUNDRY pours the castings", made["melt"],
 		f"{CHARGE_WEIGHT}kg charge consumed -> {CASTINGS_PER_HEAT} x KC-CASING, batch {heat_no}")
 
@@ -159,7 +159,7 @@ def run(qty=None):
 
 	# the whole lot the record says passed reaches stock, not just the few this
 	# run needs - a winding lot serves more than one work order, same as a heat
-	made["winding_entry"] = _wind(wd_no, wind.qty_passed, today)
+	made["winding_entry"] = _wind_via_shopfloor(wind.name, today)
 	_p("5.", "WINDING SHOP winds the lot", made["winding_entry"],
 		f"copper, insulation and varnish consumed -> {wind.qty_passed} x KC-STATOR, batch {wd_no}")
 	from kumar_service.traceability import link_batch_records
@@ -187,6 +187,14 @@ def run(qty=None):
 		"wip_warehouse": FOUNDRY_WH,
 		"planned_start_date": frappe.utils.now_datetime(),
 	})
+	# Pull the BOM's operations in explicitly. Work Order.validate() calls
+	# set_required_items() but NOT set_work_order_operations() - that one is only
+	# reachable through get_items_and_operations_from_bom(), the whitelisted
+	# method the FORM calls when you pick a BOM. So a work order raised in the UI
+	# arrives with operations and gets Job Cards on submit, while one raised from
+	# a script has an empty `operations` table and on_submit's create_job_card()
+	# loops over nothing. Nothing to do with which BOM was chosen.
+	wo.set_work_order_operations()
 	wo.flags.ignore_permissions = True
 	wo.insert(ignore_permissions=True)
 	wo.submit()
@@ -195,8 +203,10 @@ def run(qty=None):
 	_p("7.", "PRODUCTION raises a run", wo.name, f"{qty} x {item} on {bom}")
 	if ops:
 		print(f"       operations from the BOM: {' -> '.join(ops)}")
-		jobs = frappe.get_all("Job Card", filters={"work_order": wo.name}, pluck="name")
-		_p("8.", "JOB CARDS for the shop floor", f"{len(jobs)} cards", "one per operation")
+		jobs = _work_the_job_cards(wo.name, qty)
+		made["job_cards"] = jobs
+		_p("8.", "SHOP FLOOR works the cards", f"{len(jobs)} job cards",
+			"each operation booked and completed, in sequence")
 
 	# ----------------------------------------------------------- 9 manufacture
 	se = frappe.new_doc("Stock Entry")
@@ -417,93 +427,54 @@ def _buy_charge(posting_date):
 	return receipts
 
 
-def _melt(heat_no, posting_date):
-	"""Burn the charge, pour the castings, name the batch after the heat.
+def _melt(heat_record, posting_date):
+	"""The melt, built by the same code the Heat Record's button calls."""
+	from kumar_service.shopfloor import build_melt_entry
 
-	This single document is the whole traceability trick, and it is the step the
-	demo was missing: without it a casting appeared in stock by Material Receipt,
-	out of nothing, while the pig iron sat in Stores for ever - so the stock
-	ledger flatly contradicted the story being told over it.
+	return build_melt_entry(heat_record, posting_date=posting_date, submit=True).name
 
-	What it does is a one-way conversion. The pig iron, scrap and ferro-alloys go
-	OUT of Stores and do not come back; anyone reading the ledger can see which
-	heat consumed them. What comes back IN is a *different item* - a casting -
-	carrying a Batch whose id IS the heat number. That is the only "transfer"
-	there is: the metal is destroyed, and its identity survives as a batch id,
-	which is how the heat eventually reaches the pump's serial number.
+
+def _wind_via_shopfloor(winding_record, posting_date):
+	from kumar_service.shopfloor import build_winding_entry
+
+	return build_winding_entry(winding_record, posting_date=posting_date, submit=True).name
+
+
+def _work_the_job_cards(work_order, qty):
+	"""Book time against every Job Card and complete it, in sequence.
+
+	Once a Work Order carries operations, ERPNext will not let the Manufacture
+	entry through until each operation is finished - it throws
+	OperationsNotCompleteError naming the Job Card still open. That is the right
+	behaviour and worth showing, but it means the cycle has to do what the shop
+	floor does: book time on each card, in order, and complete it.
+
+	Times run back to back from one card to the next, because two cards on the
+	same workstation may not overlap.
 	"""
-	if not frappe.db.exists("Batch", heat_no):
-		b = frappe.get_doc({"doctype": "Batch", "batch_id": heat_no, "item": "KC-CASING"})
-		b.flags.ignore_permissions = True
-		b.insert(ignore_permissions=True)
-
-	se = frappe.new_doc("Stock Entry")
-	# a named type, so the Stock Entry list says "Foundry Melt" instead of a
-	# fiftieth identical "Manufacture" - and so the rail can filter to it
-	se.stock_entry_type = "Foundry Melt" if frappe.db.exists(
-		"Stock Entry Type", "Foundry Melt") else "Manufacture"
-	se.custom_heat_no = heat_no
-	se.company = COMPANY
-	se.posting_date = posting_date
-	se.set_posting_time = 1
-	se.fg_completed_qty = CASTINGS_PER_HEAT
-	for item, kg in CHARGE_KG + MOULDING_KG:
-		se.append("items", {"item_code": item, "qty": kg, "s_warehouse": STORES_WH})
-	# no basic_rate on the casting: the charge's value is what it costs, and
-	# letting ERPNext divide it is the only way the two sides stay honest
-	se.append("items", {
-		"item_code": "KC-CASING",
-		"qty": CASTINGS_PER_HEAT,
-		"t_warehouse": FOUNDRY_WH,
-		"is_finished_item": 1,
-		"use_serial_batch_fields": 1,
-		"batch_no": heat_no,
-	})
-	se.flags.ignore_permissions = True
-	se.insert(ignore_permissions=True)
-	se.submit()
-	return se.name
-
-
-def _wind(wd_no, lot_qty, posting_date):
-	"""Wind a lot of stators out of copper, insulation and varnish.
-
-	The winding shop's half of the same idea as _melt. The copper wire goes OUT
-	of Stores and does not come back as copper - it comes back wound into a
-	stator, under a Batch named after the Winding Batch Record that holds the IR
-	and HiPot readings for that lot. Without this the stators appeared in stock
-	by receipt and the copper was bought and never issued, which is exactly the
-	hole the foundry had.
-	"""
-	if not frappe.db.exists("Batch", wd_no):
-		b = frappe.get_doc({"doctype": "Batch", "batch_id": wd_no, "item": "KC-STATOR"})
-		b.flags.ignore_permissions = True
-		b.insert(ignore_permissions=True)
-
-	se = frappe.new_doc("Stock Entry")
-	se.stock_entry_type = "Winding Output" if frappe.db.exists(
-		"Stock Entry Type", "Winding Output") else "Manufacture"
-	se.custom_winding_batch = wd_no
-	se.company = COMPANY
-	se.posting_date = posting_date
-	se.set_posting_time = 1
-	se.fg_completed_qty = lot_qty
-	for item, per in WINDING_PER_STATOR:
-		se.append("items", {
-			"item_code": item, "qty": flt(per * lot_qty, 3), "s_warehouse": STORES_WH,
+	cards = frappe.get_all(
+		"Job Card",
+		filters={"work_order": work_order, "docstatus": 0},
+		fields=["name", "operation", "total_time_in_mins", "for_quantity"],
+		order_by="sequence_id asc, creation asc",
+	)
+	done = []
+	clock = frappe.utils.now_datetime()
+	for card in cards:
+		minutes = flt(card.total_time_in_mins) or 15.0
+		jc = frappe.get_doc("Job Card", card.name)
+		jc.set("time_logs", [])
+		jc.append("time_logs", {
+			"from_time": clock,
+			"to_time": add_to_date(clock, minutes=minutes),
+			"completed_qty": card.for_quantity or qty,
 		})
-	se.append("items", {
-		"item_code": "KC-STATOR",
-		"qty": lot_qty,
-		"t_warehouse": WINDING_WH,
-		"is_finished_item": 1,
-		"use_serial_batch_fields": 1,
-		"batch_no": wd_no,
-	})
-	se.flags.ignore_permissions = True
-	se.insert(ignore_permissions=True)
-	se.submit()
-	return se.name
+		jc.flags.ignore_permissions = True
+		jc.save(ignore_permissions=True)
+		jc.submit()
+		done.append(jc.name)
+		clock = add_to_date(clock, minutes=minutes)
+	return done
 
 
 def _receive(item, batch, qty, warehouse, posting_date, entry_type=None, stamp=None):

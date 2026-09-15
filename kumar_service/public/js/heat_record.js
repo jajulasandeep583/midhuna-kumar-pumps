@@ -19,6 +19,21 @@ frappe.ui.form.on("Heat Record", {
 		}
 
 		if (!frm.is_new() && frm.doc.status === "Approved for Pouring") {
+			// The melt itself. Approving a heat creates its Batch but moves no
+			// stock, so without this the castings would have to appear in stock
+			// by some other route and the charge would never be issued at all.
+			frm.add_custom_button(__("Make Melt Entry"), () => {
+				frappe.call({
+					method: "kumar_service.shopfloor.make_melt_entry",
+					args: { heat_record: frm.doc.name },
+					freeze: true,
+					freeze_message: __("Pouring..."),
+					callback: (r) => {
+						if (r.message) frappe.set_route("Form", "Stock Entry", r.message);
+					},
+				});
+			}).addClass("btn-primary");
+
 			frm.add_custom_button(__("Pumps From This Heat"), () => {
 				frappe.set_route("List", "Serial No", { custom_heat_no: frm.doc.heat_no });
 			});
