@@ -262,8 +262,12 @@ WORKSPACES = [
 		# flat numbered list. The foundry and the winding shop run on their own
 		# rhythm and their records belong to no work order, so they collapse
 		# together; the run and its output are the other two groups.
+		# DISABLED. frappe's "Sidebar Item Group" type exists in the doctype but
+		# the v16 rail did not render the children under it - the whole
+		# Production rail collapsed to a single line. Kept here because the
+		# grouping is right; re-enable only after watching it render.
 		# (group label, icon, [(link_type, target, label), ...])
-		"sidebar_groups": [
+		"_sidebar_groups_disabled": [
 			("Foundry & Winding shop", "kumar-heat", [
 				("DocType", "Heat Record", "Heat Record (melt)"),
 				("DocType", "Winding Batch Record", "Winding Batch Record"),
