@@ -220,6 +220,16 @@ def install():
 			frappe.db.set_value("Desktop Icon", name, "hidden", 1, update_modified=False)
 			print("  + hid duplicate app tile: %s" % label)
 
+	# Frappe itself shows twice: the standard v16 "Framework" tile (/desk/build,
+	# with Build, Data, Users... under it) and a "Frappe Framework" tile the
+	# same hook generated from an older route (/app/build). Hide the second -
+	# never delete it: create_desktop_icons() looks the app's tile up by its
+	# app_title, and would simply make it again on the next migrate.
+	name = frappe.db.get_value("Desktop Icon", {"label": "Frappe Framework", "icon_type": "App"})
+	if name and frappe.db.exists("Desktop Icon", {"label": "Framework", "icon_type": "App", "hidden": 0}):
+		frappe.db.set_value("Desktop Icon", name, "hidden", 1, update_modified=False)
+		print("  + hid duplicate app tile: Frappe Framework")
+
 	prune_stale_tiles()
 
 	frappe.db.commit()
