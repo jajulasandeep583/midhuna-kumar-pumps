@@ -29,13 +29,15 @@
 
       <!-- which pump, which claim, whose: one box over the loaded board -->
       <div class="mb-4 flex flex-wrap items-center gap-2">
-        <FormControl
-          class="w-full sm:w-96"
-          v-model="search"
-          type="text"
-          :placeholder="__('Serial, claim no, model, dealer or customer')"
-          autocomplete="off"
-        />
+        <!-- width on the wrapper: frappe-ui's FormControl root is w-full -->
+        <div class="w-full sm:w-80">
+          <FormControl
+            v-model="search"
+            type="text"
+            :placeholder="__('Serial, claim no, model, dealer or customer')"
+            autocomplete="off"
+          />
+        </div>
         <Button
           v-if="search || filter"
           variant="subtle"

@@ -42,7 +42,10 @@
       <!-- waiting ------------------------------------------------------ -->
       <div class="mb-2 flex items-center gap-3">
         <h2 class="text-sm font-semibold text-ink-gray-8">{{ __("Waiting for a visit") }}</h2>
-        <FormControl v-model="q" class="w-64" type="text" :placeholder="__('Serial, customer, dealer')" />
+        <!-- width on the wrapper: frappe-ui's FormControl root is w-full -->
+        <div class="w-full sm:w-64">
+          <FormControl v-model="q" type="text" :placeholder="__('Serial, customer, dealer')" />
+        </div>
       </div>
 
       <div v-if="board.loading" class="py-8 text-center text-ink-gray-5">{{ __("Loading...") }}</div>

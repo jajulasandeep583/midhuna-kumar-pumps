@@ -12,9 +12,17 @@
     </LayoutHeader>
 
     <div class="px-5 py-5">
-      <div class="mb-4 flex flex-wrap items-center gap-3">
-        <FormControl v-model="q" class="w-72" type="text" :placeholder="searchHint" />
-        <FormControl v-model="state" type="select" class="w-52" :options="stateOptions" />
+      <!-- Width goes on a wrapper, never on the FormControl: frappe-ui's root
+           carries w-full, so a w-52 on the component loses and the control
+           spans the page - which is how the status filter ended up a
+           full-width bar on its own line. -->
+      <div class="mb-4 flex flex-wrap items-center gap-2">
+        <div class="w-full sm:w-64">
+          <FormControl v-model="q" type="text" :placeholder="searchHint" />
+        </div>
+        <div class="w-40">
+          <FormControl v-model="state" type="select" :options="stateOptions" />
+        </div>
         <span class="text-sm text-ink-gray-5">
           {{ __("{0} of {1}", [String(rows.length), String(all.length)]) }}
           <span v-if="openCount" class="ml-1 text-ink-gray-7">
