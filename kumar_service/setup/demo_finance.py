@@ -98,6 +98,96 @@ def _cash_account():
 	)
 
 
+RECLASS_TITLE = "Opening stock reclassified out of Stock Adjustment"
+
+
+def reclassify_opening_stock():
+	"""Move opening stock off the P&L and into equity, where it belongs.
+
+	The seed brings stock on hand in with Material Receipt entries. ERPNext
+	balances a Material Receipt by crediting the Stock Adjustment account, which
+	is an EXPENSE - so bringing in 52 lakh of opening stock parked minus 52 lakh
+	in expenses. The P&L then read "Expenses: -6.38L" and showed a 22.98L profit
+	on 16.60L of income, which is not a small cosmetic problem: negative expenses
+	make the software look broken to the one person in the room who reads a P&L
+	properly.
+
+	Opening stock is not a cost of trading, it is what the owner started with, so
+	the contra belongs in Opening Balance Equity. This posts that reclassification
+	rather than touching the submitted stock entries: same accounts, same totals,
+	no stock re-posted, and it can be cancelled if anyone disagrees.
+
+	Idempotent - it only moves what is still sitting in Stock Adjustment.
+
+		bench --site kumarpumps.localhost execute \\
+			kumar_service.setup.demo_finance.reclassify_opening_stock
+	"""
+	adjustment = _account("Stock Adjustment", "Expense")
+	equity = _account("Opening Balance Equity", "Equity")
+	if not adjustment or not equity:
+		_log("! no Stock Adjustment / Opening Balance Equity account - skipping")
+		return {}
+
+	rows = frappe.db.sql(
+		"""
+		select gl.posting_date, round(sum(gl.credit - gl.debit), 2) net
+		from `tabGL Entry` gl
+		where gl.is_cancelled = 0 and gl.account = %s and gl.voucher_type = 'Stock Entry'
+		group by gl.posting_date having net > 0 order by gl.posting_date
+		""",
+		adjustment,
+		as_dict=True,
+	)
+	if not rows:
+		_log("  + Stock Adjustment carries no opening stock - nothing to reclassify")
+		return {}
+
+	cost_centre = frappe.db.get_value(
+		"Cost Center", {"company": COMPANY, "is_group": 0, "cost_center_name": "Main"}
+	) or frappe.db.get_value("Cost Center", {"company": COMPANY, "is_group": 0})
+
+	made = []
+	for row in rows:
+		# one entry per posting date, so a P&L for ANY month nets to zero rather
+		# than only the year as a whole
+		if frappe.db.exists("Journal Entry", {
+			"title": RECLASS_TITLE, "posting_date": row.posting_date, "docstatus": 1,
+		}):
+			continue
+
+		def _je(row=row):
+			je = frappe.new_doc("Journal Entry")
+			je.title = RECLASS_TITLE
+			je.voucher_type = "Journal Entry"
+			je.company = COMPANY
+			je.posting_date = row.posting_date
+			je.user_remark = (
+				"Opening stock brought in by Material Receipt credits Stock Adjustment, "
+				"an expense account. Reclassified to Opening Balance Equity so the P&L "
+				"shows trading, not the stock the business started with."
+			)
+			je.append("accounts", {
+				"account": adjustment, "debit_in_account_currency": row.net,
+				"cost_center": cost_centre,
+			})
+			je.append("accounts", {
+				"account": equity, "credit_in_account_currency": row.net,
+				"cost_center": cost_centre,
+			})
+			je.flags.ignore_permissions = True
+			je.insert(ignore_permissions=True)
+			je.submit()
+			return je.name
+
+		name = _try(f"reclassify {row.posting_date} {row.net:,.2f}", _je)
+		if name:
+			made.append(name)
+			frappe.db.commit()
+
+	_log(f"  + reclassified opening stock on {len(made)} date(s)")
+	return {"journal_entries": made}
+
+
 # ---------------------------------------------------------------- masters
 
 
